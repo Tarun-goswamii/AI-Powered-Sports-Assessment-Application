@@ -1,6 +1,7 @@
 // lib/features/home/presentation/screens/home_screen.dart
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../shared/presentation/widgets/glass_card.dart';
 import '../../../../shared/presentation/widgets/neon_button.dart';
@@ -96,17 +97,12 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
               children: [
                 Text(
                   'Hello, $userName',
-                  style: const TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
-                  ),
+                  style: AppTypography.h2,
                 ),
                 const SizedBox(height: 4),
-                const Text(
+                Text(
                   'Ready to assess your performance?',
-                  style: TextStyle(
-                    fontSize: 14,
+                  style: AppTypography.bodyMedium.copyWith(
                     color: AppColors.textSecondary,
                   ),
                 ),
@@ -376,15 +372,68 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
   }
 
   void _showDailyBonusDialog() {
-    // TODO: Show daily bonus modal
+    showDialog(
+      context: context,
+      builder: (context) => Dialog(
+        backgroundColor: Colors.transparent,
+        child: GlassCard(
+          padding: AppSpacing.paddingLarge,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Icon(
+                Icons.celebration,
+                size: 64,
+                color: AppColors.neonGreen,
+              ),
+              const SizedBox(height: 16),
+              Text(
+                'Daily Bonus!',
+                style: AppTypography.h2,
+              ),
+              const SizedBox(height: 8),
+              Text(
+                'Claim your daily login bonus of 10 credits!',
+                style: AppTypography.bodyMedium,
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 24),
+              NeonButton(
+                text: 'Claim Bonus',
+                onPressed: () {
+                  Navigator.of(context).pop();
+                  // TODO: Award credits
+                },
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
   }
 
   void _onQuickAccessTap(String title) {
-    // TODO: Navigate to feature
+    switch (title) {
+      case 'Mentors':
+        context.go('/mentors');
+        break;
+      case 'Community':
+        context.go('/community');
+        break;
+      case 'Nutrition':
+        // TODO: Navigate to nutrition screen
+        break;
+      case 'Recovery':
+        // TODO: Navigate to recovery screen
+        break;
+      case 'Body Logs':
+        // TODO: Navigate to body logs screen
+        break;
+    }
   }
 
   void _onTestTap(String testId) {
-    // TODO: Navigate to test detail
+    context.go('/test-detail?testId=$testId');
   }
 
   @override
