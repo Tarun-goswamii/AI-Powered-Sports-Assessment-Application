@@ -1,0 +1,118 @@
+name: sports_assessment_app
+description: AI-Powered Sports Talent Assessment Platform
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: '>=3.2.0 <4.0.0'
+  flutter: '>=3.16.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  # State Management
+  flutter_riverpod: ^2.4.9
+  freezed_annotation: ^2.4.1
+
+  # Navigation
+  go_router: ^12.1.3
+
+  # Backend & Database
+  supabase_flutter: ^2.0.2
+  hive: ^2.2.3
+  hive_flutter: ^1.1.0
+
+  # Storage & Preferences
+  shared_preferences: ^2.2.2
+  flutter_secure_storage: ^9.0.0
+  path_provider: ^2.1.1
+
+  # Networking
+  dio: ^5.3.2
+  connectivity_plus: ^5.0.2
+
+  # UI & Animations
+  cached_network_image: ^3.3.0
+  flutter_svg: ^2.0.9
+  google_fonts: ^6.1.0
+  lottie: ^2.7.0
+  flutter_staggered_animations: ^1.1.1
+
+  # Camera & Media
+  camera: ^0.10.5+5
+  video_player: ^2.8.1
+  image_picker: ^1.0.4
+
+  # Permissions & Device
+  permission_handler: ^11.1.0
+  device_info_plus: ^9.1.0
+  package_info_plus: ^4.2.0
+
+  # Location & Maps
+  geolocator: ^10.1.0
+  geocoding: ^2.1.1
+
+  # Notifications
+  flutter_local_notifications: ^17.2.0
+  firebase_messaging: ^14.7.9
+
+  # Charts & Data Visualization
+  fl_chart: ^0.65.0
+
+  # Utils
+  intl: ^0.18.1
+  uuid: ^4.2.1
+  url_launcher: ^6.2.2
+  share_plus: ^7.2.1
+
+  # JSON & Serialization
+  json_annotation: ^4.8.1
+  equatable: ^2.0.5
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^3.0.1
+
+  # Code Generation
+  build_runner: ^2.4.7
+  freezed: ^2.4.6
+  json_serializable: ^6.7.1
+  hive_generator: ^2.0.1
+
+  # App Configuration
+  flutter_launcher_icons: ^0.13.1
+  flutter_native_splash: ^2.3.6
+
+  # Testing
+  mockito: ^5.4.4
+  integration_test:
+    sdk: flutter
+
+flutter:
+  uses-material-design: true
+
+  assets:
+    - assets/images/
+    - assets/icons/
+    - assets/animations/
+
+# App Icons Configuration
+flutter_launcher_icons:
+  android: true
+  ios: true
+  image_path: "assets/icons/app_icon.png"
+  adaptive_icon_background: "#121212"
+  adaptive_icon_foreground: "assets/icons/app_icon_foreground.png"
+
+# Splash Screen Configuration
+flutter_native_splash:
+  color: "#121212"
+  image: "assets/images/splash_logo.png"
+  android_gravity: center
+  ios_content_mode: center
+  web: false
+  android_12:
+    image: "assets/images/splash_logo.png"
+    color: "#121212"
