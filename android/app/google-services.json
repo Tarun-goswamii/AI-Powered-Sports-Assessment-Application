@@ -1,0 +1,46 @@
+{
+  "project_info": {
+    "project_number": "353205052706",
+    "project_id": "ai-sport-assessment",
+    "storage_bucket": "ai-sport-assessment.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:353205052706:android:5815e7b99f14911b32317b",
+        "android_client_info": {
+          "package_name": "com.example.sports_talent_assessment"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "353205052706-lmboojmhr1bl58nq8apijrko5lrnu8ik.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAPifHu945t_OZ9HkFkLW9hlHRyFRy8Kug"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "353205052706-lmboojmhr1bl58nq8apijrko5lrnu8ik.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "353205052706-4gq8s4kqbujo56bdd2gp51jd7gl605iu.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.aisport.app"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

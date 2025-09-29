@@ -6,7 +6,7 @@ import '../../../../core/theme/app_layout.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../shared/presentation/widgets/glass_card.dart';
 import '../../../../shared/presentation/widgets/neon_button.dart';
-import '../widgets/test_card.dart';
+import '../widgets/test_card_new.dart';
 import '../widgets/progress_card.dart';
 import '../widgets/quick_access_card.dart';
 import '../widgets/daily_login_bonus.dart';
@@ -76,7 +76,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
             onRefresh: _handleRefresh,
             child: SingleChildScrollView(
               physics: const AlwaysScrollableScrollPhysics(),
-              padding: AppLayout.homeScreenPadding,
+              padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
               child: FadeTransition(
                 opacity: _fadeAnimation,
                 child: SlideTransition(
