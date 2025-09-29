@@ -27,7 +27,7 @@ class TestCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       width: 160,
-      height: 180,
+      height: 150, // Reduced height to prevent overflow
       decoration: BoxDecoration(
         color: AppColors.card,
         borderRadius: BorderRadius.circular(16),
@@ -49,7 +49,7 @@ class TestCard extends StatelessWidget {
           onTap: onStartTest,
           borderRadius: BorderRadius.circular(16),
           child: Padding(
-            padding: const EdgeInsets.all(16),
+            padding: const EdgeInsets.all(12), // Reduced padding
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
@@ -58,11 +58,11 @@ class TestCard extends StatelessWidget {
                   alignment: Alignment.center,
                   children: [
                     Container(
-                      width: 48,
-                      height: 48,
+                      width: 40, // Reduced size
+                      height: 40,
                       decoration: BoxDecoration(
                         color: _getStatusColor().withOpacity(0.1),
-                        borderRadius: BorderRadius.circular(12),
+                        borderRadius: BorderRadius.circular(10),
                         border: Border.all(
                           color: _getStatusColor().withOpacity(0.3),
                           width: 1,
@@ -71,7 +71,7 @@ class TestCard extends StatelessWidget {
                       child: Icon(
                         icon,
                         color: _getStatusColor(),
-                        size: 24,
+                        size: 20,
                       ),
                     ),
                     if (status == TestStatus.completed)
@@ -79,8 +79,8 @@ class TestCard extends StatelessWidget {
                         top: -2,
                         right: -2,
                         child: Container(
-                          width: 18,
-                          height: 18,
+                          width: 16,
+                          height: 16,
                           decoration: BoxDecoration(
                             color: AppColors.success,
                             shape: BoxShape.circle,
@@ -92,17 +92,17 @@ class TestCard extends StatelessWidget {
                           child: const Icon(
                             Icons.check,
                             color: Colors.white,
-                            size: 10,
+                            size: 8,
                           ),
                         ),
                       ),
                   ],
                 ),
-                const SizedBox(height: 12),
+                const SizedBox(height: 8),
                 Text(
                   title,
                   style: const TextStyle(
-                    fontSize: 14,
+                    fontSize: 13,
                     fontWeight: FontWeight.w600,
                     color: Colors.white,
                   ),
@@ -110,51 +110,51 @@ class TestCard extends StatelessWidget {
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
                 ),
-                const SizedBox(height: 6),
+                const SizedBox(height: 4),
                 Text(
                   description,
                   style: TextStyle(
-                    fontSize: 11,
+                    fontSize: 10,
                     color: AppColors.textSecondary,
-                    height: 1.3,
+                    height: 1.2,
                   ),
                   textAlign: TextAlign.center,
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
                 ),
                 if (duration != null || difficulty != null) ...[
-                  const SizedBox(height: 8),
+                  const SizedBox(height: 6),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       if (duration != null) ...[
                         Icon(
                           Icons.timer,
-                          size: 12,
+                          size: 10,
                           color: AppColors.textSecondary,
                         ),
                         const SizedBox(width: 2),
                         Text(
                           '${duration}min',
                           style: TextStyle(
-                            fontSize: 10,
+                            fontSize: 9,
                             color: AppColors.textSecondary,
                             fontWeight: FontWeight.w500,
                           ),
                         ),
                       ],
                       if (difficulty != null) ...[
-                        if (duration != null) const SizedBox(width: 6),
+                        if (duration != null) const SizedBox(width: 4),
                         Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1),
+                          padding: const EdgeInsets.symmetric(horizontal: 3, vertical: 1),
                           decoration: BoxDecoration(
                             color: _getDifficultyColor().withOpacity(0.1),
-                            borderRadius: BorderRadius.circular(6),
+                            borderRadius: BorderRadius.circular(4),
                           ),
                           child: Text(
                             difficulty!,
                             style: TextStyle(
-                              fontSize: 9,
+                              fontSize: 8,
                               color: _getDifficultyColor(),
                               fontWeight: FontWeight.w600,
                             ),
@@ -164,21 +164,21 @@ class TestCard extends StatelessWidget {
                     ],
                   ),
                 ],
-                const SizedBox(height: 12),
+                const SizedBox(height: 8),
                 SizedBox(
                   width: double.infinity,
-                  height: 32,
+                  height: 28, // Reduced button height
                   child: ElevatedButton(
                     onPressed: onStartTest,
                     style: ElevatedButton.styleFrom(
                       backgroundColor: _getStatusColor(),
                       foregroundColor: Colors.white,
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
+                        borderRadius: BorderRadius.circular(6),
                       ),
                       padding: EdgeInsets.zero,
                       textStyle: const TextStyle(
-                        fontSize: 12,
+                        fontSize: 11,
                         fontWeight: FontWeight.w600,
                       ),
                     ),

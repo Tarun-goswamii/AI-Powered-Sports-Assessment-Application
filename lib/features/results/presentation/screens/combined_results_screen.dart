@@ -122,8 +122,6 @@ class _CombinedResultsScreenState extends State<CombinedResultsScreen>
           // Performance Summary
           GlassCard(
             padding: const EdgeInsets.all(24),
-            enableNeonGlow: true,
-            neonGlowColor: AppColors.neonGreen,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [

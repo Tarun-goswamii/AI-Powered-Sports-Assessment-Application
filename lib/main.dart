@@ -1,8 +1,6 @@
-// lib/main.dart
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -18,13 +16,6 @@ void main() async {
 
   // Initialize Hive for local storage
   await Hive.initFlutter();
-
-  // Initialize Supabase
-  await Supabase.initialize(
-    url: AppConfig.supabaseUrl,
-    anonKey: AppConfig.supabaseAnonKey,
-    debug: AppConfig.enableLogging,
-  );
 
   // Set system UI overlay style for dark theme
   SystemChrome.setSystemUIOverlayStyle(
