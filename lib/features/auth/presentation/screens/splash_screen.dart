@@ -12,11 +12,12 @@ class SplashScreen extends StatefulWidget {
 
 class _SplashScreenState extends State<SplashScreen>
     with TickerProviderStateMixin {
-  late AnimationController _logoController;
+  late AnimationController _logoAnimationController;
   late Animation<double> _logoScaleAnimation;
   late Animation<double> _logoOpacityAnimation;
 
-  late AnimationController _textController;
+  late AnimationController _textAnimationController;
+  late Animation<Offset> _textSlideAnimation;
   late Animation<double> _textOpacityAnimation;
 
   @override
@@ -28,52 +29,66 @@ class _SplashScreenState extends State<SplashScreen>
 
   void _setupAnimations() {
     // Logo animations
-    _logoController = AnimationController(
+    _logoAnimationController = AnimationController(
       duration: const Duration(milliseconds: 1500),
       vsync: this,
     );
 
-    _logoScaleAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
-      CurvedAnimation(
-        parent: _logoController,
-        curve: Curves.elasticOut,
-      ),
-    );
+    _logoScaleAnimation = Tween<double>(
+      begin: 0.5,
+      end: 1.0,
+    ).animate(CurvedAnimation(
+      parent: _logoAnimationController,
+      curve: Curves.elasticOut,
+    ));
 
-    _logoOpacityAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
-      CurvedAnimation(
-        parent: _logoController,
-        curve: const Interval(0.0, 0.7, curve: Curves.easeIn),
-      ),
-    );
+    _logoOpacityAnimation = Tween<double>(
+      begin: 0.0,
+      end: 1.0,
+    ).animate(CurvedAnimation(
+      parent: _logoAnimationController,
+      curve: Curves.easeIn,
+    ));
 
     // Text animations
-    _textController = AnimationController(
+    _textAnimationController = AnimationController(
       duration: const Duration(milliseconds: 1000),
       vsync: this,
     );
 
-    _textOpacityAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
-      CurvedAnimation(
-        parent: _textController,
-        curve: Curves.easeIn,
-      ),
-    );
+    _textSlideAnimation = Tween<Offset>(
+      begin: const Offset(0, 1),
+      end: Offset.zero,
+    ).animate(CurvedAnimation(
+      parent: _textAnimationController,
+      curve: Curves.easeOutCubic,
+    ));
+
+    _textOpacityAnimation = Tween<double>(
+      begin: 0.0,
+      end: 1.0,
+    ).animate(CurvedAnimation(
+      parent: _textAnimationController,
+      curve: Curves.easeIn,
+    ));
 
     // Start animations
-    _logoController.forward().then((_) {
-      _textController.forward();
+    _logoAnimationController.forward().then((_) {
+      _textAnimationController.forward();
     });
   }
 
   void _navigateToNextScreen() async {
-    // Simulate loading time
     await Future.delayed(const Duration(seconds: 3));
-
     if (mounted) {
-      // TODO: Check if user has seen onboarding
-      // For now, always go to onboarding
-      context.go('/onboarding');
+      // Check if user has seen onboarding
+      final hasSeenOnboarding = false; // TODO: Get from shared preferences
+
+      if (hasSeenOnboarding) {
+        context.go('/auth');
+      } else {
+        context.go('/onboarding');
+      }
     }
   }
 
@@ -90,9 +105,9 @@ class _SplashScreenState extends State<SplashScreen>
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                // Animated Logo
+                // Animated logo
                 AnimatedBuilder(
-                  animation: _logoController,
+                  animation: _logoAnimationController,
                   builder: (context, child) {
                     return Transform.scale(
                       scale: _logoScaleAnimation.value,
@@ -102,9 +117,27 @@ class _SplashScreenState extends State<SplashScreen>
                           width: 120,
                           height: 120,
                           decoration: BoxDecoration(
-                            gradient: AppGradients.purpleBlue,
-                            shape: BoxShape.circle,
-                            boxShadow: AppColors.neonGlowPurple,
+                            gradient: LinearGradient(
+                              colors: [
+                                AppColors.royalPurple.withOpacity(0.8),
+                                AppColors.electricBlue.withOpacity(0.6),
+                              ],
+                              begin: Alignment.topLeft,
+                              end: Alignment.bottomRight,
+                            ),
+                            borderRadius: BorderRadius.circular(30),
+                            boxShadow: [
+                              BoxShadow(
+                                color: AppColors.royalPurple.withOpacity(0.4),
+                                blurRadius: 30,
+                                spreadRadius: 5,
+                              ),
+                              BoxShadow(
+                                color: AppColors.electricBlue.withOpacity(0.3),
+                                blurRadius: 20,
+                                spreadRadius: 2,
+                              ),
+                            ],
                           ),
                           child: const Icon(
                             Icons.sports_soccer,
@@ -116,86 +149,55 @@ class _SplashScreenState extends State<SplashScreen>
                     );
                   },
                 ),
-
-                const SizedBox(height: 32),
-
-                // App Name
+                const SizedBox(height: 40),
+                // Animated text
                 AnimatedBuilder(
-                  animation: _textController,
+                  animation: _textAnimationController,
                   builder: (context, child) {
-                    return Opacity(
-                      opacity: _textOpacityAnimation.value,
-                      child: Column(
-                        children: [
-                          Text(
-                            'Sports Assessment',
-                            style: TextStyle(
-                              fontSize: 28,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.white,
-                              shadows: [
-                                Shadow(
-                                  color: AppColors.royalPurple.withOpacity(0.5),
-                                  blurRadius: 10,
-                                  offset: const Offset(0, 2),
-                                ),
-                              ],
+                    return SlideTransition(
+                      position: _textSlideAnimation,
+                      child: Opacity(
+                        opacity: _textOpacityAnimation.value,
+                        child: Column(
+                          children: [
+                            Text(
+                              'Sports Assessment',
+                              style: const TextStyle(
+                                fontSize: 28,
+                                fontWeight: FontWeight.w700,
+                                color: Colors.white,
+                                letterSpacing: -0.5,
+                              ),
+                              textAlign: TextAlign.center,
                             ),
-                          ),
-                          const SizedBox(height: 8),
-                          Text(
-                            'AI-Powered Talent Platform',
-                            style: TextStyle(
-                              fontSize: 16,
-                              color: AppColors.textSecondary,
-                              letterSpacing: 1.2,
+                            const SizedBox(height: 8),
+                            Text(
+                              'AI-Powered Talent Evaluation',
+                              style: TextStyle(
+                                fontSize: 16,
+                                color: AppColors.textSecondary.withOpacity(0.8),
+                                fontWeight: FontWeight.w400,
+                                letterSpacing: 0.2,
+                              ),
+                              textAlign: TextAlign.center,
                             ),
-                          ),
-                        ],
-                      ),
-                    );
-                  },
-                ),
-
-                const SizedBox(height: 64),
-
-                // Loading Indicator
-                AnimatedBuilder(
-                  animation: _textController,
-                  builder: (context, child) {
-                    return Opacity(
-                      opacity: _textOpacityAnimation.value,
-                      child: SizedBox(
-                        width: 32,
-                        height: 32,
-                        child: CircularProgressIndicator(
-                          strokeWidth: 3,
-                          valueColor: AlwaysStoppedAnimation<Color>(
-                            AppColors.electricBlue,
-                          ),
+                          ],
                         ),
                       ),
                     );
                   },
                 ),
-
-                const SizedBox(height: 32),
-
-                // Version
-                AnimatedBuilder(
-                  animation: _textController,
-                  builder: (context, child) {
-                    return Opacity(
-                      opacity: _textOpacityAnimation.value * 0.7,
-                      child: Text(
-                        'v1.0.0',
-                        style: TextStyle(
-                          fontSize: 12,
-                          color: AppColors.textTertiary,
-                        ),
-                      ),
-                    );
-                  },
+                const SizedBox(height: 60),
+                // Loading indicator
+                SizedBox(
+                  width: 40,
+                  height: 40,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 3,
+                    valueColor: AlwaysStoppedAnimation<Color>(
+                      AppColors.royalPurple,
+                    ),
+                  ),
                 ),
               ],
             ),
@@ -207,8 +209,8 @@ class _SplashScreenState extends State<SplashScreen>
 
   @override
   void dispose() {
-    _logoController.dispose();
-    _textController.dispose();
+    _logoAnimationController.dispose();
+    _textAnimationController.dispose();
     super.dispose();
   }
 }

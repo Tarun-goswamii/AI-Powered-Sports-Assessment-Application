@@ -1,538 +1,595 @@
+// lib/features/store/presentation/screens/store_screen.dart
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:google_fonts/google_fonts.dart';
-import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
-
+import 'package:go_router/go_router.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../shared/presentation/widgets/glass_card.dart';
 import '../../../../shared/presentation/widgets/neon_button.dart';
 
-class StoreScreen extends ConsumerStatefulWidget {
+class StoreScreen extends StatefulWidget {
   const StoreScreen({super.key});
 
   @override
-  ConsumerState<StoreScreen> createState() => _StoreScreenState();
+  State<StoreScreen> createState() => _StoreScreenState();
 }
 
-class _StoreScreenState extends ConsumerState<StoreScreen>
+class _StoreScreenState extends State<StoreScreen>
     with TickerProviderStateMixin {
-  late AnimationController _fadeController;
-  late Animation<double> _fadeAnimation;
-
-  final List<String> _categories = ['All', 'Supplements', 'Equipment', 'Nutrition', 'Recovery'];
-  String _selectedCategory = 'All';
-
-  final List<Map<String, dynamic>> _products = [
-    {
-      'name': 'Whey Protein Isolate',
-      'brand': 'SportsAI Verified',
-      'price': 2999,
-      'originalPrice': 3499,
-      'rating': 4.8,
-      'reviews': 1247,
-      'image': 'protein',
-      'category': 'Supplements',
-      'discount': 14,
-      'description': 'Premium whey protein isolate for optimal muscle recovery',
-      'benefits': ['High protein content', 'Fast absorption', 'Verified quality'],
-    },
-    {
-      'name': 'Creatine Monohydrate',
-      'brand': 'SportsAI Verified',
-      'price': 1299,
-      'originalPrice': 1499,
-      'rating': 4.9,
-      'reviews': 892,
-      'image': 'creatine',
-      'category': 'Supplements',
-      'discount': 13,
-      'description': 'Pure creatine monohydrate for enhanced performance',
-      'benefits': ['Increases strength', 'Improves recovery', 'Scientifically proven'],
-    },
-    {
-      'name': 'Resistance Bands Set',
-      'brand': 'Pro Fitness',
-      'price': 899,
-      'originalPrice': 1199,
-      'rating': 4.6,
-      'reviews': 456,
-      'image': 'bands',
-      'category': 'Equipment',
-      'discount': 25,
-      'description': 'Complete resistance band set for home workouts',
-      'benefits': ['Multiple resistance levels', 'Portable', 'Durable'],
-    },
-    {
-      'name': 'BCAA Complex',
-      'brand': 'SportsAI Verified',
-      'price': 1899,
-      'originalPrice': 2199,
-      'rating': 4.7,
-      'reviews': 634,
-      'image': 'bcaa',
-      'category': 'Supplements',
-      'discount': 14,
-      'description': 'Essential amino acids for muscle preservation',
-      'benefits': ['Reduces muscle breakdown', 'Enhances recovery', 'Intra-workout support'],
-    },
-  ];
+  late TabController _tabController;
+  final List<Map<String, dynamic>> _cartItems = [];
 
   @override
   void initState() {
     super.initState();
-    _fadeController = AnimationController(
-      duration: const Duration(milliseconds: 800),
-      vsync: this,
-    );
-    _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
-      CurvedAnimation(parent: _fadeController, curve: Curves.easeOut),
-    );
-    _fadeController.forward();
+    _tabController = TabController(length: 4, vsync: this);
   }
 
   @override
   void dispose() {
-    _fadeController.dispose();
+    _tabController.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final size = MediaQuery.of(context).size;
-
-    return Scaffold(
-      backgroundColor: theme.scaffoldBackgroundColor,
-      body: Container(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [
-              AppColors.primary.withOpacity(0.1),
-              AppColors.background,
-              AppColors.secondary.withOpacity(0.1),
-            ],
-          ),
-        ),
-        child: SafeArea(
-          child: FadeTransition(
-            opacity: _fadeAnimation,
-            child: CustomScrollView(
-              physics: const BouncingScrollPhysics(),
-              slivers: [
-                // Header with Credits
-                SliverAppBar(
-                  backgroundColor: Colors.transparent,
-                  elevation: 0,
-                  floating: true,
-                  pinned: false,
-                  flexibleSpace: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-                    child: Column(
-                      children: [
-                        Row(
-                          children: [
-                            IconButton(
-                              onPressed: () => Navigator.of(context).pop(),
-                              icon: Icon(
-                                Icons.arrow_back_ios_new,
-                                color: AppColors.electricBlue,
-                                size: 24,
-                              ),
-                            ),
-                            const SizedBox(width: 16),
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  Text(
-                                    'VERIFIED STORE',
-                                    style: GoogleFonts.inter(
-                                      fontSize: 28,
-                                      fontWeight: FontWeight.bold,
-                                      color: AppColors.electricBlue,
-                                      letterSpacing: 1.2,
-                                    ),
-                                  ),
-                                  Text(
-                                    'Premium sports supplements & equipment',
-                                    style: GoogleFonts.inter(
-                                      fontSize: 14,
-                                      color: AppColors.textSecondary,
-                                      fontWeight: FontWeight.w400,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                            Container(
-                              padding: const EdgeInsets.all(12),
-                              decoration: BoxDecoration(
-                                color: AppColors.electricBlue.withOpacity(0.1),
-                                borderRadius: BorderRadius.circular(16),
-                                border: Border.all(
-                                  color: AppColors.electricBlue.withOpacity(0.3),
-                                  width: 1,
-                                ),
-                              ),
-                              child: Icon(
-                                Icons.store,
-                                color: AppColors.electricBlue,
-                                size: 24,
-                              ),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 16),
-                        _buildCreditsCard(),
-                      ],
+    return Container(
+      decoration: BoxDecoration(
+        gradient: AppColors.backgroundGradient,
+      ),
+      child: SafeArea(
+        child: Column(
+          children: [
+            // Header with Credits
+            Padding(
+              padding: const EdgeInsets.all(20),
+              child: Row(
+                children: [
+                  IconButton(
+                    onPressed: () => context.go('/home'),
+                    icon: const Icon(Icons.arrow_back, color: Colors.white),
+                    style: IconButton.styleFrom(
+                      backgroundColor: AppColors.card.withOpacity(0.5),
+                      padding: const EdgeInsets.all(12),
                     ),
                   ),
-                  expandedHeight: 140,
-                ),
-
-                // Categories
-                SliverToBoxAdapter(
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 20),
-                    child: AnimationLimiter(
-                      child: Column(
-                        children: AnimationConfiguration.toStaggeredList(
-                          duration: const Duration(milliseconds: 600),
-                          childAnimationBuilder: (widget) => SlideAnimation(
-                            verticalOffset: 30.0,
-                            child: FadeInAnimation(child: widget),
-                          ),
-                          children: [
-                            const SizedBox(height: 8),
-                            _buildCategories(),
-                            const SizedBox(height: 24),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-
-                // Featured Products
-                SliverToBoxAdapter(
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 20),
+                  const SizedBox(width: 16),
+                  const Expanded(
                     child: Text(
-                      'FEATURED PRODUCTS',
-                      style: GoogleFonts.inter(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                        color: AppColors.electricBlue,
-                        letterSpacing: 1.0,
+                      'Store',
+                      style: TextStyle(
+                        fontSize: 28,
+                        fontWeight: FontWeight.w700,
+                        color: Colors.white,
                       ),
                     ),
                   ),
-                ),
-
-                // Products Grid
-                SliverPadding(
-                  padding: const EdgeInsets.all(20),
-                  sliver: SliverGrid(
-                    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 2,
-                      mainAxisSpacing: 16,
-                      crossAxisSpacing: 16,
-                      childAspectRatio: 0.75,
-                    ),
-                    delegate: SliverChildBuilderDelegate(
-                      (context, index) {
-                        final product = _products[index % _products.length];
-                        return AnimationConfiguration.staggeredGrid(
-                          position: index,
-                          duration: const Duration(milliseconds: 600),
-                          columnCount: 2,
-                          child: ScaleAnimation(
-                            child: FadeInAnimation(
-                              child: _buildProductCard(product),
-                            ),
-                          ),
-                        );
-                      },
-                      childCount: _products.length,
-                    ),
+                  Row(
+                    children: [
+                      const Icon(
+                        Icons.monetization_on,
+                        color: AppColors.warmOrange,
+                        size: 20,
+                      ),
+                      const SizedBox(width: 4),
+                      const Text(
+                        '1,250',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                          color: AppColors.warmOrange,
+                        ),
+                      ),
+                      const SizedBox(width: 16),
+                      IconButton(
+                        onPressed: () => context.go('/profile'),
+                        icon: const Icon(Icons.person, color: Colors.white),
+                      ),
+                    ],
                   ),
-                ),
-
-                // Bottom spacing
-                const SliverToBoxAdapter(
-                  child: SizedBox(height: 32),
-                ),
-              ],
+                ],
+              ),
             ),
-          ),
+
+            // Tab Bar
+            Container(
+              margin: const EdgeInsets.symmetric(horizontal: 20),
+              decoration: BoxDecoration(
+                color: AppColors.card.withOpacity(0.3),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: TabBar(
+                controller: _tabController,
+                indicator: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [AppColors.royalPurple, AppColors.electricBlue],
+                  ),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                indicatorSize: TabBarIndicatorSize.tab,
+                dividerColor: Colors.transparent,
+                labelColor: Colors.white,
+                unselectedLabelColor: AppColors.textSecondary,
+                tabs: const [
+                  Tab(text: 'Supplements'),
+                  Tab(text: 'Equipment'),
+                  Tab(text: 'Nutrition'),
+                  Tab(text: 'Cart'),
+                ],
+              ),
+            ),
+
+            // Tab Content
+            Expanded(
+              child: TabBarView(
+                controller: _tabController,
+                children: [
+                  _buildSupplementsTab(),
+                  _buildEquipmentTab(),
+                  _buildNutritionTab(),
+                  _buildCartTab(),
+                ],
+              ),
+            ),
+          ],
         ),
       ),
     );
   }
 
-  Widget _buildCreditsCard() {
-    return GlassCard(
-      padding: const EdgeInsets.all(16),
-      child: Row(
+  Widget _buildSupplementsTab() {
+    return SingleChildScrollView(
+      padding: const EdgeInsets.all(20),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Container(
-            padding: const EdgeInsets.all(10),
-            decoration: BoxDecoration(
-              color: AppColors.neonGreen.withOpacity(0.1),
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: Icon(
-              Icons.stars,
-              color: AppColors.neonGreen,
-              size: 20,
+          const Text(
+            'Performance Supplements',
+            style: TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.w600,
+              color: Colors.white,
             ),
           ),
-          const SizedBox(width: 12),
-          Expanded(
+          const SizedBox(height: 16),
+
+          // Featured Product
+          GlassCard(
+            padding: const EdgeInsets.all(20),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  'Available Credits',
-                  style: GoogleFonts.inter(
-                    fontSize: 12,
-                    color: AppColors.textSecondary,
-                    fontWeight: FontWeight.w500,
+                Container(
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      colors: [AppColors.neonGreen, AppColors.neonGreen.withOpacity(0.6)],
+                    ),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: const Icon(
+                    Icons.science,
+                    color: Colors.white,
+                    size: 32,
                   ),
                 ),
-                Text(
-                  '1,250 Credits',
-                  style: GoogleFonts.inter(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                    color: AppColors.neonGreen,
+                const SizedBox(height: 16),
+                const Text(
+                  'Elite Whey Protein',
+                  style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.w700,
+                    color: Colors.white,
                   ),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  'Premium whey protein isolate for muscle recovery and growth. 25g protein per serving.',
+                  style: TextStyle(
+                    fontSize: 14,
+                    color: AppColors.textSecondary,
+                    height: 1.4,
+                  ),
+                ),
+                const SizedBox(height: 16),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    const Text(
+                      '500 credits',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w700,
+                        color: AppColors.warmOrange,
+                      ),
+                    ),
+                    NeonButton(
+                      text: 'Add to Cart',
+                      onPressed: () => _addToCart('Elite Whey Protein', 500),
+                      size: NeonButtonSize.small,
+                    ),
+                  ],
                 ),
               ],
             ),
           ),
-          NeonButton(
-            onPressed: () {},
-            text: 'EARN MORE',
-            size: NeonButtonSize.small,
-            variant: NeonButtonVariant.secondary,
+          const SizedBox(height: 24),
+
+          // Product Grid
+          GridView.count(
+            crossAxisCount: 2,
+            crossAxisSpacing: 16,
+            mainAxisSpacing: 16,
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            children: [
+              _buildProductCard(
+                'Creatine Monohydrate',
+                'Pure creatine for strength gains',
+                300,
+                AppColors.electricBlue,
+                Icons.fitness_center,
+              ),
+              _buildProductCard(
+                'BCAA Complex',
+                'Essential amino acids',
+                250,
+                AppColors.royalPurple,
+                Icons.science,
+              ),
+              _buildProductCard(
+                'Pre-Workout Boost',
+                'Energy and focus formula',
+                400,
+                AppColors.neonGreen,
+                Icons.bolt,
+              ),
+              _buildProductCard(
+                'Recovery Matrix',
+                'Post-workout recovery blend',
+                350,
+                AppColors.warmOrange,
+                Icons.healing,
+              ),
+            ],
           ),
         ],
       ),
     );
   }
 
-  Widget _buildCategories() {
+  Widget _buildEquipmentTab() {
     return SingleChildScrollView(
-      scrollDirection: Axis.horizontal,
-      physics: const BouncingScrollPhysics(),
-      child: Row(
-        children: _categories.map((category) {
-          final isSelected = category == _selectedCategory;
-          return Container(
-            margin: const EdgeInsets.only(right: 12),
-            child: InkWell(
-              onTap: () {
-                setState(() => _selectedCategory = category);
-              },
-              child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                decoration: BoxDecoration(
-                  color: isSelected
-                      ? AppColors.electricBlue.withOpacity(0.1)
-                      : AppColors.card,
-                  borderRadius: BorderRadius.circular(25),
-                  border: Border.all(
-                    color: isSelected
-                        ? AppColors.electricBlue
-                        : AppColors.electricBlue.withOpacity(0.3),
-                    width: 1,
-                  ),
-                ),
-                child: Text(
-                  category,
-                  style: GoogleFonts.inter(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w600,
-                    color: isSelected ? AppColors.electricBlue : AppColors.textSecondary,
-                  ),
-                ),
-              ),
+      padding: const EdgeInsets.all(20),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(
+            'Training Equipment',
+            style: TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.w600,
+              color: Colors.white,
             ),
-          );
-        }).toList(),
+          ),
+          const SizedBox(height: 16),
+
+          _buildProductCard(
+            'Professional Stopwatch',
+            'Precision timing for tests',
+            800,
+            AppColors.electricBlue,
+            Icons.timer,
+          ),
+          const SizedBox(height: 16),
+          _buildProductCard(
+            'Measuring Tape',
+            'Accurate body measurements',
+            200,
+            AppColors.royalPurple,
+            Icons.straighten,
+          ),
+          const SizedBox(height: 16),
+          _buildProductCard(
+            'Agility Cones Set',
+            'Complete set for agility training',
+            600,
+            AppColors.neonGreen,
+            Icons.flag,
+          ),
+          const SizedBox(height: 16),
+          _buildProductCard(
+            'Heart Rate Monitor',
+            'Real-time heart rate tracking',
+            1200,
+            AppColors.warmOrange,
+            Icons.monitor_heart,
+          ),
+        ],
       ),
     );
   }
 
-  Widget _buildProductCard(Map<String, dynamic> product) {
+  Widget _buildNutritionTab() {
+    return SingleChildScrollView(
+      padding: const EdgeInsets.all(20),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(
+            'Nutrition Plans',
+            style: TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.w600,
+              color: Colors.white,
+            ),
+          ),
+          const SizedBox(height: 16),
+
+          _buildProductCard(
+            'Athlete Meal Plan',
+            '7-day customized nutrition plan',
+            1500,
+            AppColors.neonGreen,
+            Icons.restaurant_menu,
+          ),
+          const SizedBox(height: 16),
+          _buildProductCard(
+            'Weight Gain Program',
+            'High-calorie nutrition guide',
+            1200,
+            AppColors.warmOrange,
+            Icons.trending_up,
+          ),
+          const SizedBox(height: 16),
+          _buildProductCard(
+            'Vegan Athlete Plan',
+            'Plant-based performance nutrition',
+            1300,
+            AppColors.royalPurple,
+            Icons.eco,
+          ),
+          const SizedBox(height: 16),
+          _buildProductCard(
+            'Recovery Nutrition',
+            'Post-workout meal planning',
+            1000,
+            AppColors.electricBlue,
+            Icons.healing,
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildCartTab() {
+    return SingleChildScrollView(
+      padding: const EdgeInsets.all(20),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              const Expanded(
+                child: Text(
+                  'Shopping Cart',
+                  style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.w600,
+                    color: Colors.white,
+                  ),
+                ),
+              ),
+              if (_cartItems.isNotEmpty)
+                Text(
+                  '${_cartItems.length} items',
+                  style: TextStyle(
+                    fontSize: 14,
+                    color: AppColors.textSecondary,
+                  ),
+                ),
+            ],
+          ),
+          const SizedBox(height: 16),
+
+          if (_cartItems.isEmpty)
+            Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(
+                    Icons.shopping_cart_outlined,
+                    size: 64,
+                    color: AppColors.textSecondary,
+                  ),
+                  const SizedBox(height: 16),
+                  Text(
+                    'Your cart is empty',
+                    style: TextStyle(
+                      fontSize: 18,
+                      color: AppColors.textSecondary,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    'Add some products to get started',
+                    style: TextStyle(
+                      fontSize: 14,
+                      color: AppColors.textSecondary,
+                    ),
+                  ),
+                ],
+              ),
+            )
+          else
+            Column(
+              children: [
+                ..._cartItems.map((item) => _buildCartItem(item)),
+                const SizedBox(height: 24),
+                GlassCard(
+                  padding: const EdgeInsets.all(20),
+                  child: Column(
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          const Text(
+                            'Total:',
+                            style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.w600,
+                              color: Colors.white,
+                            ),
+                          ),
+                          Text(
+                            '${_calculateTotal()} credits',
+                            style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.w700,
+                              color: AppColors.warmOrange,
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 16),
+                      NeonButton(
+                        text: 'Checkout',
+                        onPressed: () {},
+                        size: NeonButtonSize.medium,
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildProductCard(String name, String description, int price, Color color, IconData icon) {
     return GlassCard(
       padding: const EdgeInsets.all(16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Product Image Placeholder
-          Expanded(
-            child: Container(
-              decoration: BoxDecoration(
-                color: AppColors.card,
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(
-                  color: AppColors.electricBlue.withOpacity(0.3),
-                  width: 1,
-                ),
-              ),
-              child: Center(
-                child: Icon(
-                  _getProductIcon(product['image'] as String),
-                  color: AppColors.electricBlue,
-                  size: 48,
-                ),
-              ),
+          Container(
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: color.withOpacity(0.2),
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Icon(
+              icon,
+              color: color,
+              size: 24,
             ),
           ),
-
           const SizedBox(height: 12),
-
-          // Product Name
           Text(
-            product['name'] as String,
-            style: GoogleFonts.inter(
-              fontSize: 14,
-              fontWeight: FontWeight.bold,
-              color: AppColors.textPrimary,
+            name,
+            style: const TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.w600,
+              color: Colors.white,
             ),
-            maxLines: 2,
-            overflow: TextOverflow.ellipsis,
           ),
-
           const SizedBox(height: 4),
-
-          // Brand
           Text(
-            product['brand'] as String,
-            style: GoogleFonts.inter(
-              fontSize: 11,
+            description,
+            style: TextStyle(
+              fontSize: 12,
               color: AppColors.textSecondary,
-              fontWeight: FontWeight.w500,
+              height: 1.3,
             ),
           ),
-
-          const SizedBox(height: 8),
-
-          // Rating
-          Row(
-            children: [
-              Icon(
-                Icons.star,
-                color: AppColors.neonGreen,
-                size: 14,
-              ),
-              const SizedBox(width: 4),
-              Text(
-                '${product['rating']}',
-                style: GoogleFonts.inter(
-                  fontSize: 12,
-                  fontWeight: FontWeight.w600,
-                  color: AppColors.textPrimary,
-                ),
-              ),
-              Text(
-                ' (${product['reviews']})',
-                style: GoogleFonts.inter(
-                  fontSize: 10,
-                  color: AppColors.textSecondary,
-                ),
-              ),
-            ],
-          ),
-
-          const SizedBox(height: 8),
-
-          // Price
-          Row(
-            children: [
-              Text(
-                '₹${product['price']}',
-                style: GoogleFonts.inter(
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                  color: AppColors.neonGreen,
-                ),
-              ),
-              const SizedBox(width: 8),
-              Text(
-                '₹${product['originalPrice']}',
-                style: GoogleFonts.inter(
-                  fontSize: 12,
-                  color: AppColors.textSecondary,
-                  decoration: TextDecoration.lineThrough,
-                ),
-              ),
-              const SizedBox(width: 8),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                decoration: BoxDecoration(
-                  color: AppColors.brightRed.withOpacity(0.1),
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Text(
-                  '-${product['discount']}%',
-                  style: GoogleFonts.inter(
-                    fontSize: 10,
-                    fontWeight: FontWeight.bold,
-                    color: AppColors.brightRed,
-                  ),
-                ),
-              ),
-            ],
-          ),
-
           const SizedBox(height: 12),
-
-          // Add to Cart Button
-          SizedBox(
-            width: double.infinity,
-            height: 32,
-            child: ElevatedButton(
-              onPressed: () {},
-              style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.electricBlue,
-                foregroundColor: Colors.white,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                padding: EdgeInsets.zero,
-              ),
-              child: Text(
-                'ADD TO CART',
-                style: GoogleFonts.inter(
-                  fontSize: 12,
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                '$price credits',
+                style: TextStyle(
+                  fontSize: 14,
                   fontWeight: FontWeight.w600,
+                  color: AppColors.warmOrange,
                 ),
               ),
-            ),
+              IconButton(
+                onPressed: () => _addToCart(name, price),
+                icon: Icon(
+                  Icons.add_shopping_cart,
+                  color: color,
+                  size: 20,
+                ),
+              ),
+            ],
           ),
         ],
       ),
     );
   }
 
-  IconData _getProductIcon(String imageType) {
-    switch (imageType) {
-      case 'protein':
-        return Icons.fitness_center;
-      case 'creatine':
-        return Icons.science;
-      case 'bands':
-        return Icons.sports_gymnastics;
-      case 'bcaa':
-        return Icons.local_drink;
-      default:
-        return Icons.inventory;
-    }
+  Widget _buildCartItem(Map<String, dynamic> item) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 8),
+      child: GlassCard(
+        padding: const EdgeInsets.all(16),
+        child: Row(
+          children: [
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    item['name'],
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.white,
+                    ),
+                  ),
+                  Text(
+                    '${item['price']} credits',
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: AppColors.textSecondary,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            IconButton(
+              onPressed: () => _removeFromCart(item),
+              icon: const Icon(
+                Icons.remove_circle,
+                color: AppColors.brightRed,
+                size: 20,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _addToCart(String name, int price) {
+    setState(() {
+      _cartItems.add({'name': name, 'price': price});
+    });
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('$name added to cart'),
+        backgroundColor: AppColors.neonGreen,
+      ),
+    );
+  }
+
+  void _removeFromCart(Map<String, dynamic> item) {
+    setState(() {
+      _cartItems.remove(item);
+    });
+  }
+
+  int _calculateTotal() {
+    return _cartItems.fold(0, (sum, item) => sum + (item['price'] as int));
   }
 }

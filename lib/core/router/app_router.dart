@@ -20,6 +20,9 @@ import '../../features/help/presentation/screens/help_screen.dart';
 import '../../features/store/presentation/screens/store_screen.dart';
 import '../../features/credits/presentation/screens/credits_screen.dart';
 import '../../features/leaderboard/presentation/screens/leaderboard_screen.dart';
+import '../../features/nutrition/presentation/screens/nutrition_screen.dart';
+import '../../features/recovery/presentation/screens/recovery_screen.dart';
+import '../../features/body_logs/presentation/screens/body_logs_screen.dart';
 
 class AppRouter {
   static final GoRouter router = GoRouter(
@@ -104,23 +107,106 @@ class AppRouter {
             path: '/leaderboard',
             builder: (context, state) => const LeaderboardScreen(),
           ),
+          GoRoute(
+            path: '/nutrition',
+            builder: (context, state) => const NutritionScreen(),
+          ),
+          GoRoute(
+            path: '/recovery',
+            builder: (context, state) => const RecoveryScreen(),
+          ),
+          GoRoute(
+            path: '/body-logs',
+            builder: (context, state) => const BodyLogsScreen(),
+          ),
         ],
       ),
     ],
   );
 }
 
-class AppShell extends StatelessWidget {
+class AppShell extends StatefulWidget {
   final Widget child;
 
   const AppShell({super.key, required this.child});
 
   @override
+  State<AppShell> createState() => _AppShellState();
+}
+
+class _AppShellState extends State<AppShell> with TickerProviderStateMixin {
+  late AnimationController _navAnimationController;
+  late Animation<double> _navAnimation;
+
+  @override
+  void initState() {
+    super.initState();
+    _setupNavAnimation();
+  }
+
+  void _setupNavAnimation() {
+    _navAnimationController = AnimationController(
+      duration: const Duration(milliseconds: 300),
+      vsync: this,
+    );
+
+    _navAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(
+        parent: _navAnimationController,
+        curve: Curves.easeInOut,
+      ),
+    );
+
+    _navAnimationController.forward();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: child,
-      bottomNavigationBar: BottomNavigationBar(
-        backgroundColor: const Color(0xFF121212),
+      body: widget.child,
+      bottomNavigationBar: AnimatedBuilder(
+        animation: _navAnimation,
+        builder: (context, child) {
+          return Transform.translate(
+            offset: Offset(0, (1 - _navAnimation.value) * 100),
+            child: Opacity(
+              opacity: _navAnimation.value,
+              child: _buildBottomNavigationBar(),
+            ),
+          );
+        },
+      ),
+    );
+  }
+
+  Widget _buildBottomNavigationBar() {
+    return Container(
+      height: 80,
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+          colors: [
+            const Color(0xFF1A1A1A).withOpacity(0.95),
+            const Color(0xFF121212).withOpacity(0.98),
+          ],
+        ),
+        border: Border(
+          top: BorderSide(
+            color: const Color(0xFF333333).withOpacity(0.3),
+            width: 0.5,
+          ),
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.3),
+            blurRadius: 20,
+            offset: const Offset(0, -5),
+          ),
+        ],
+      ),
+      child: BottomNavigationBar(
+        backgroundColor: Colors.transparent,
         selectedItemColor: const Color(0xFF6A0DAD),
         unselectedItemColor: const Color(0xB3FFFFFF),
         selectedFontSize: 12.0,
@@ -129,11 +215,31 @@ class AppShell extends StatelessWidget {
         elevation: 0,
         type: BottomNavigationBarType.fixed,
         items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
-          BottomNavigationBarItem(icon: Icon(Icons.bar_chart), label: 'Results'),
-          BottomNavigationBarItem(icon: Icon(Icons.chat), label: 'Community'),
-          BottomNavigationBarItem(icon: Icon(Icons.school), label: 'Mentors'),
-          BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Profile'),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.home_rounded),
+            activeIcon: Icon(Icons.home_rounded, size: 28),
+            label: 'Home',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.bar_chart_rounded),
+            activeIcon: Icon(Icons.bar_chart_rounded, size: 28),
+            label: 'Results',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.chat_bubble_rounded),
+            activeIcon: Icon(Icons.chat_bubble_rounded, size: 28),
+            label: 'Community',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.school_rounded),
+            activeIcon: Icon(Icons.school_rounded, size: 28),
+            label: 'Mentors',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.person_rounded),
+            activeIcon: Icon(Icons.person_rounded, size: 28),
+            label: 'Profile',
+          ),
         ],
         currentIndex: _getCurrentIndex(context),
         onTap: (index) {
@@ -167,5 +273,11 @@ class AppShell extends StatelessWidget {
     if (location.startsWith('/mentors')) return 3;
     if (location.startsWith('/profile')) return 4;
     return 0;
+  }
+
+  @override
+  void dispose() {
+    _navAnimationController.dispose();
+    super.dispose();
   }
 }

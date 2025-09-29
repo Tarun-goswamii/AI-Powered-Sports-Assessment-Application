@@ -1,20 +1,25 @@
 // lib/features/home/presentation/screens/home_screen.dart
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../core/theme/app_colors.dart';
+import '../../../../core/theme/app_layout.dart';
+import '../../../../core/theme/app_typography.dart';
 import '../../../../shared/presentation/widgets/glass_card.dart';
 import '../../../../shared/presentation/widgets/neon_button.dart';
+import '../widgets/test_card.dart';
+import '../widgets/progress_card.dart';
+import '../widgets/quick_access_card.dart';
+import '../widgets/daily_login_bonus.dart';
+import '../widgets/quick_stats_section.dart';
 
-class HomeScreen extends ConsumerStatefulWidget {
+class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
 
   @override
-  ConsumerState<HomeScreen> createState() => _HomeScreenState();
+  State<HomeScreen> createState() => _HomeScreenState();
 }
 
-class _HomeScreenState extends ConsumerState<HomeScreen>
-    with TickerProviderStateMixin {
+class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   late AnimationController _animationController;
   late Animation<double> _fadeAnimation;
   late Animation<Offset> _slideAnimation;
@@ -23,11 +28,15 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
   void initState() {
     super.initState();
     _setupAnimations();
+    // Show daily login bonus on first load
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _showDailyLoginBonus();
+    });
   }
 
   void _setupAnimations() {
     _animationController = AnimationController(
-      duration: const Duration(milliseconds: 300),
+      duration: const Duration(milliseconds: 600),
       vsync: this,
     );
 
@@ -46,10 +55,16 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
     _animationController.forward();
   }
 
+  void _showDailyLoginBonus() {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => const DailyLoginBonus(),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-    final userName = 'Athlete'; // TODO: Get from auth provider
-
     return Scaffold(
       backgroundColor: AppColors.background,
       body: Container(
@@ -61,7 +76,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
             onRefresh: _handleRefresh,
             child: SingleChildScrollView(
               physics: const AlwaysScrollableScrollPhysics(),
-              padding: const EdgeInsets.only(bottom: 100),
+              padding: AppLayout.homeScreenPadding,
               child: FadeTransition(
                 opacity: _fadeAnimation,
                 child: SlideTransition(
@@ -69,10 +84,17 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      _buildHeader(userName),
-                      _buildProgressCard(),
+                      _buildHeader(),
+                      SizedBox(height: AppLayout.homeScreenSpacing),
+                      const ProgressCard(
+                        completedTests: 4,
+                        totalTests: 6,
+                      ),
+                      SizedBox(height: AppLayout.homeScreenSpacing),
                       _buildQuickAccessCards(),
-                      _buildTestsGrid(),
+                      SizedBox(height: AppLayout.homeScreenSpacing),
+                      _buildTestGrid(),
+                      SizedBox(height: AppLayout.homeScreenSpacing),
                       _buildQuickStats(),
                     ],
                   ),
@@ -85,355 +107,261 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
     );
   }
 
-  Widget _buildHeader(String userName) {
-    return Padding(
-      padding: AppSpacing.paddingHorizontalMedium,
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'Hello, $userName',
-                  style: AppTypography.h2,
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  'Ready to assess your performance?',
-                  style: AppTypography.bodyMedium.copyWith(
-                    color: AppColors.textSecondary,
-                  ),
-                ),
-              ],
-            ),
-          ),
-          _buildDailyBonusButton(),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildDailyBonusButton() {
-    return GestureDetector(
-      onTap: _showDailyBonusDialog,
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-        decoration: BoxDecoration(
-          color: const Color(0x33FFC107),
-          border: Border.all(color: const Color(0x4DFFC107)),
-          borderRadius: BorderRadius.circular(8),
-        ),
-        child: const Text(
-          '🎁 Test Bonus',
-          style: TextStyle(
-            fontSize: 12,
-            color: Color(0xFFFFC107),
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildProgressCard() {
-    return Padding(
-      padding: AppSpacing.paddingHorizontalMedium,
-      child: GlassCard(
-        padding: AppSpacing.paddingMedium,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  'Test Progress',
-                  style: AppTypography.h3,
-                ),
-                Text(
-                  '4/6 Complete',
-                  style: AppTypography.bodyMedium.copyWith(
-                    color: AppColors.textSecondary,
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 16),
-            Container(
-              height: 8,
-              decoration: BoxDecoration(
-                color: AppColors.muted,
-                borderRadius: BorderRadius.circular(4),
-              ),
-              child: FractionallySizedBox(
-                alignment: Alignment.centerLeft,
-                widthFactor: 0.67, // 4/6 = 67% progress
-                child: Container(
-                  decoration: BoxDecoration(
-                    gradient: AppGradients.purpleBlue,
-                    borderRadius: BorderRadius.circular(4),
-                  ),
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildQuickAccessCards() {
-    final cards = [
-      {'title': 'Mentors', 'color': AppColors.royalPurple, 'icon': Icons.school},
-      {'title': 'Community', 'color': AppColors.electricBlue, 'icon': Icons.chat_bubble},
-      {'title': 'Nutrition', 'color': AppColors.warmOrange, 'icon': Icons.restaurant},
-      {'title': 'Recovery', 'color': Color(0xFFEC4899), 'icon': Icons.spa},
-      {'title': 'Body Logs', 'color': Color(0xFF9CA3AF), 'icon': Icons.track_changes},
-    ];
-
-    return SizedBox(
-      height: 140,
-      child: ListView.builder(
-        scrollDirection: Axis.horizontal,
-        padding: AppSpacing.paddingHorizontalMedium,
-        itemCount: cards.length,
-        itemBuilder: (context, index) {
-          final card = cards[index];
-          return Container(
-            width: 120,
-            margin: const EdgeInsets.only(right: 12),
-            child: GlassCard(
-              padding: AppSpacing.paddingSmall,
-              enableNeonGlow: true,
-              neonGlowColor: card['color'] as Color,
-              onTap: () => _onQuickAccessTap(card['title'] as String),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(
-                    card['icon'] as IconData,
-                    size: 32,
-                    color: card['color'] as Color,
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    card['title'] as String,
-                    style: AppTypography.bodyMedium,
-                    textAlign: TextAlign.center,
-                  ),
-                ],
-              ),
-            ),
-          );
-        },
-      ),
-    );
-  }
-
-  Widget _buildTestsGrid() {
-    final tests = [
-      {'id': 'vertical-jump', 'title': 'Vertical Jump', 'icon': Icons.arrow_upward},
-      {'id': 'shuttle-run', 'title': 'Shuttle Run', 'icon': Icons.directions_run},
-      {'id': 'sit-ups', 'title': 'Sit-ups', 'icon': Icons.fitness_center},
-      {'id': 'endurance', 'title': 'Endurance', 'icon': Icons.timer},
-      {'id': 'height', 'title': 'Height', 'icon': Icons.height},
-      {'id': 'weight', 'title': 'Weight', 'icon': Icons.monitor_weight},
-    ];
-
-    return Padding(
-      padding: AppSpacing.paddingHorizontalMedium,
-      child: GridView.builder(
-        shrinkWrap: true,
-        physics: const NeverScrollableScrollPhysics(),
-        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: 2,
-          crossAxisSpacing: 12,
-          mainAxisSpacing: 12,
-          childAspectRatio: 0.85,
-        ),
-        itemCount: tests.length,
-        itemBuilder: (context, index) {
-          final test = tests[index];
-          return GlassCard(
-            padding: AppSpacing.paddingMedium,
-            onTap: () => _onTestTap(test['id'] as String),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Container(
-                  width: 48,
-                  height: 48,
-                  decoration: BoxDecoration(
-                    gradient: AppGradients.purpleBlue,
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Icon(
-                    test['icon'] as IconData,
-                    color: Colors.white,
-                    size: 24,
-                  ),
-                ),
-                const SizedBox(height: 12),
-                Text(
-                  test['title'] as String,
-                  style: AppTypography.bodyLarge,
-                  textAlign: TextAlign.center,
-                ),
-                const SizedBox(height: 8),
-                NeonButton(
-                  text: 'Start Test',
-                  size: NeonButtonSize.small,
-                  onPressed: () => _onTestTap(test['id'] as String),
-                ),
-              ],
-            ),
-          );
-        },
-      ),
-    );
-  }
-
-  Widget _buildQuickStats() {
-    return Padding(
-      padding: AppSpacing.paddingHorizontalMedium,
-      child: Row(
-        children: [
-          Expanded(
-            child: GlassCard(
-              padding: AppSpacing.paddingSmall,
-              child: Column(
-                children: [
-                  Text(
-                    '15',
-                    style: AppTypography.h2.copyWith(
-                      color: AppColors.neonGreen,
-                    ),
-                  ),
-                  Text(
-                    'Tests Taken',
-                    style: AppTypography.bodySmall,
-                    textAlign: TextAlign.center,
-                  ),
-                ],
-              ),
-            ),
-          ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: GlassCard(
-              padding: AppSpacing.paddingSmall,
-              child: Column(
-                children: [
-                  Text(
-                    'Top 25%',
-                    style: AppTypography.h2.copyWith(
-                      color: AppColors.electricBlue,
-                    ),
-                  ),
-                  Text(
-                    'Ranking',
-                    style: AppTypography.bodySmall,
-                    textAlign: TextAlign.center,
-                  ),
-                ],
-              ),
-            ),
-          ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: GlassCard(
-              padding: AppSpacing.paddingSmall,
-              child: Column(
-                children: [
-                  Text(
-                    '5',
-                    style: AppTypography.h2.copyWith(
-                      color: AppColors.warmOrange,
-                    ),
-                  ),
-                  Text(
-                    'Badges',
-                    style: AppTypography.bodySmall,
-                    textAlign: TextAlign.center,
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Future<void> _handleRefresh() async {
-    await Future.delayed(const Duration(seconds: 1));
-    // TODO: Refresh data
-  }
-
-  void _showDailyBonusDialog() {
-    showDialog(
-      context: context,
-      builder: (context) => Dialog(
-        backgroundColor: Colors.transparent,
-        child: GlassCard(
-          padding: AppSpacing.paddingLarge,
+  Widget _buildHeader() {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Expanded(
           child: Column(
-            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Icon(
-                Icons.celebration,
-                size: 64,
-                color: AppColors.neonGreen,
-              ),
-              const SizedBox(height: 16),
               Text(
-                'Daily Bonus!',
-                style: AppTypography.h2,
+                'Hello, Athlete!',
+                style: AppTypography.h2.copyWith(
+                  color: AppColors.foreground,
+                  fontWeight: FontWeight.w600,
+                ),
               ),
-              const SizedBox(height: 8),
+              const SizedBox(height: 4),
               Text(
-                'Claim your daily login bonus of 10 credits!',
-                style: AppTypography.bodyMedium,
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: 24),
-              NeonButton(
-                text: 'Claim Bonus',
-                onPressed: () {
-                  Navigator.of(context).pop();
-                  // TODO: Award credits
-                },
+                'Ready to assess your performance?',
+                style: AppTypography.bodyMedium.copyWith(
+                  color: AppColors.textSecondary,
+                ),
               ),
             ],
           ),
         ),
+        // Daily bonus button
+        GestureDetector(
+          onTap: _showDailyLoginBonus,
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+            decoration: BoxDecoration(
+              color: AppColors.neonGreen.withOpacity(0.1),
+              border: Border.all(
+                color: AppColors.neonGreen.withOpacity(0.3),
+                width: 1,
+              ),
+              borderRadius: BorderRadius.circular(20),
+            ),
+            child: Row(
+              children: [
+                Icon(
+                  Icons.celebration,
+                  color: AppColors.neonGreen,
+                  size: 16,
+                ),
+                const SizedBox(width: 6),
+                Text(
+                  'Daily Bonus',
+                  style: TextStyle(
+                    color: AppColors.neonGreen,
+                    fontSize: 12,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildQuickAccessCards() {
+    return SizedBox(
+      height: AppLayout.quickAccessHeight,
+      child: ListView.builder(
+        scrollDirection: Axis.horizontal,
+        padding: EdgeInsets.zero,
+        itemCount: AppLayout.quickAccessCardCount,
+        itemBuilder: (context, index) {
+          final cardData = _getQuickAccessCardData(index);
+          return Container(
+            width: AppLayout.quickAccessCardWidth,
+            margin: EdgeInsets.only(
+              right: index < AppLayout.quickAccessCardCount - 1
+                  ? AppLayout.testGridCrossAxisSpacing
+                  : 0,
+            ),
+            child: QuickAccessCard(
+              title: cardData['title'] as String,
+              subtitle: cardData['subtitle'] as String,
+              icon: cardData['icon'] as IconData,
+              color: cardData['color'] as Color,
+              onTap: () => context.go(cardData['route'] as String),
+            ),
+          );
+        },
       ),
     );
   }
 
-  void _onQuickAccessTap(String title) {
-    switch (title) {
-      case 'Mentors':
-        context.go('/mentors');
-        break;
-      case 'Community':
-        context.go('/community');
-        break;
-      case 'Nutrition':
-        // TODO: Navigate to nutrition screen
-        break;
-      case 'Recovery':
-        // TODO: Navigate to recovery screen
-        break;
-      case 'Body Logs':
-        // TODO: Navigate to body logs screen
-        break;
-    }
+  Widget _buildTestGrid() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'Available Tests',
+          style: AppTypography.h3.copyWith(
+            color: AppColors.foreground,
+          ),
+        ),
+        const SizedBox(height: 16),
+        GridView.builder(
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: AppLayout.testGridCrossAxisCount,
+            crossAxisSpacing: AppLayout.testGridCrossAxisSpacing,
+            mainAxisSpacing: AppLayout.testGridMainAxisSpacing,
+            childAspectRatio: AppLayout.testGridChildAspectRatio,
+          ),
+          itemCount: AppLayout.testGridItemCount,
+          itemBuilder: (context, index) {
+            final testData = _getTestData(index);
+            return TestCard(
+              title: testData['title'] as String,
+              description: testData['description'] as String,
+              icon: testData['icon'] as IconData,
+              status: testData['status'] as TestStatus,
+              duration: testData['duration'] as int?,
+              difficulty: testData['difficulty'] as String?,
+              onStartTest: () => context.go('/test-detail'),
+            );
+          },
+        ),
+      ],
+    );
   }
 
-  void _onTestTap(String testId) {
-    context.go('/test-detail?testId=$testId');
+  Widget _buildQuickStats() {
+    return QuickStatsSection(
+      stats: [
+        StatItem(
+          value: '15',
+          label: 'Tests Taken',
+          subtitle: 'Total',
+          color: AppColors.royalPurple,
+          icon: Icons.science,
+        ),
+        StatItem(
+          value: 'Top 25%',
+          label: 'Ranking',
+          subtitle: 'National',
+          color: AppColors.electricBlue,
+          icon: Icons.leaderboard,
+        ),
+        StatItem(
+          value: '5',
+          label: 'Badges',
+          subtitle: 'Earned',
+          color: AppColors.neonGreen,
+          icon: Icons.military_tech,
+        ),
+      ],
+    );
+  }
+
+  Map<String, dynamic> _getQuickAccessCardData(int index) {
+    final cards = [
+      {
+        'title': 'Mentors',
+        'subtitle': 'Expert Guidance',
+        'icon': Icons.school,
+        'color': AppLayout.quickAccessColors[0],
+        'route': '/mentors',
+      },
+      {
+        'title': 'Community',
+        'subtitle': 'Connect & Share',
+        'icon': Icons.chat_bubble,
+        'color': AppLayout.quickAccessColors[1],
+        'route': '/community',
+      },
+      {
+        'title': 'Nutrition',
+        'subtitle': 'Meal Plans',
+        'icon': Icons.restaurant,
+        'color': AppLayout.quickAccessColors[2],
+        'route': '/nutrition',
+      },
+      {
+        'title': 'Recovery',
+        'subtitle': 'Rest & Recovery',
+        'icon': Icons.spa,
+        'color': AppLayout.quickAccessColors[3],
+        'route': '/recovery',
+      },
+      {
+        'title': 'Body Logs',
+        'subtitle': 'Track Progress',
+        'icon': Icons.track_changes,
+        'color': AppLayout.quickAccessColors[4],
+        'route': '/body-logs',
+      },
+    ];
+    return cards[index];
+  }
+
+  Map<String, dynamic> _getTestData(int index) {
+    final tests = [
+      {
+        'title': 'Vertical Jump',
+        'description': 'Measure explosive power',
+        'icon': Icons.arrow_upward,
+        'status': TestStatus.notStarted,
+        'duration': 5,
+        'difficulty': 'Medium',
+      },
+      {
+        'title': 'Shuttle Run',
+        'description': 'Test agility and speed',
+        'icon': Icons.directions_run,
+        'status': TestStatus.inProgress,
+        'duration': 10,
+        'difficulty': 'Hard',
+      },
+      {
+        'title': 'Sit-ups',
+        'description': 'Core strength assessment',
+        'icon': Icons.fitness_center,
+        'status': TestStatus.completed,
+        'duration': 3,
+        'difficulty': 'Easy',
+      },
+      {
+        'title': 'Endurance',
+        'description': 'Cardiovascular fitness',
+        'icon': Icons.timer,
+        'status': TestStatus.notStarted,
+        'duration': 15,
+        'difficulty': 'Hard',
+      },
+      {
+        'title': 'Height',
+        'description': 'Physical measurements',
+        'icon': Icons.height,
+        'status': TestStatus.completed,
+        'duration': 2,
+        'difficulty': 'Easy',
+      },
+      {
+        'title': 'Weight',
+        'description': 'Body composition',
+        'icon': Icons.monitor_weight,
+        'status': TestStatus.notStarted,
+        'duration': 2,
+        'difficulty': 'Easy',
+      },
+    ];
+    return tests[index];
+  }
+
+  Future<void> _handleRefresh() async {
+    await Future.delayed(const Duration(seconds: 1));
+    // Refresh data logic here
   }
 
   @override

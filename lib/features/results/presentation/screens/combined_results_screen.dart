@@ -14,129 +14,97 @@ class CombinedResultsScreen extends StatefulWidget {
 
 class _CombinedResultsScreenState extends State<CombinedResultsScreen>
     with TickerProviderStateMixin {
-  String _selectedFilter = 'All';
-  String _selectedSort = 'Newest';
+  late TabController _tabController;
 
-  final List<Map<String, dynamic>> testResults = [
-    {
-      'id': '1',
-      'testName': 'Vertical Jump',
-      'score': 45.2,
-      'unit': 'cm',
-      'percentile': 78,
-      'grade': 'Excellent',
-      'date': '2024-01-15',
-      'status': 'completed',
-    },
-    {
-      'id': '2',
-      'testName': 'Shuttle Run',
-      'score': 8.5,
-      'unit': 'seconds',
-      'percentile': 65,
-      'grade': 'Good',
-      'date': '2024-01-12',
-      'status': 'completed',
-    },
-    {
-      'id': '3',
-      'testName': 'Sit-ups',
-      'score': 42,
-      'unit': 'reps',
-      'percentile': 82,
-      'grade': 'Excellent',
-      'date': '2024-01-10',
-      'status': 'completed',
-    },
-    {
-      'id': '4',
-      'testName': 'Endurance Run',
-      'score': 1850,
-      'unit': 'meters',
-      'percentile': 71,
-      'grade': 'Good',
-      'date': '2024-01-08',
-      'status': 'completed',
-    },
-  ];
+  @override
+  void initState() {
+    super.initState();
+    _tabController = TabController(length: 3, vsync: this);
+  }
+
+  @override
+  void dispose() {
+    _tabController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: AppColors.background,
-      appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        title: const Text(
-          'Test History',
-          style: TextStyle(
-            color: Colors.white,
-            fontSize: 20,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        leading: IconButton(
-          onPressed: () => context.pop(),
-          icon: const Icon(Icons.arrow_back, color: Colors.white),
-        ),
+    return Container(
+      decoration: BoxDecoration(
+        gradient: AppColors.backgroundGradient,
       ),
-      body: Container(
-        decoration: BoxDecoration(
-          gradient: AppColors.backgroundGradient,
-        ),
+      child: SafeArea(
         child: Column(
           children: [
-            // Filters and Sort
+            // Header
             Padding(
-              padding: const EdgeInsets.all(20.0),
+              padding: const EdgeInsets.all(20),
               child: Row(
                 children: [
-                  Expanded(
-                    child: _buildFilterDropdown(),
+                  IconButton(
+                    onPressed: () => context.go('/home'),
+                    icon: const Icon(Icons.arrow_back, color: Colors.white),
+                    style: IconButton.styleFrom(
+                      backgroundColor: AppColors.card.withOpacity(0.5),
+                      padding: const EdgeInsets.all(12),
+                    ),
                   ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: _buildSortDropdown(),
+                  const SizedBox(width: 16),
+                  const Expanded(
+                    child: Text(
+                      'My Results',
+                      style: TextStyle(
+                        fontSize: 28,
+                        fontWeight: FontWeight.w700,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ),
+                  IconButton(
+                    onPressed: () => context.go('/achievements'),
+                    icon: const Icon(Icons.emoji_events, color: Colors.white),
                   ),
                 ],
               ),
             ),
 
-            // Stats Overview
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20.0),
-              child: GlassCard(
-                padding: const EdgeInsets.all(20),
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: _buildStatItem('Total Tests', '15', AppColors.electricBlue),
-                    ),
-                    Expanded(
-                      child: _buildStatItem('Avg Score', '78%', AppColors.neonGreen),
-                    ),
-                    Expanded(
-                      child: _buildStatItem('Best Test', 'Vertical Jump', AppColors.warmOrange),
-                    ),
-                  ],
+            // Tab Bar
+            Container(
+              margin: const EdgeInsets.symmetric(horizontal: 20),
+              decoration: BoxDecoration(
+                color: AppColors.card.withOpacity(0.3),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: TabBar(
+                controller: _tabController,
+                indicator: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [AppColors.royalPurple, AppColors.electricBlue],
+                  ),
+                  borderRadius: BorderRadius.circular(8),
                 ),
+                indicatorSize: TabBarIndicatorSize.tab,
+                dividerColor: Colors.transparent,
+                labelColor: Colors.white,
+                unselectedLabelColor: AppColors.textSecondary,
+                tabs: const [
+                  Tab(text: 'Overview'),
+                  Tab(text: 'Tests'),
+                  Tab(text: 'Analytics'),
+                ],
               ),
             ),
 
-            const SizedBox(height: 20),
-
-            // Results List
+            // Tab Content
             Expanded(
-              child: ListView.builder(
-                padding: const EdgeInsets.symmetric(horizontal: 20.0),
-                itemCount: testResults.length,
-                itemBuilder: (context, index) {
-                  final result = testResults[index];
-                  return Padding(
-                    padding: const EdgeInsets.only(bottom: 12.0),
-                    child: _buildResultCard(result),
-                  );
-                },
+              child: TabBarView(
+                controller: _tabController,
+                children: [
+                  _buildOverviewTab(),
+                  _buildTestsTab(),
+                  _buildAnalyticsTab(),
+                ],
               ),
             ),
           ],
@@ -145,202 +113,208 @@ class _CombinedResultsScreenState extends State<CombinedResultsScreen>
     );
   }
 
-  Widget _buildFilterDropdown() {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-      decoration: BoxDecoration(
-        color: AppColors.card,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: AppColors.border),
-      ),
-      child: DropdownButton<String>(
-        value: _selectedFilter,
-        isExpanded: true,
-        dropdownColor: AppColors.card,
-        style: const TextStyle(color: Colors.white),
-        underline: const SizedBox(),
-        items: ['All', 'This Week', 'This Month', 'Excellent', 'Good', 'Average']
-            .map((filter) => DropdownMenuItem(
-                  value: filter,
-                  child: Text(filter),
-                ))
-            .toList(),
-        onChanged: (value) {
-          setState(() {
-            _selectedFilter = value!;
-          });
-        },
-      ),
-    );
-  }
-
-  Widget _buildSortDropdown() {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-      decoration: BoxDecoration(
-        color: AppColors.card,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: AppColors.border),
-      ),
-      child: DropdownButton<String>(
-        value: _selectedSort,
-        isExpanded: true,
-        dropdownColor: AppColors.card,
-        style: const TextStyle(color: Colors.white),
-        underline: const SizedBox(),
-        items: ['Newest', 'Oldest', 'Highest Score', 'Lowest Score']
-            .map((sort) => DropdownMenuItem(
-                  value: sort,
-                  child: Text(sort),
-                ))
-            .toList(),
-        onChanged: (value) {
-          setState(() {
-            _selectedSort = value!;
-          });
-        },
-      ),
-    );
-  }
-
-  Widget _buildStatItem(String label, String value, Color color) {
-    return Column(
-      children: [
-        Text(
-          value,
-          style: TextStyle(
-            fontSize: 24,
-            fontWeight: FontWeight.bold,
-            color: color,
-          ),
-        ),
-        const SizedBox(height: 4),
-        Text(
-          label,
-          style: TextStyle(
-            fontSize: 12,
-            color: AppColors.textSecondary,
-          ),
-          textAlign: TextAlign.center,
-        ),
-      ],
-    );
-  }
-
-  Widget _buildResultCard(Map<String, dynamic> result) {
-    Color gradeColor;
-    switch (result['grade']) {
-      case 'Excellent':
-        gradeColor = AppColors.neonGreen;
-        break;
-      case 'Good':
-        gradeColor = AppColors.electricBlue;
-        break;
-      case 'Average':
-        gradeColor = AppColors.warmOrange;
-        break;
-      default:
-        gradeColor = AppColors.textSecondary;
-    }
-
-    return GlassCard(
+  Widget _buildOverviewTab() {
+    return SingleChildScrollView(
       padding: const EdgeInsets.all(20),
-      onTap: () => _viewDetailedResult(result),
-      child: Row(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Test Icon
-          Container(
-            width: 48,
-            height: 48,
-            decoration: BoxDecoration(
-              gradient: AppGradients.purpleBlue,
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: Icon(
-              _getTestIcon(result['testName']),
-              color: Colors.white,
-              size: 24,
-            ),
-          ),
-
-          const SizedBox(width: 16),
-
-          // Test Details
-          Expanded(
+          // Performance Summary
+          GlassCard(
+            padding: const EdgeInsets.all(24),
+            enableNeonGlow: true,
+            neonGlowColor: AppColors.neonGreen,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  result['testName'],
-                  style: const TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
+                const Text(
+                  'Performance Summary',
+                  style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.w600,
                     color: Colors.white,
                   ),
                 ),
-                const SizedBox(height: 4),
-                Text(
-                  result['date'],
+                const SizedBox(height: 20),
+                _buildStatRow('Total Tests Completed', '12'),
+                const SizedBox(height: 12),
+                _buildStatRow('Average Score', '8.4/10'),
+                const SizedBox(height: 12),
+                _buildStatRow('Best Performance', '40m Sprint - 4.8s'),
+                const SizedBox(height: 12),
+                _buildStatRow('Improvement Rate', '+15%'),
+              ],
+            ),
+          ),
+          const SizedBox(height: 24),
+
+          // Recent Tests
+          const Text(
+            'Recent Tests',
+            style: TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.w600,
+              color: Colors.white,
+            ),
+          ),
+          const SizedBox(height: 16),
+          _buildRecentTestCard('40m Sprint', '5.2s', '2 days ago', AppColors.neonGreen),
+          const SizedBox(height: 12),
+          _buildRecentTestCard('Vertical Jump', '65cm', '1 week ago', AppColors.electricBlue),
+          const SizedBox(height: 12),
+          _buildRecentTestCard('Agility Test', '8.9s', '2 weeks ago', AppColors.warmOrange),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildTestsTab() {
+    return SingleChildScrollView(
+      padding: const EdgeInsets.all(20),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(
+            'Test History',
+            style: TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.w600,
+              color: Colors.white,
+            ),
+          ),
+          const SizedBox(height: 16),
+          _buildTestHistoryItem('40m Sprint', '5.2s', 'Excellent', 'Dec 15, 2024', AppColors.neonGreen),
+          const SizedBox(height: 12),
+          _buildTestHistoryItem('Vertical Jump', '65cm', 'Good', 'Dec 10, 2024', AppColors.electricBlue),
+          const SizedBox(height: 12),
+          _buildTestHistoryItem('Agility Test', '8.9s', 'Average', 'Dec 5, 2024', AppColors.warmOrange),
+          const SizedBox(height: 12),
+          _buildTestHistoryItem('Push-up Test', '42 reps', 'Excellent', 'Nov 28, 2024', AppColors.neonGreen),
+          const SizedBox(height: 12),
+          _buildTestHistoryItem('Sit-up Test', '58 reps', 'Good', 'Nov 20, 2024', AppColors.electricBlue),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildAnalyticsTab() {
+    return SingleChildScrollView(
+      padding: const EdgeInsets.all(20),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(
+            'Performance Analytics',
+            style: TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.w600,
+              color: Colors.white,
+            ),
+          ),
+          const SizedBox(height: 16),
+
+          // Progress Chart Placeholder
+          GlassCard(
+            padding: const EdgeInsets.all(24),
+            child: Column(
+              children: [
+                const Text(
+                  'Progress Over Time',
                   style: TextStyle(
-                    fontSize: 12,
-                    color: AppColors.textSecondary,
+                    fontSize: 18,
+                    fontWeight: FontWeight.w600,
+                    color: Colors.white,
+                  ),
+                ),
+                const SizedBox(height: 20),
+                Container(
+                  height: 200,
+                  decoration: BoxDecoration(
+                    color: AppColors.card,
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: const Center(
+                    child: Text(
+                      'Chart Placeholder\n(Performance trends)',
+                      style: TextStyle(
+                        color: AppColors.textSecondary,
+                        fontSize: 16,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
                   ),
                 ),
               ],
             ),
           ),
+          const SizedBox(height: 24),
 
-          // Score and Grade
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.end,
+          // Strengths & Weaknesses
+          Row(
             children: [
-              Text(
-                '${result['score']} ${result['unit']}',
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                  color: gradeColor,
-                ),
-              ),
-              const SizedBox(height: 4),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                decoration: BoxDecoration(
-                  color: gradeColor.withOpacity(0.2),
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: gradeColor.withOpacity(0.3)),
-                ),
-                child: Text(
-                  result['grade'],
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: gradeColor,
-                    fontWeight: FontWeight.w500,
+              Expanded(
+                child: GlassCard(
+                  padding: const EdgeInsets.all(20),
+                  child: Column(
+                    children: [
+                      Icon(
+                        Icons.thumb_up,
+                        color: AppColors.neonGreen,
+                        size: 32,
+                      ),
+                      const SizedBox(height: 12),
+                      const Text(
+                        'Strengths',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.white,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        'Speed, Agility, Endurance',
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: AppColors.textSecondary,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                    ],
                   ),
                 ),
               ),
-            ],
-          ),
-
-          const SizedBox(width: 12),
-
-          // Percentile
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.end,
-            children: [
-              Text(
-                '${result['percentile']}%',
-                style: const TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white,
-                ),
-              ),
-              Text(
-                'Percentile',
-                style: TextStyle(
-                  fontSize: 10,
-                  color: AppColors.textSecondary,
+              const SizedBox(width: 16),
+              Expanded(
+                child: GlassCard(
+                  padding: const EdgeInsets.all(20),
+                  child: Column(
+                    children: [
+                      Icon(
+                        Icons.thumb_down,
+                        color: AppColors.brightRed,
+                        size: 32,
+                      ),
+                      const SizedBox(height: 12),
+                      const Text(
+                        'Areas to Improve',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.white,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        'Upper body strength, Flexibility',
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: AppColors.textSecondary,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ],
@@ -350,35 +324,127 @@ class _CombinedResultsScreenState extends State<CombinedResultsScreen>
     );
   }
 
-  IconData _getTestIcon(String testName) {
-    switch (testName) {
-      case 'Vertical Jump':
-        return Icons.arrow_upward;
-      case 'Shuttle Run':
-        return Icons.directions_run;
-      case 'Sit-ups':
-        return Icons.fitness_center;
-      case 'Endurance Run':
-        return Icons.timer;
-      default:
-        return Icons.sports;
-    }
-  }
-
-  void _viewDetailedResult(Map<String, dynamic> result) {
-    // Navigate to detailed result screen
-    // TODO: Implement detailed result screen
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('Viewing ${result['testName']} results')),
+  Widget _buildStatRow(String label, String value) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Text(
+          label,
+          style: TextStyle(
+            fontSize: 14,
+            color: AppColors.textSecondary,
+          ),
+        ),
+        Text(
+          value,
+          style: const TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.w600,
+            color: Colors.white,
+          ),
+        ),
+      ],
     );
   }
-}
 
-// Import needed for gradients
-class AppGradients {
-  static const LinearGradient purpleBlue = LinearGradient(
-    colors: [Color(0xFF6A0DAD), Color(0xFF007BFF)],
-    begin: Alignment.topLeft,
-    end: Alignment.bottomRight,
-  );
+  Widget _buildRecentTestCard(String testName, String result, String date, Color color) {
+    return GlassCard(
+      padding: const EdgeInsets.all(16),
+      child: Row(
+        children: [
+          Container(
+            width: 12,
+            height: 12,
+            decoration: BoxDecoration(
+              color: color,
+              borderRadius: BorderRadius.circular(6),
+            ),
+          ),
+          const SizedBox(width: 16),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  testName,
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                    color: Colors.white,
+                  ),
+                ),
+                Text(
+                  date,
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: AppColors.textSecondary,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          Text(
+            result,
+            style: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.w700,
+              color: color,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildTestHistoryItem(String testName, String result, String rating, String date, Color color) {
+    return GlassCard(
+      padding: const EdgeInsets.all(16),
+      child: Row(
+        children: [
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  testName,
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                    color: Colors.white,
+                  ),
+                ),
+                Text(
+                  date,
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: AppColors.textSecondary,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: [
+              Text(
+                result,
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                  color: color,
+                ),
+              ),
+              Text(
+                rating,
+                style: TextStyle(
+                  fontSize: 12,
+                  color: color.withOpacity(0.8),
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
 }

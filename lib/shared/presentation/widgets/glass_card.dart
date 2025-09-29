@@ -47,8 +47,8 @@ class GlassCard extends StatelessWidget {
         child: InkWell(
           onTap: onTap,
           borderRadius: borderRadius ?? BorderRadius.circular(24),
-          splashColor: AppColors.royalPurple.withOpacity(0.1),
-          highlightColor: AppColors.royalPurple.withOpacity(0.05),
+          splashColor: AppColors.royalPurple.withValues(alpha: 0.1),
+          highlightColor: AppColors.royalPurple.withValues(alpha: 0.05),
           child: content,
         ),
       );
@@ -123,8 +123,8 @@ class _InteractiveGlassCardState extends State<InteractiveGlassCard>
               ).copyWith(
                 boxShadow: widget.enableNeonGlow && widget.neonGlowColor != null
                     ? AppColors.neonGlowPurple.map((shadow) => BoxShadow(
-                        color: shadow.color.withOpacity(
-                          shadow.color.opacity * _glowAnimation.value,
+                        color: shadow.color.withValues(
+                          alpha: shadow.color.a * _glowAnimation.value,
                         ),
                         blurRadius: shadow.blurRadius * _glowAnimation.value,
                         spreadRadius: shadow.spreadRadius,

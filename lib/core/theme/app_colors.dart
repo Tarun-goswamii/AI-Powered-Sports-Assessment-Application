@@ -61,18 +61,19 @@ class AppColors {
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
     colors: [
-      royalPurple.withOpacity(0.1),
-      electricBlue.withOpacity(0.05),
+      royalPurple.withValues(alpha: 0.1),
+      electricBlue.withValues(alpha: 0.05),
     ],
   );
 
-  static final LinearGradient backgroundGradient = LinearGradient(
+  // Background gradient for screens
+  static const LinearGradient backgroundGradient = LinearGradient(
     begin: Alignment.topCenter,
     end: Alignment.bottomCenter,
     colors: [
-      const Color(0xFF1A1A1A),
-      deepCharcoal,
-      const Color(0xFF0A0A0A),
+      Color(0xFF1A1A1A),          // Slightly lighter than deep charcoal
+      deepCharcoal,               // #121212
+      Color(0xFF0A0A0A),          // Darker than deep charcoal
     ],
   );
 
@@ -268,90 +269,7 @@ class AppColors {
   }
 }
 
-// ✍️ EXACT TYPOGRAPHY SYSTEM FROM REACT CSS
-class AppTypography {
-  // Font family: 'Inter', 'Roboto', -apple-system, BlinkMacSystemFont, system-ui, sans-serif
-  static const String fontFamily = 'Inter';
 
-  // EXACT font weights from React CSS
-  static const FontWeight normal = FontWeight.w400;   // --font-weight-normal: 400
-  static const FontWeight medium = FontWeight.w500;   // --font-weight-medium: 500
-  static const FontWeight semiBold = FontWeight.w600; // Semi-bold
-  static const FontWeight bold = FontWeight.w700;     // Bold
-
-  // EXACT text styles matching React CSS typography
-  static const TextStyle h1 = TextStyle(
-    fontSize: 24,           // --text-2xl equivalent
-    fontWeight: medium,     // --font-weight-medium: 500
-    height: 1.5,           // line-height: 1.5
-    fontFamily: fontFamily,
-    color: Colors.white,
-  );
-
-  static const TextStyle h2 = TextStyle(
-    fontSize: 20,           // --text-xl equivalent
-    fontWeight: medium,     // --font-weight-medium: 500
-    height: 1.5,           // line-height: 1.5
-    fontFamily: fontFamily,
-    color: Colors.white,
-  );
-
-  static const TextStyle h3 = TextStyle(
-    fontSize: 18,           // --text-lg equivalent
-    fontWeight: medium,     // --font-weight-medium: 500
-    height: 1.5,           // line-height: 1.5
-    fontFamily: fontFamily,
-    color: Colors.white,
-  );
-
-  static const TextStyle h4 = TextStyle(
-    fontSize: 16,           // --text-base equivalent
-    fontWeight: medium,     // --font-weight-medium: 500
-    height: 1.5,           // line-height: 1.5
-    fontFamily: fontFamily,
-    color: Colors.white,
-  );
-
-  static const TextStyle bodyLarge = TextStyle(
-    fontSize: 16,           // --text-base equivalent
-    fontWeight: normal,     // --font-weight-normal: 400
-    height: 1.5,           // line-height: 1.5
-    fontFamily: fontFamily,
-    color: Colors.white,
-  );
-
-  static const TextStyle bodyMedium = TextStyle(
-    fontSize: 14,           // --text-sm equivalent
-    fontWeight: normal,     // --font-weight-normal: 400
-    height: 1.5,           // line-height: 1.5
-    fontFamily: fontFamily,
-    color: Colors.white,
-  );
-
-  static const TextStyle bodySmall = TextStyle(
-    fontSize: 12,           // --text-xs equivalent
-    fontWeight: normal,     // --font-weight-normal: 400
-    height: 1.5,           // line-height: 1.5
-    fontFamily: fontFamily,
-    color: Colors.white,
-  );
-
-  static const TextStyle labelLarge = TextStyle(
-    fontSize: 16,           // --text-base equivalent
-    fontWeight: medium,     // --font-weight-medium: 500
-    height: 1.5,           // line-height: 1.5
-    fontFamily: fontFamily,
-    color: Colors.white,
-  );
-
-  static const TextStyle buttonText = TextStyle(
-    fontSize: 16,           // --text-base equivalent
-    fontWeight: medium,     // --font-weight-medium: 500
-    height: 1.5,           // line-height: 1.5
-    fontFamily: fontFamily,
-    color: Colors.white,
-  );
-}
 
 // 📐 EXACT SPACING SYSTEM FROM REACT CSS/TAILWIND
 class AppSpacing {
@@ -485,54 +403,7 @@ class AppBreakpoints {
   static const double minTouchTarget = 44.0;
 }
 
-// 🏗️ EXACT LAYOUT SPECIFICATIONS FROM REACT IMPLEMENTATION
-class AppLayout {
-  // Bottom Navigation specifications (from BottomNavigationBar component)
-  static const double bottomNavHeight = 80.0;
-  static const int bottomNavItemCount = 5;
-  static const List<String> bottomNavLabels = ['Home', 'Results', 'Community', 'Mentors', 'Profile'];
 
-  // Test Cards Grid specifications (from HomeScreen)
-  static const int testGridCrossAxisCount = 2;           // 2 columns
-  static const double testGridCrossAxisSpacing = 12.0;   // gap-3
-  static const double testGridMainAxisSpacing = 12.0;    // gap-3
-  static const double testGridChildAspectRatio = 0.85;   // Height slightly more than width
-  static const int testGridItemCount = 6;                // 6 test cards total
-
-  // Quick Access Cards specifications (from HomeScreen)
-  static const int quickAccessCardCount = 5;
-  static const List<String> quickAccessLabels = ['Mentors', 'Community', 'Nutrition', 'Recovery', 'Body Logs'];
-  static const List<Color> quickAccessColors = [
-    AppColors.royalPurple,  // Mentors - purple
-    AppColors.electricBlue, // Community - blue
-    AppColors.warmOrange,   // Nutrition - orange
-    Color(0xFFEC4899),      // Recovery - pink
-    Color(0xFF9CA3AF),      // Body Logs - gray
-  ];
-
-  // Home Screen Layout specifications
-  static const EdgeInsets homeScreenPadding = EdgeInsets.symmetric(horizontal: 20.0, vertical: 16.0);
-  static const double homeScreenSpacing = 24.0;          // Space between sections
-  static const double progressCardHeight = 120.0;        // Progress card height
-  static const double quickStatsHeight = 80.0;          // Quick stats section height
-
-  // Glass Card specifications (matching React glassmorphism)
-  static const double glassCardDefaultPadding = 20.0;    // Default padding inside cards
-  static const double glassCardBorderRadius = 24.0;      // Default border radius
-  static const double glassCardBorderWidth = 1.0;        // Border width
-  static const double glassCardBlurRadius = 15.0;        // backdrop-filter: blur(15px)
-
-  // Modal and Dialog specifications
-  static const double modalBorderRadius = 24.0;
-  static const EdgeInsets modalPadding = EdgeInsets.all(24.0);
-  static const Color modalBarrierColor = Color(0x80000000); // Semi-transparent black
-
-  // Safe area handling (from React CSS mobile optimizations)
-  static const EdgeInsets safeAreaPadding = EdgeInsets.only(
-    top: 44.0,    // Status bar height
-    bottom: 34.0, // Home indicator height on newer iPhones
-  );
-}
 
 // 🎯 EXACT COMPONENT SPECIFICATIONS FROM REACT IMPLEMENTATION
 class AppComponents {

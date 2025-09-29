@@ -10,12 +10,6 @@ class TestDetailScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Get test ID from route parameters
-    final testId = GoRouterState.of(context).uri.queryParameters['testId'] ?? 'vertical-jump';
-
-    // Test data based on testId
-    final testData = _getTestData(testId);
-
     return Scaffold(
       backgroundColor: AppColors.background,
       body: Container(
@@ -27,178 +21,234 @@ class TestDetailScreen extends StatelessWidget {
             children: [
               // Header
               Padding(
-                padding: AppSpacing.paddingMedium,
+                padding: const EdgeInsets.all(20),
                 child: Row(
                   children: [
                     IconButton(
-                      onPressed: () => context.pop(),
+                      onPressed: () => context.go('/home'),
                       icon: const Icon(Icons.arrow_back, color: Colors.white),
                     ),
                     const SizedBox(width: 16),
-                    Expanded(
+                    const Expanded(
                       child: Text(
-                        testData['title'] as String,
-                        style: AppTypography.h2,
+                        '40m Sprint Test',
+                        style: TextStyle(
+                          fontSize: 24,
+                          fontWeight: FontWeight.w700,
+                          color: Colors.white,
+                        ),
                       ),
                     ),
                   ],
                 ),
               ),
-
               // Content
               Expanded(
                 child: SingleChildScrollView(
-                  padding: AppSpacing.paddingMedium,
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      // Test Info Card
+                      // Test Overview Card
                       GlassCard(
-                        padding: AppSpacing.paddingMedium,
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'Test Information',
-                              style: AppTypography.h3,
-                            ),
-                            const SizedBox(height: 16),
-                            _buildInfoRow('Duration', testData['duration'] as String),
-                            _buildInfoRow('Difficulty', testData['difficulty'] as String),
-                            _buildInfoRow('Equipment', (testData['equipment'] as List<String>).join(', ')),
-                          ],
-                        ),
-                      ),
-
-                      const SizedBox(height: 20),
-
-                      // Description
-                      GlassCard(
-                        padding: AppSpacing.paddingMedium,
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'Description',
-                              style: AppTypography.h3,
-                            ),
-                            const SizedBox(height: 12),
-                            Text(
-                              testData['description'] as String,
-                              style: AppTypography.bodyMedium.copyWith(
-                                color: AppColors.textSecondary,
-                                height: 1.5,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-
-                      const SizedBox(height: 20),
-
-                      // Instructions
-                      GlassCard(
-                        padding: AppSpacing.paddingMedium,
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'Instructions',
-                              style: AppTypography.h3,
-                            ),
-                            const SizedBox(height: 12),
-                            ...List.generate(
-                              (testData['instructions'] as List<String>).length,
-                              (index) => Padding(
-                                padding: const EdgeInsets.only(bottom: 8.0),
-                                child: Row(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Container(
-                                      width: 24,
-                                      height: 24,
-                                      decoration: BoxDecoration(
-                                        color: AppColors.royalPurple,
-                                        shape: BoxShape.circle,
-                                      ),
-                                      child: Center(
-                                        child: Text(
-                                          '${index + 1}',
-                                          style: const TextStyle(
-                                            color: Colors.white,
-                                            fontSize: 12,
-                                            fontWeight: FontWeight.bold,
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                    const SizedBox(width: 12),
-                                    Expanded(
-                                      child: Text(
-                                        (testData['instructions'] as List<String>)[index],
-                                        style: AppTypography.bodySmall.copyWith(
-                                          color: AppColors.textSecondary,
-                                          height: 1.4,
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-
-                      const SizedBox(height: 20),
-
-                      // Tips
-                      GlassCard(
-                        padding: AppSpacing.paddingMedium,
+                        padding: const EdgeInsets.all(24),
+                        enableNeonGlow: true,
+                        neonGlowColor: AppColors.royalPurple,
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Row(
                               children: [
-                                Icon(
-                                  Icons.lightbulb_outline,
-                                  color: AppColors.neonGreen,
-                                  size: 20,
+                                Container(
+                                  width: 60,
+                                  height: 60,
+                                  decoration: BoxDecoration(
+                                    gradient: LinearGradient(
+                                      colors: [AppColors.royalPurple, AppColors.electricBlue],
+                                      begin: Alignment.topLeft,
+                                      end: Alignment.bottomRight,
+                                    ),
+                                    borderRadius: BorderRadius.circular(16),
+                                  ),
+                                  child: const Icon(
+                                    Icons.directions_run,
+                                    color: Colors.white,
+                                    size: 30,
+                                  ),
                                 ),
-                                const SizedBox(width: 8),
-                                Text(
-                                  'Pro Tips',
-                                  style: AppTypography.h3,
+                                const SizedBox(width: 16),
+                                const Expanded(
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        '40m Sprint Test',
+                                        style: TextStyle(
+                                          fontSize: 20,
+                                          fontWeight: FontWeight.w700,
+                                          color: Colors.white,
+                                        ),
+                                      ),
+                                      SizedBox(height: 4),
+                                      Text(
+                                        'Speed & Acceleration Assessment',
+                                        style: TextStyle(
+                                          fontSize: 14,
+                                          color: AppColors.textSecondary,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
                                 ),
                               ],
                             ),
-                            const SizedBox(height: 12),
-                            ...List.generate(
-                              (testData['tips'] as List<String>).length,
-                              (index) => Padding(
-                                padding: const EdgeInsets.only(bottom: 8.0),
-                                child: Text(
-                                  '• ${(testData['tips'] as List<String>)[index]}',
-                                  style: AppTypography.bodySmall.copyWith(
-                                    color: AppColors.textSecondary,
-                                    height: 1.4,
-                                  ),
-                                ),
+                            const SizedBox(height: 24),
+                            Row(
+                              children: [
+                                _buildStatItem('Duration', '30 sec', Icons.timer),
+                                const SizedBox(width: 24),
+                                _buildStatItem('Credits', '+50', Icons.stars),
+                                const SizedBox(width: 24),
+                                _buildStatItem('Difficulty', 'Medium', Icons.trending_up),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: 24),
+
+                      // Test Description
+                      GlassCard(
+                        padding: const EdgeInsets.all(24),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const Text(
+                              'Test Description',
+                              style: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.w600,
+                                color: Colors.white,
+                              ),
+                            ),
+                            const SizedBox(height: 16),
+                            Text(
+                              'The 40m sprint test measures your acceleration and maximum speed capabilities. This test is crucial for athletes in sports requiring quick bursts of speed like football, basketball, and track events.',
+                              style: TextStyle(
+                                fontSize: 16,
+                                color: AppColors.textSecondary.withOpacity(0.9),
+                                height: 1.6,
+                              ),
+                            ),
+                            const SizedBox(height: 16),
+                            Text(
+                              'The test involves sprinting as fast as possible for 40 meters from a standing start. Your performance will be analyzed using AI to provide personalized training recommendations.',
+                              style: TextStyle(
+                                fontSize: 16,
+                                color: AppColors.textSecondary.withOpacity(0.9),
+                                height: 1.6,
                               ),
                             ),
                           ],
                         ),
                       ),
+                      const SizedBox(height: 24),
 
+                      // Requirements
+                      GlassCard(
+                        padding: const EdgeInsets.all(24),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const Text(
+                              'Requirements',
+                              style: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.w600,
+                                color: Colors.white,
+                              ),
+                            ),
+                            const SizedBox(height: 16),
+                            _buildRequirementItem(
+                              Icons.straighten,
+                              'Clear 40m running space',
+                            ),
+                            const SizedBox(height: 12),
+                            _buildRequirementItem(
+                              Icons.phone_android,
+                              'Smartphone with camera',
+                            ),
+                            const SizedBox(height: 12),
+                            _buildRequirementItem(
+                              Icons.wb_sunny,
+                              'Good lighting conditions',
+                            ),
+                            const SizedBox(height: 12),
+                            _buildRequirementItem(
+                              Icons.accessibility,
+                              'Wear athletic clothing',
+                            ),
+                            const SizedBox(height: 12),
+                            _buildRequirementItem(
+                              Icons.sports,
+                              'Proper warm-up completed',
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: 24),
+
+                      // Instructions
+                      GlassCard(
+                        padding: const EdgeInsets.all(24),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const Text(
+                              'Instructions',
+                              style: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.w600,
+                                color: Colors.white,
+                              ),
+                            ),
+                            const SizedBox(height: 16),
+                            _buildInstructionStep(
+                              '1',
+                              'Position your phone 5-10 meters away from the start line',
+                            ),
+                            const SizedBox(height: 12),
+                            _buildInstructionStep(
+                              '2',
+                              'Ensure the camera can capture your full sprint',
+                            ),
+                            const SizedBox(height: 12),
+                            _buildInstructionStep(
+                              '3',
+                              'Start from a standing position behind the start line',
+                            ),
+                            const SizedBox(height: 12),
+                            _buildInstructionStep(
+                              '4',
+                              'Sprint as fast as possible for 40 meters',
+                            ),
+                            const SizedBox(height: 12),
+                            _buildInstructionStep(
+                              '5',
+                              'The AI will analyze your speed and form',
+                            ),
+                          ],
+                        ),
+                      ),
                       const SizedBox(height: 32),
 
                       // Start Test Button
                       NeonButton(
                         text: 'Start Test',
-                        onPressed: () => _startTest(context, testId),
+                        onPressed: () => context.go('/calibration'),
+                        size: NeonButtonSize.large,
                       ),
-
-                      const SizedBox(height: 20),
+                      const SizedBox(height: 40),
                     ],
                   ),
                 ),
@@ -210,151 +260,103 @@ class TestDetailScreen extends StatelessWidget {
     );
   }
 
-  Map<String, dynamic> _getTestData(String testId) {
-    final testDataMap = {
-      'vertical-jump': {
-        'title': 'Vertical Jump Test',
-        'description': 'Measure your explosive leg power by jumping as high as possible from a standing position.',
-        'duration': '2 minutes',
-        'difficulty': 'Medium',
-        'equipment': ['Measuring tape or wall', 'Chalk (optional)'],
-        'instructions': [
-          'Stand with feet shoulder-width apart',
-          'Reach up and mark your standing reach height',
-          'Jump as high as possible, touching the wall at the highest point',
-          'Measure the difference between standing reach and jump height'
-        ],
-        'tips': [
-          'Use a soft surface to avoid injury',
-          'Practice the motion before recording',
-          'Keep your arms extended upward during the jump'
-        ]
-      },
-      'shuttle-run': {
-        'title': 'Shuttle Run Test',
-        'description': 'Test your agility and quick directional changes with this shuttle run assessment.',
-        'duration': '3 minutes',
-        'difficulty': 'Medium',
-        'equipment': ['Cones or markers', 'Stopwatch'],
-        'instructions': [
-          'Place two markers 10 meters apart',
-          'Start at one marker',
-          'Run to the other marker and touch it',
-          'Run back to the starting marker',
-          'Repeat for the required number of shuttles'
-        ],
-        'tips': [
-          'Keep your body low during direction changes',
-          'Use quick, explosive movements',
-          'Maintain good form throughout the test'
-        ]
-      },
-      'sit-ups': {
-        'title': 'Sit-ups Test',
-        'description': 'Assess your core strength and endurance with this sit-ups assessment.',
-        'duration': '2 minutes',
-        'difficulty': 'Easy',
-        'equipment': ['Mat or soft surface', 'Partner to count'],
-        'instructions': [
-          'Lie on your back with knees bent',
-          'Place hands behind your head',
-          'Lift your upper body off the ground',
-          'Touch your elbows to your knees',
-          'Lower back down and repeat'
-        ],
-        'tips': [
-          'Keep your feet flat on the ground',
-          'Don\'t pull on your neck',
-          'Breathe steadily throughout the test'
-        ]
-      },
-      'endurance': {
-        'title': 'Endurance Run Test',
-        'description': 'Measure your cardiovascular fitness and endurance with this running assessment.',
-        'duration': '15 minutes',
-        'difficulty': 'Hard',
-        'equipment': ['Stopwatch', 'Measuring tape (for distance)'],
-        'instructions': [
-          'Warm up for 5 minutes',
-          'Run at a steady pace for the test duration',
-          'Maintain consistent speed throughout',
-          'Cool down after completing the test'
-        ],
-        'tips': [
-          'Stay hydrated before and during the test',
-          'Maintain proper running form',
-          'Pace yourself for the full duration'
-        ]
-      },
-      'height': {
-        'title': 'Height Measurement',
-        'description': 'Record your accurate height for body composition analysis.',
-        'duration': '1 minute',
-        'difficulty': 'Easy',
-        'equipment': ['Measuring tape or stadiometer'],
-        'instructions': [
-          'Stand straight against a wall',
-          'Remove shoes and any headwear',
-          'Keep heels, buttocks, shoulders, and head against the wall',
-          'Look straight ahead',
-          'Record the measurement at the top of your head'
-        ],
-        'tips': [
-          'Measure in the morning before eating',
-          'Stand tall with good posture',
-          'Have someone help you measure accurately'
-        ]
-      },
-      'weight': {
-        'title': 'Weight Measurement',
-        'description': 'Record your current weight for body composition tracking.',
-        'duration': '1 minute',
-        'difficulty': 'Easy',
-        'equipment': ['Digital scale'],
-        'instructions': [
-          'Step on the scale barefoot',
-          'Stand still in the center of the scale',
-          'Keep your weight evenly distributed',
-          'Record the weight shown'
-        ],
-        'tips': [
-          'Weigh yourself at the same time each day',
-          'Use the same scale consistently',
-          'Weigh before eating or drinking'
-        ]
-      },
-    };
-
-    return testDataMap[testId] ?? testDataMap['vertical-jump']!;
-  }
-
-  Widget _buildInfoRow(String label, String value) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 8.0),
-      child: Row(
+  Widget _buildStatItem(String label, String value, IconData icon) {
+    return Expanded(
+      child: Column(
         children: [
+          Icon(
+            icon,
+            color: AppColors.royalPurple,
+            size: 24,
+          ),
+          const SizedBox(height: 8),
           Text(
-            '$label: ',
-            style: AppTypography.bodyMedium.copyWith(
-              color: AppColors.textSecondary,
-              fontWeight: FontWeight.w500,
+            value,
+            style: const TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.w700,
+              color: Colors.white,
             ),
           ),
-          Expanded(
-            child: Text(
-              value,
-              style: AppTypography.bodyMedium.copyWith(
-                color: Colors.white,
-              ),
+          const SizedBox(height: 4),
+          Text(
+            label,
+            style: TextStyle(
+              fontSize: 12,
+              color: AppColors.textSecondary,
             ),
+            textAlign: TextAlign.center,
           ),
         ],
       ),
     );
   }
 
-  void _startTest(BuildContext context, String testId) {
-    // Navigate to calibration screen with testId
-    context.go('/calibration?testId=$testId');
+  Widget _buildRequirementItem(IconData icon, String text) {
+    return Row(
+      children: [
+        Container(
+          width: 32,
+          height: 32,
+          decoration: BoxDecoration(
+            color: AppColors.royalPurple.withOpacity(0.1),
+            borderRadius: BorderRadius.circular(8),
+          ),
+          child: Icon(
+            icon,
+            color: AppColors.royalPurple,
+            size: 16,
+          ),
+        ),
+        const SizedBox(width: 12),
+        Expanded(
+          child: Text(
+            text,
+            style: const TextStyle(
+              fontSize: 14,
+              color: Colors.white,
+              height: 1.4,
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildInstructionStep(String step, String text) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Container(
+          width: 24,
+          height: 24,
+          decoration: BoxDecoration(
+            color: AppColors.electricBlue,
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: Center(
+            child: Text(
+              step,
+              style: const TextStyle(
+                fontSize: 12,
+                fontWeight: FontWeight.w700,
+                color: Colors.white,
+              ),
+            ),
+          ),
+        ),
+        const SizedBox(width: 12),
+        Expanded(
+          child: Text(
+            text,
+            style: TextStyle(
+              fontSize: 14,
+              color: AppColors.textSecondary.withOpacity(0.9),
+              height: 1.4,
+            ),
+          ),
+        ),
+      ],
+    );
   }
 }

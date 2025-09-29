@@ -13,35 +13,15 @@ class CalibrationScreen extends StatefulWidget {
   State<CalibrationScreen> createState() => _CalibrationScreenState();
 }
 
-class _CalibrationScreenState extends State<CalibrationScreen>
-    with TickerProviderStateMixin {
+class _CalibrationScreenState extends State<CalibrationScreen> {
   CameraController? _cameraController;
   bool _isInitialized = false;
   bool _isCalibrating = false;
-  double _calibrationProgress = 0.0;
-
-  late AnimationController _animationController;
-  late Animation<double> _scaleAnimation;
 
   @override
   void initState() {
     super.initState();
-    _setupAnimations();
     _initializeCamera();
-  }
-
-  void _setupAnimations() {
-    _animationController = AnimationController(
-      duration: const Duration(milliseconds: 500),
-      vsync: this,
-    );
-
-    _scaleAnimation = Tween<double>(begin: 1.0, end: 1.05).animate(
-      CurvedAnimation(
-        parent: _animationController,
-        curve: Curves.easeInOut,
-      ),
-    );
   }
 
   Future<void> _initializeCamera() async {
@@ -65,10 +45,19 @@ class _CalibrationScreenState extends State<CalibrationScreen>
       // Handle camera initialization error
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Camera initialization failed')),
+          SnackBar(
+            content: Text('Camera initialization failed: $e'),
+            backgroundColor: AppColors.brightRed,
+          ),
         );
       }
     }
+  }
+
+  @override
+  void dispose() {
+    _cameraController?.dispose();
+    super.dispose();
   }
 
   @override
@@ -84,22 +73,20 @@ class _CalibrationScreenState extends State<CalibrationScreen>
             children: [
               // Header
               Padding(
-                padding: const EdgeInsets.all(16.0),
+                padding: const EdgeInsets.all(20),
                 child: Row(
                   children: [
                     IconButton(
-                      onPressed: () => context.pop(),
+                      onPressed: () => context.go('/test-detail'),
                       icon: const Icon(Icons.arrow_back, color: Colors.white),
                     ),
                     const SizedBox(width: 16),
-                    const Expanded(
-                      child: Text(
-                        'Camera Calibration',
-                        style: TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
-                        ),
+                    const Text(
+                      'Camera Calibration',
+                      style: TextStyle(
+                        fontSize: 24,
+                        fontWeight: FontWeight.w700,
+                        color: Colors.white,
                       ),
                     ),
                   ],
@@ -109,86 +96,140 @@ class _CalibrationScreenState extends State<CalibrationScreen>
               // Camera Preview
               Expanded(
                 child: Container(
-                  margin: const EdgeInsets.all(20),
+                  margin: const EdgeInsets.symmetric(horizontal: 20),
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(24),
                     border: Border.all(
-                      color: AppColors.border,
+                      color: AppColors.royalPurple.withOpacity(0.3),
                       width: 2,
                     ),
                   ),
                   child: ClipRRect(
                     borderRadius: BorderRadius.circular(22),
                     child: _isInitialized && _cameraController != null
-                        ? Stack(
-                            children: [
-                              CameraPreview(_cameraController!),
-                              _buildCalibrationOverlay(),
-                            ],
-                          )
-                        : const Center(
-                            child: CircularProgressIndicator(
-                              color: AppColors.electricBlue,
+                        ? CameraPreview(_cameraController!)
+                        : Container(
+                            color: AppColors.card,
+                            child: const Center(
+                              child: CircularProgressIndicator(
+                                color: AppColors.royalPurple,
+                              ),
                             ),
                           ),
                   ),
                 ),
               ),
 
-              // Instructions
+              // Calibration Instructions
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                padding: const EdgeInsets.all(20),
                 child: GlassCard(
-                  padding: const EdgeInsets.all(20),
+                  padding: const EdgeInsets.all(24),
                   child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
-                        _getCalibrationInstruction(),
-                        textAlign: TextAlign.center,
-                        style: const TextStyle(
-                          fontSize: 16,
+                      const Text(
+                        'Calibration Instructions',
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.w600,
                           color: Colors.white,
-                          height: 1.5,
                         ),
                       ),
-                      const SizedBox(height: 20),
-                      if (_isCalibrating) ...[
-                        LinearProgressIndicator(
-                          value: _calibrationProgress,
-                          backgroundColor: AppColors.muted,
-                          valueColor: AlwaysStoppedAnimation<Color>(
-                            AppColors.electricBlue,
+                      const SizedBox(height: 16),
+                      _buildCalibrationStep(
+                        '1',
+                        'Position your phone 5-10 meters from the start line',
+                        Icons.location_on,
+                      ),
+                      const SizedBox(height: 12),
+                      _buildCalibrationStep(
+                        '2',
+                        'Ensure the entire 40m track is visible in frame',
+                        Icons.visibility,
+                      ),
+                      const SizedBox(height: 12),
+                      _buildCalibrationStep(
+                        '3',
+                        'Keep the camera steady and level',
+                        Icons.straighten,
+                      ),
+                      const SizedBox(height: 12),
+                      _buildCalibrationStep(
+                        '4',
+                        'Test the view by standing at the start line',
+                        Icons.accessibility,
+                      ),
+                      const SizedBox(height: 24),
+
+                      // Calibration Status
+                      Container(
+                        padding: const EdgeInsets.all(16),
+                        decoration: BoxDecoration(
+                          color: _isCalibrating
+                              ? AppColors.neonGreen.withOpacity(0.1)
+                              : AppColors.royalPurple.withOpacity(0.1),
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(
+                            color: _isCalibrating
+                                ? AppColors.neonGreen
+                                : AppColors.royalPurple,
+                            width: 1,
                           ),
                         ),
-                        const SizedBox(height: 10),
-                        Text(
-                          '${(_calibrationProgress * 100).round()}% Complete',
-                          style: TextStyle(
-                            color: AppColors.textSecondary,
-                            fontSize: 14,
-                          ),
+                        child: Row(
+                          children: [
+                            Icon(
+                              _isCalibrating ? Icons.check_circle : Icons.info,
+                              color: _isCalibrating
+                                  ? AppColors.neonGreen
+                                  : AppColors.royalPurple,
+                            ),
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: Text(
+                                _isCalibrating
+                                    ? 'Calibration complete! Ready to record.'
+                                    : 'Adjust camera position for optimal view.',
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  color: _isCalibrating
+                                      ? AppColors.neonGreen
+                                      : AppColors.royalPurple,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                            ),
+                          ],
                         ),
-                      ],
+                      ),
+
+                      const SizedBox(height: 24),
+
+                      // Action Buttons
+                      Row(
+                        children: [
+                          Expanded(
+                            child: NeonButton(
+                              text: _isCalibrating ? 'Recalibrate' : 'Calibrate',
+                              variant: NeonButtonVariant.secondary,
+                              onPressed: _toggleCalibration,
+                            ),
+                          ),
+                          const SizedBox(width: 16),
+                          Expanded(
+                            child: NeonButton(
+                              text: 'Start Recording',
+                              onPressed: _isCalibrating
+                                  ? () => context.go('/recording')
+                                  : null,
+                              size: NeonButtonSize.large,
+                            ),
+                          ),
+                        ],
+                      ),
                     ],
                   ),
-                ),
-              ),
-
-              // Action Button
-              Padding(
-                padding: const EdgeInsets.all(20.0),
-                child: AnimatedBuilder(
-                  animation: _scaleAnimation,
-                  builder: (context, child) {
-                    return Transform.scale(
-                      scale: _scaleAnimation.value,
-                      child: NeonButton(
-                        text: _isCalibrating ? 'Calibrating...' : 'Start Calibration',
-                        isLoading: _isCalibrating,
-                        onPressed: _isCalibrating ? null : _startCalibration,
-                      ),
-                    );
-                  },
                 ),
               ),
             ],
@@ -198,173 +239,69 @@ class _CalibrationScreenState extends State<CalibrationScreen>
     );
   }
 
-  Widget _buildCalibrationOverlay() {
-    return Container(
-      color: Colors.black.withOpacity(0.3),
-      child: Stack(
-        children: [
-          // Center crosshair
-          Center(
-            child: Container(
-              width: 200,
-              height: 200,
-              decoration: BoxDecoration(
-                border: Border.all(
-                  color: AppColors.electricBlue,
-                  width: 2,
-                ),
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Stack(
-                children: [
-                  // Vertical line
-                  Center(
-                    child: Container(
-                      width: 2,
-                      height: 200,
-                      color: AppColors.electricBlue,
-                    ),
-                  ),
-                  // Horizontal line
-                  Center(
-                    child: Container(
-                      height: 2,
-                      width: 200,
-                      color: AppColors.electricBlue,
-                    ),
-                  ),
-                  // Corner markers
-                  Positioned(
-                    top: 10,
-                    left: 10,
-                    child: Container(
-                      width: 20,
-                      height: 20,
-                      decoration: BoxDecoration(
-                        border: Border.all(
-                          color: AppColors.neonGreen,
-                          width: 3,
-                        ),
-                      ),
-                    ),
-                  ),
-                  Positioned(
-                    top: 10,
-                    right: 10,
-                    child: Container(
-                      width: 20,
-                      height: 20,
-                      decoration: BoxDecoration(
-                        border: Border.all(
-                          color: AppColors.neonGreen,
-                          width: 3,
-                        ),
-                      ),
-                    ),
-                  ),
-                  Positioned(
-                    bottom: 10,
-                    left: 10,
-                    child: Container(
-                      width: 20,
-                      height: 20,
-                      decoration: BoxDecoration(
-                        border: Border.all(
-                          color: AppColors.neonGreen,
-                          width: 3,
-                        ),
-                      ),
-                    ),
-                  ),
-                  Positioned(
-                    bottom: 10,
-                    right: 10,
-                    child: Container(
-                      width: 20,
-                      height: 20,
-                      decoration: BoxDecoration(
-                        border: Border.all(
-                          color: AppColors.neonGreen,
-                          width: 3,
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
+  Widget _buildCalibrationStep(String step, String text, IconData icon) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Container(
+          width: 24,
+          height: 24,
+          decoration: BoxDecoration(
+            color: AppColors.electricBlue,
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: Center(
+            child: Text(
+              step,
+              style: const TextStyle(
+                fontSize: 12,
+                fontWeight: FontWeight.w700,
+                color: Colors.white,
               ),
             ),
           ),
-
-          // Position guide text
-          Positioned(
-            bottom: 40,
-            left: 20,
-            right: 20,
-            child: Container(
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: AppColors.deepCharcoal.withOpacity(0.8),
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(
-                  color: AppColors.border,
-                ),
-              ),
-              child: Text(
-                'Position yourself in the center of the frame with the markers visible',
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  color: AppColors.textSecondary,
-                  fontSize: 14,
-                ),
-              ),
+        ),
+        const SizedBox(width: 12),
+        Icon(
+          icon,
+          color: AppColors.royalPurple,
+          size: 20,
+        ),
+        const SizedBox(width: 8),
+        Expanded(
+          child: Text(
+            text,
+            style: TextStyle(
+              fontSize: 14,
+              color: AppColors.textSecondary.withOpacity(0.9),
+              height: 1.4,
             ),
           ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 
-  String _getCalibrationInstruction() {
-    if (_isCalibrating) {
-      return 'Hold still while we calibrate the camera...';
-    }
-    return 'Position yourself in the center of the frame with all 4 corner markers visible. Ensure good lighting and stand still during calibration.';
-  }
-
-  void _startCalibration() async {
+  void _toggleCalibration() {
     setState(() {
-      _isCalibrating = true;
-      _calibrationProgress = 0.0;
+      _isCalibrating = !_isCalibrating;
     });
 
-    _animationController.repeat(reverse: true);
-
-    // Simulate calibration process
-    for (int i = 0; i <= 100; i += 10) {
-      await Future.delayed(const Duration(milliseconds: 200));
-      if (mounted) {
-        setState(() {
-          _calibrationProgress = i / 100;
-        });
-      }
-    }
-
-    _animationController.stop();
-
-    if (mounted) {
-      setState(() {
-        _isCalibrating = false;
+    if (_isCalibrating) {
+      // Simulate calibration process
+      Future.delayed(const Duration(seconds: 2), () {
+        if (mounted) {
+          setState(() {
+            _isCalibrating = true;
+          });
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Calibration successful!'),
+              backgroundColor: Color(0xFF00FFB2),
+            ),
+          );
+        }
       });
-
-      // Navigate to recording screen
-      context.push('/recording');
     }
-  }
-
-  @override
-  void dispose() {
-    _cameraController?.dispose();
-    _animationController.dispose();
-    super.dispose();
   }
 }

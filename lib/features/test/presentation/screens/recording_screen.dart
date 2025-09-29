@@ -1,8 +1,8 @@
 // lib/features/test/presentation/screens/recording_screen.dart
-import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:camera/camera.dart';
+import 'dart:async';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../shared/presentation/widgets/glass_card.dart';
 import '../../../../shared/presentation/widgets/neon_button.dart';
@@ -19,34 +19,25 @@ class _RecordingScreenState extends State<RecordingScreen>
   CameraController? _cameraController;
   bool _isInitialized = false;
   bool _isRecording = false;
-  bool _isPaused = false;
-  int _recordingTime = 0;
-  Timer? _timer;
-
-  late AnimationController _pulseController;
+  bool _isCountdownActive = false;
+  int _countdownValue = 3;
+  Timer? _countdownTimer;
+  Timer? _recordingTimer;
+  int _recordingDuration = 0;
+  late AnimationController _pulseAnimationController;
   late Animation<double> _pulseAnimation;
 
   @override
   void initState() {
     super.initState();
-    _setupAnimations();
     _initializeCamera();
-  }
-
-  void _setupAnimations() {
-    _pulseController = AnimationController(
+    _pulseAnimationController = AnimationController(
       duration: const Duration(milliseconds: 1000),
       vsync: this,
-    );
-
+    )..repeat(reverse: true);
     _pulseAnimation = Tween<double>(begin: 1.0, end: 1.2).animate(
-      CurvedAnimation(
-        parent: _pulseController,
-        curve: Curves.easeInOut,
-      ),
+      CurvedAnimation(parent: _pulseAnimationController, curve: Curves.easeInOut),
     );
-
-    _pulseController.repeat(reverse: true);
   }
 
   Future<void> _initializeCamera() async {
@@ -69,10 +60,108 @@ class _RecordingScreenState extends State<RecordingScreen>
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Camera initialization failed')),
+          SnackBar(
+            content: Text('Camera initialization failed: $e'),
+            backgroundColor: AppColors.brightRed,
+          ),
         );
       }
     }
+  }
+
+  @override
+  void dispose() {
+    _cameraController?.dispose();
+    _countdownTimer?.cancel();
+    _recordingTimer?.cancel();
+    _pulseAnimationController.dispose();
+    super.dispose();
+  }
+
+  void _startCountdown() {
+    setState(() {
+      _isCountdownActive = true;
+      _countdownValue = 3;
+    });
+
+    _countdownTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
+      setState(() {
+        _countdownValue--;
+      });
+
+      if (_countdownValue == 0) {
+        timer.cancel();
+        _startRecording();
+      }
+    });
+  }
+
+  Future<void> _startRecording() async {
+    if (_cameraController == null || !_cameraController!.value.isInitialized) {
+      return;
+    }
+
+    try {
+      await _cameraController!.startVideoRecording();
+      setState(() {
+        _isRecording = true;
+        _isCountdownActive = false;
+        _recordingDuration = 0;
+      });
+
+      _recordingTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
+        setState(() {
+          _recordingDuration++;
+        });
+
+        // Auto-stop after 45 seconds (typical sprint test duration)
+        if (_recordingDuration >= 45) {
+          _stopRecording();
+        }
+      });
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Failed to start recording: $e'),
+            backgroundColor: AppColors.brightRed,
+          ),
+        );
+      }
+    }
+  }
+
+  Future<void> _stopRecording() async {
+    if (!_isRecording) return;
+
+    try {
+      final file = await _cameraController!.stopVideoRecording();
+      _recordingTimer?.cancel();
+
+      setState(() {
+        _isRecording = false;
+      });
+
+      // Navigate to completion screen with video file path
+      if (mounted) {
+        context.go('/test-completion');
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Failed to stop recording: $e'),
+            backgroundColor: AppColors.brightRed,
+          ),
+        );
+      }
+    }
+  }
+
+  String _formatDuration(int seconds) {
+    final minutes = seconds ~/ 60;
+    final remainingSeconds = seconds % 60;
+    return '${minutes.toString().padLeft(2, '0')}:${remainingSeconds.toString().padLeft(2, '0')}';
   }
 
   @override
@@ -84,264 +173,181 @@ class _RecordingScreenState extends State<RecordingScreen>
           gradient: AppColors.backgroundGradient,
         ),
         child: SafeArea(
-          child: Column(
+          child: Stack(
             children: [
-              // Header with timer
-              Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Row(
-                  children: [
-                    IconButton(
-                      onPressed: _isRecording ? null : () => context.pop(),
-                      icon: Icon(
-                        Icons.arrow_back,
-                        color: _isRecording ? AppColors.textTertiary : Colors.white,
-                      ),
-                    ),
-                    const SizedBox(width: 16),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          const Text(
+              Column(
+                children: [
+                  // Header
+                  Padding(
+                    padding: const EdgeInsets.all(20),
+                    child: Row(
+                      children: [
+                        IconButton(
+                          onPressed: () => context.go('/calibration'),
+                          icon: const Icon(Icons.arrow_back, color: Colors.white),
+                        ),
+                        const SizedBox(width: 16),
+                        const Expanded(
+                          child: Text(
                             'Recording Test',
                             style: TextStyle(
-                              fontSize: 20,
-                              fontWeight: FontWeight.bold,
+                              fontSize: 24,
+                              fontWeight: FontWeight.w700,
                               color: Colors.white,
                             ),
                           ),
-                          if (_isRecording)
-                            Text(
-                              _formatTime(_recordingTime),
-                              style: TextStyle(
-                                fontSize: 16,
-                                color: AppColors.electricBlue,
-                                fontWeight: FontWeight.w500,
+                        ),
+                      ],
+                    ),
+                  ),
+
+                  // Camera Preview
+                  Expanded(
+                    child: Container(
+                      margin: const EdgeInsets.symmetric(horizontal: 20),
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(24),
+                        border: Border.all(
+                          color: _isRecording
+                              ? AppColors.brightRed
+                              : AppColors.royalPurple.withOpacity(0.3),
+                          width: _isRecording ? 3 : 2,
+                        ),
+                      ),
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(22),
+                        child: _isInitialized && _cameraController != null
+                            ? CameraPreview(_cameraController!)
+                            : Container(
+                                color: AppColors.card,
+                                child: const Center(
+                                  child: CircularProgressIndicator(
+                                    color: AppColors.royalPurple,
+                                  ),
+                                ),
                               ),
+                      ),
+                    ),
+                  ),
+
+                  // Recording Controls
+                  Padding(
+                    padding: const EdgeInsets.all(20),
+                    child: GlassCard(
+                      padding: const EdgeInsets.all(24),
+                      child: Column(
+                        children: [
+                          // Recording Status
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              AnimatedBuilder(
+                                animation: _pulseAnimation,
+                                builder: (context, child) {
+                                  return Transform.scale(
+                                    scale: _isRecording ? _pulseAnimation.value : 1.0,
+                                    child: Container(
+                                      width: 16,
+                                      height: 16,
+                                      decoration: BoxDecoration(
+                                        color: _isRecording
+                                            ? AppColors.brightRed
+                                            : AppColors.neonGreen,
+                                        shape: BoxShape.circle,
+                                      ),
+                                    ),
+                                  );
+                                },
+                              ),
+                              const SizedBox(width: 12),
+                              Text(
+                                _isRecording
+                                    ? 'Recording: ${_formatDuration(_recordingDuration)}'
+                                    : 'Ready to Record',
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w600,
+                                  color: _isRecording
+                                      ? AppColors.brightRed
+                                      : AppColors.neonGreen,
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 24),
+
+                          // Instructions
+                          Text(
+                            _isRecording
+                                ? 'Sprint as fast as possible when ready!'
+                                : 'Get ready at the start line. Press start when prepared.',
+                            style: TextStyle(
+                              fontSize: 14,
+                              color: AppColors.textSecondary.withOpacity(0.9),
+                              height: 1.4,
                             ),
+                            textAlign: TextAlign.center,
+                          ),
+                          const SizedBox(height: 24),
+
+                          // Control Buttons
+                          Row(
+                            children: [
+                              if (!_isRecording && !_isCountdownActive) ...[
+                                Expanded(
+                                  child: NeonButton(
+                                    text: 'Start Recording',
+                                    onPressed: _startCountdown,
+                                    size: NeonButtonSize.large,
+                                  ),
+                                ),
+                              ] else if (_isRecording) ...[
+                                Expanded(
+                                  child: NeonButton(
+                                    text: 'Stop Recording',
+                                    variant: NeonButtonVariant.secondary,
+                                    onPressed: _stopRecording,
+                                    size: NeonButtonSize.large,
+                                  ),
+                                ),
+                              ] else ...[
+                                const Expanded(
+                                  child: SizedBox(),
+                                ),
+                              ],
+                            ],
+                          ),
                         ],
                       ),
                     ),
-                    if (_isRecording)
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 12,
-                          vertical: 6,
-                        ),
-                        decoration: BoxDecoration(
-                          color: AppColors.brightRed.withOpacity(0.2),
-                          borderRadius: BorderRadius.circular(16),
-                          border: Border.all(
-                            color: AppColors.brightRed,
-                            width: 1,
-                          ),
-                        ),
-                        child: Row(
-                          children: [
-                            AnimatedBuilder(
-                              animation: _pulseAnimation,
-                              builder: (context, child) {
-                                return Transform.scale(
-                                  scale: _pulseAnimation.value,
-                                  child: Container(
-                                    width: 8,
-                                    height: 8,
-                                    decoration: const BoxDecoration(
-                                      color: AppColors.brightRed,
-                                      shape: BoxShape.circle,
-                                    ),
-                                  ),
-                                );
-                              },
-                            ),
-                            const SizedBox(width: 8),
-                            const Text(
-                              'REC',
-                              style: TextStyle(
-                                color: AppColors.brightRed,
-                                fontSize: 12,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                  ],
-                ),
+                  ),
+                ],
               ),
 
-              // Camera Preview
-              Expanded(
-                child: Container(
-                  margin: const EdgeInsets.all(20),
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(24),
-                    border: Border.all(
-                      color: _isRecording
-                          ? AppColors.brightRed
-                          : AppColors.border,
-                      width: _isRecording ? 3 : 2,
+              // Countdown Overlay
+              if (_isCountdownActive)
+                Container(
+                  color: Colors.black.withOpacity(0.7),
+                  child: Center(
+                    child: GlassCard(
+                      padding: const EdgeInsets.all(40),
+                      enableNeonGlow: true,
+                      neonGlowColor: AppColors.electricBlue,
+                      child: Text(
+                        _countdownValue.toString(),
+                        style: TextStyle(
+                          fontSize: 72,
+                          fontWeight: FontWeight.w900,
+                          color: AppColors.electricBlue,
+                        ),
+                      ),
                     ),
                   ),
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(22),
-                    child: _isInitialized && _cameraController != null
-                        ? CameraPreview(_cameraController!)
-                        : const Center(
-                            child: CircularProgressIndicator(
-                              color: AppColors.electricBlue,
-                            ),
-                          ),
-                  ),
                 ),
-              ),
-
-              // Instructions
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20.0),
-                child: GlassCard(
-                  padding: const EdgeInsets.all(20),
-                  child: Column(
-                    children: [
-                      Icon(
-                        _getInstructionIcon(),
-                        size: 48,
-                        color: _getInstructionColor(),
-                      ),
-                      const SizedBox(height: 16),
-                      Text(
-                        _getInstructionText(),
-                        textAlign: TextAlign.center,
-                        style: const TextStyle(
-                          fontSize: 16,
-                          color: Colors.white,
-                          height: 1.5,
-                        ),
-                      ),
-                      if (_isRecording) ...[
-                        const SizedBox(height: 16),
-                        Text(
-                          'Keep moving within the frame',
-                          style: TextStyle(
-                            fontSize: 14,
-                            color: AppColors.textSecondary,
-                          ),
-                        ),
-                      ],
-                    ],
-                  ),
-                ),
-              ),
-
-              // Control Buttons
-              Padding(
-                padding: const EdgeInsets.all(20.0),
-                child: Row(
-                  children: [
-                    if (_isRecording) ...[
-                      Expanded(
-                        child: NeonButton(
-                          text: _isPaused ? 'Resume' : 'Pause',
-                          variant: NeonButtonVariant.secondary,
-                          onPressed: _togglePause,
-                        ),
-                      ),
-                      const SizedBox(width: 16),
-                    ],
-                    Expanded(
-                      flex: _isRecording ? 2 : 1,
-                      child: NeonButton(
-                        text: _isRecording ? 'Stop Recording' : 'Start Recording',
-                        onPressed: _toggleRecording,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
             ],
           ),
         ),
       ),
     );
-  }
-
-  IconData _getInstructionIcon() {
-    if (_isRecording) {
-      return _isPaused ? Icons.pause_circle : Icons.play_circle;
-    }
-    return Icons.camera_alt;
-  }
-
-  Color _getInstructionColor() {
-    if (_isRecording) {
-      return _isPaused ? AppColors.warmOrange : AppColors.neonGreen;
-    }
-    return AppColors.electricBlue;
-  }
-
-  String _getInstructionText() {
-    if (_isPaused) {
-      return 'Recording paused. Resume when ready to continue.';
-    }
-    if (_isRecording) {
-      return 'Perform your test movements naturally. Keep the camera steady and ensure you stay within the frame.';
-    }
-    return 'Position yourself in the center of the frame. Press start when ready to begin recording.';
-  }
-
-  String _formatTime(int seconds) {
-    final minutes = seconds ~/ 60;
-    final remainingSeconds = seconds % 60;
-    return '${minutes.toString().padLeft(2, '0')}:${remainingSeconds.toString().padLeft(2, '0')}';
-  }
-
-  void _toggleRecording() {
-    if (_isRecording) {
-      _stopRecording();
-    } else {
-      _startRecording();
-    }
-  }
-
-  void _startRecording() {
-    setState(() {
-      _isRecording = true;
-      _isPaused = false;
-      _recordingTime = 0;
-    });
-
-    _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
-      if (mounted && !_isPaused) {
-        setState(() {
-          _recordingTime++;
-        });
-      }
-    });
-  }
-
-  void _stopRecording() {
-    _timer?.cancel();
-    setState(() {
-      _isRecording = false;
-      _isPaused = false;
-    });
-
-    // Navigate to completion screen
-    context.push('/test-completion');
-  }
-
-  void _togglePause() {
-    setState(() {
-      _isPaused = !_isPaused;
-    });
-  }
-
-  @override
-  void dispose() {
-    _cameraController?.dispose();
-    _timer?.cancel();
-    _pulseController.dispose();
-    super.dispose();
   }
 }

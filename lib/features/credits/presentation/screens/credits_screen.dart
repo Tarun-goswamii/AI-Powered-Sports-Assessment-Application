@@ -1,503 +1,572 @@
+// lib/features/credits/presentation/screens/credits_screen.dart
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:google_fonts/google_fonts.dart';
-import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
-
+import 'package:go_router/go_router.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../shared/presentation/widgets/glass_card.dart';
 import '../../../../shared/presentation/widgets/neon_button.dart';
 
-class CreditsScreen extends ConsumerStatefulWidget {
+class CreditsScreen extends StatelessWidget {
   const CreditsScreen({super.key});
 
   @override
-  ConsumerState<CreditsScreen> createState() => _CreditsScreenState();
-}
-
-class _CreditsScreenState extends ConsumerState<CreditsScreen>
-    with TickerProviderStateMixin {
-  late AnimationController _fadeController;
-  late Animation<double> _fadeAnimation;
-
-  final int _currentCredits = 1250;
-  final int _totalEarned = 2450;
-  final int _totalSpent = 1200;
-
-  final List<Map<String, dynamic>> _earnMethods = [
-    {
-      'title': 'Complete Fitness Test',
-      'description': 'Earn 50 credits per test',
-      'icon': Icons.directions_run,
-      'color': AppColors.neonGreen,
-      'credits': 50,
-    },
-    {
-      'title': 'Share Results',
-      'description': 'Earn 25 credits for sharing',
-      'icon': Icons.share,
-      'color': AppColors.electricBlue,
-      'credits': 25,
-    },
-    {
-      'title': 'Daily Login',
-      'description': 'Earn 10 credits daily',
-      'icon': Icons.calendar_today,
-      'color': AppColors.warmOrange,
-      'credits': 10,
-    },
-    {
-      'title': 'Mentor Others',
-      'description': 'Earn 100 credits per session',
-      'icon': Icons.school,
-      'color': AppColors.royalPurple,
-      'credits': 100,
-    },
-    {
-      'title': 'Community Challenge',
-      'description': 'Earn 75 credits for participation',
-      'icon': Icons.emoji_events,
-      'color': AppColors.neonGreen,
-      'credits': 75,
-    },
-    {
-      'title': 'Weekly Goal',
-      'description': 'Earn 150 credits for completing weekly goals',
-      'icon': Icons.flag,
-      'color': AppColors.brightRed,
-      'credits': 150,
-    },
-  ];
-
-  final List<Map<String, dynamic>> _spendMethods = [
-    {
-      'title': 'Premium Supplements',
-      'description': 'Discounts on verified products',
-      'icon': Icons.local_pharmacy,
-      'color': AppColors.neonGreen,
-    },
-    {
-      'title': 'Expert Consultation',
-      'description': '1-on-1 sessions with coaches',
-      'icon': Icons.person,
-      'color': AppColors.electricBlue,
-    },
-    {
-      'title': 'Premium Features',
-      'description': 'Unlock advanced analytics',
-      'icon': Icons.analytics,
-      'color': AppColors.warmOrange,
-    },
-    {
-      'title': 'Exclusive Content',
-      'description': 'Access premium training videos',
-      'icon': Icons.video_library,
-      'color': AppColors.royalPurple,
-    },
-  ];
-
-  @override
-  void initState() {
-    super.initState();
-    _fadeController = AnimationController(
-      duration: const Duration(milliseconds: 800),
-      vsync: this,
-    );
-    _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
-      CurvedAnimation(parent: _fadeController, curve: Curves.easeOut),
-    );
-    _fadeController.forward();
-  }
-
-  @override
-  void dispose() {
-    _fadeController.dispose();
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-
-    return Scaffold(
-      backgroundColor: theme.scaffoldBackgroundColor,
-      body: Container(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [
-              AppColors.primary.withOpacity(0.1),
-              AppColors.background,
-              AppColors.secondary.withOpacity(0.1),
-            ],
-          ),
-        ),
-        child: SafeArea(
-          child: FadeTransition(
-            opacity: _fadeAnimation,
-            child: CustomScrollView(
-              physics: const BouncingScrollPhysics(),
-              slivers: [
-                // Header
-                SliverAppBar(
-                  backgroundColor: Colors.transparent,
-                  elevation: 0,
-                  floating: true,
-                  pinned: false,
-                  flexibleSpace: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-                    child: Row(
-                      children: [
-                        IconButton(
-                          onPressed: () => Navigator.of(context).pop(),
-                          icon: Icon(
-                            Icons.arrow_back_ios_new,
-                            color: AppColors.electricBlue,
-                            size: 24,
-                          ),
-                        ),
-                        const SizedBox(width: 16),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Text(
-                                'CREDITS',
-                                style: GoogleFonts.inter(
-                                  fontSize: 28,
-                                  fontWeight: FontWeight.bold,
-                                  color: AppColors.electricBlue,
-                                  letterSpacing: 1.2,
-                                ),
-                              ),
-                              Text(
-                                'Earn & spend your rewards',
-                                style: GoogleFonts.inter(
-                                  fontSize: 14,
-                                  color: AppColors.textSecondary,
-                                  fontWeight: FontWeight.w400,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                        Container(
-                          padding: const EdgeInsets.all(12),
-                          decoration: BoxDecoration(
-                            color: AppColors.neonGreen.withOpacity(0.1),
-                            borderRadius: BorderRadius.circular(16),
-                            border: Border.all(
-                              color: AppColors.neonGreen.withOpacity(0.3),
-                              width: 1,
-                            ),
-                          ),
-                          child: Icon(
-                            Icons.stars,
-                            color: AppColors.neonGreen,
-                            size: 24,
-                          ),
-                        ),
-                      ],
+    return Container(
+      decoration: BoxDecoration(
+        gradient: AppColors.backgroundGradient,
+      ),
+      child: SafeArea(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(20),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Header
+              Row(
+                children: [
+                  IconButton(
+                    onPressed: () => context.go('/settings'),
+                    icon: const Icon(Icons.arrow_back, color: Colors.white),
+                  ),
+                  const Expanded(
+                    child: Text(
+                      'About & Credits',
+                      style: TextStyle(
+                        fontSize: 28,
+                        fontWeight: FontWeight.w700,
+                        color: Colors.white,
+                      ),
+                      textAlign: TextAlign.center,
                     ),
                   ),
-                ),
+                  const SizedBox(width: 48), // Balance the back button
+                ],
+              ),
+              const SizedBox(height: 24),
 
-                // Credits Overview
-                SliverToBoxAdapter(
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 20),
-                    child: AnimationLimiter(
-                      child: Column(
-                        children: AnimationConfiguration.toStaggeredList(
-                          duration: const Duration(milliseconds: 600),
-                          childAnimationBuilder: (widget) => SlideAnimation(
-                            verticalOffset: 50.0,
-                            child: FadeInAnimation(child: widget),
-                          ),
-                          children: [
-                            const SizedBox(height: 8),
-                            _buildCreditsOverview(),
-                            const SizedBox(height: 32),
-                            _buildEarnCreditsSection(),
-                            const SizedBox(height: 32),
-                            _buildSpendCreditsSection(),
-                          ],
+              // App Logo and Info
+              GlassCard(
+                padding: const EdgeInsets.all(24),
+                child: Column(
+                  children: [
+                    Container(
+                      width: 80,
+                      height: 80,
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          colors: [AppColors.royalPurple, AppColors.electricBlue],
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
                         ),
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      child: const Icon(
+                        Icons.sports_soccer,
+                        color: Colors.white,
+                        size: 40,
                       ),
                     ),
-                  ),
+                    const SizedBox(height: 16),
+                    const Text(
+                      'AI Sports Assessment',
+                      style: TextStyle(
+                        fontSize: 24,
+                        fontWeight: FontWeight.w700,
+                        color: Colors.white,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      'Version 1.0.0',
+                      style: TextStyle(
+                        fontSize: 16,
+                        color: AppColors.textSecondary,
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    Text(
+                      'Revolutionizing sports talent assessment with AI-powered precision and comprehensive athlete development tools.',
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: AppColors.textSecondary,
+                        height: 1.4,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                  ],
                 ),
+              ),
+              const SizedBox(height: 24),
 
-                // Bottom spacing
-                const SliverToBoxAdapter(
-                  child: SizedBox(height: 32),
+              // Key Features
+              const Text(
+                'Key Features',
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.w600,
+                  color: Colors.white,
                 ),
-              ],
-            ),
+              ),
+              const SizedBox(height: 16),
+              _buildFeatureItem(
+                Icons.camera,
+                'AI-Powered Test Recording',
+                'Advanced computer vision for accurate fitness test analysis',
+                AppColors.neonGreen,
+              ),
+              _buildFeatureItem(
+                Icons.analytics,
+                'Comprehensive Analytics',
+                'Detailed performance insights and progress tracking',
+                AppColors.electricBlue,
+              ),
+              _buildFeatureItem(
+                Icons.group,
+                'Community Platform',
+                'Connect with fellow athletes and share achievements',
+                AppColors.royalPurple,
+              ),
+              _buildFeatureItem(
+                Icons.school,
+                'Expert Mentorship',
+                'Access to professional coaches and nutritionists',
+                AppColors.warmOrange,
+              ),
+
+              const SizedBox(height: 32),
+
+              // Technology Stack
+              const Text(
+                'Technology Stack',
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.w600,
+                  color: Colors.white,
+                ),
+              ),
+              const SizedBox(height: 16),
+              GlassCard(
+                padding: const EdgeInsets.all(20),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    _buildTechItem('Flutter', 'Cross-platform mobile framework', AppColors.electricBlue),
+                    const SizedBox(height: 12),
+                    _buildTechItem('Dart', 'Programming language', AppColors.royalPurple),
+                    const SizedBox(height: 12),
+                    _buildTechItem('Supabase', 'Backend as a Service', AppColors.neonGreen),
+                    const SizedBox(height: 12),
+                    _buildTechItem('TensorFlow Lite', 'AI/ML inference', AppColors.warmOrange),
+                    const SizedBox(height: 12),
+                    _buildTechItem('Camera Plugin', 'Native camera integration', AppColors.royalPurple),
+                  ],
+                ),
+              ),
+
+              const SizedBox(height: 32),
+
+              // Team Credits
+              const Text(
+                'Development Team',
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.w600,
+                  color: Colors.white,
+                ),
+              ),
+              const SizedBox(height: 16),
+              _buildTeamMember(
+                'Lead Developer',
+                'AI Sports Team',
+                'Full-stack development and AI integration',
+                AppColors.neonGreen,
+              ),
+              const SizedBox(height: 12),
+              _buildTeamMember(
+                'UI/UX Designer',
+                'Design Team',
+                'User experience and interface design',
+                AppColors.electricBlue,
+              ),
+              const SizedBox(height: 12),
+              _buildTeamMember(
+                'Sports Scientist',
+                'Dr. Sports Lab',
+                'Fitness testing protocols and validation',
+                AppColors.royalPurple,
+              ),
+
+              const SizedBox(height: 32),
+
+              // Acknowledgments
+              const Text(
+                'Acknowledgments',
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.w600,
+                  color: Colors.white,
+                ),
+              ),
+              const SizedBox(height: 16),
+              GlassCard(
+                padding: const EdgeInsets.all(20),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      'Special Thanks',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.white,
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    Text(
+                      '• Indian Sports Federations for collaboration and validation\n• Beta testers and early adopters\n• Open source community for amazing tools\n• Flutter and Supabase teams for excellent frameworks',
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: AppColors.textSecondary,
+                        height: 1.6,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+
+              const SizedBox(height: 32),
+
+              // Contact Information
+              const Text(
+                'Contact Us',
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.w600,
+                  color: Colors.white,
+                ),
+              ),
+              const SizedBox(height: 16),
+              GlassCard(
+                padding: const EdgeInsets.all(20),
+                child: Column(
+                  children: [
+                    _buildContactItem(
+                      Icons.email,
+                      'support@aisports.in',
+                      'General inquiries and support',
+                      AppColors.electricBlue,
+                    ),
+                    const SizedBox(height: 16),
+                    _buildContactItem(
+                      Icons.business,
+                      'AI Sports Assessment Pvt Ltd',
+                      'Mumbai, Maharashtra, India',
+                      AppColors.royalPurple,
+                    ),
+                    const SizedBox(height: 16),
+                    _buildContactItem(
+                      Icons.web,
+                      'www.aisports.in',
+                      'Visit our website',
+                      AppColors.neonGreen,
+                    ),
+                  ],
+                ),
+              ),
+
+              const SizedBox(height: 32),
+
+              // Legal
+              const Text(
+                'Legal',
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.w600,
+                  color: Colors.white,
+                ),
+              ),
+              const SizedBox(height: 16),
+              _buildLegalItem('Privacy Policy', 'How we protect your data'),
+              _buildLegalItem('Terms of Service', 'User agreement and conditions'),
+              _buildLegalItem('Data Processing', 'Information about data usage'),
+
+              const SizedBox(height: 40),
+
+              // Social Links
+              const Text(
+                'Follow Us',
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.w600,
+                  color: Colors.white,
+                ),
+              ),
+              const SizedBox(height: 16),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  _buildSocialButton(Icons.facebook, AppColors.electricBlue),
+                  const SizedBox(width: 16),
+                  _buildSocialButton(Icons.camera_alt, AppColors.neonGreen), // Instagram
+                  const SizedBox(width: 16),
+                  _buildSocialButton(Icons.alternate_email, AppColors.royalPurple), // Twitter
+                  const SizedBox(width: 16),
+                  _buildSocialButton(Icons.play_arrow, AppColors.warmOrange), // YouTube
+                ],
+              ),
+
+              const SizedBox(height: 40),
+
+              // Copyright
+              Center(
+                child: Text(
+                  '© 2025 AI Sports Assessment. All rights reserved.',
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: AppColors.textSecondary,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+              ),
+              const SizedBox(height: 20),
+            ],
           ),
         ),
       ),
     );
   }
 
-  Widget _buildCreditsOverview() {
-    return GlassCard(
-      padding: const EdgeInsets.all(24),
-      child: Column(
-        children: [
-          // Main Credits Display
-          Container(
-            padding: const EdgeInsets.all(20),
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: [AppColors.neonGreen, AppColors.electricBlue],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
+  Widget _buildFeatureItem(IconData icon, String title, String description, Color color) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 12),
+      child: GlassCard(
+        padding: const EdgeInsets.all(16),
+        child: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                color: color.withOpacity(0.2),
+                borderRadius: BorderRadius.circular(10),
               ),
-              borderRadius: BorderRadius.circular(20),
-              boxShadow: AppColors.neonGlowGreen,
+              child: Icon(
+                icon,
+                color: color,
+                size: 20,
+              ),
             ),
-            child: Column(
-              children: [
-                Icon(
-                  Icons.stars,
+            const SizedBox(width: 16),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    title,
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.white,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    description,
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: AppColors.textSecondary,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildTechItem(String name, String description, Color color) {
+    return Row(
+      children: [
+        Container(
+          width: 8,
+          height: 8,
+          decoration: BoxDecoration(
+            color: color,
+            borderRadius: BorderRadius.circular(4),
+          ),
+        ),
+        const SizedBox(width: 12),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                name,
+                style: const TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
                   color: Colors.white,
-                  size: 48,
                 ),
-                const SizedBox(height: 12),
+              ),
+              Text(
+                description,
+                style: TextStyle(
+                  fontSize: 12,
+                  color: AppColors.textSecondary,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildTeamMember(String role, String name, String description, Color color) {
+    return GlassCard(
+      padding: const EdgeInsets.all(16),
+      child: Row(
+        children: [
+          CircleAvatar(
+            radius: 24,
+            backgroundColor: color.withOpacity(0.2),
+            child: Icon(
+              Icons.person,
+              color: color,
+              size: 20,
+            ),
+          ),
+          const SizedBox(width: 16),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
                 Text(
-                  '$_currentCredits',
-                  style: GoogleFonts.inter(
-                    fontSize: 48,
-                    fontWeight: FontWeight.bold,
+                  role,
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
                     color: Colors.white,
                   ),
                 ),
                 Text(
-                  'AVAILABLE CREDITS',
-                  style: GoogleFonts.inter(
+                  name,
+                  style: TextStyle(
+                    fontSize: 14,
+                    color: color,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  description,
+                  style: TextStyle(
                     fontSize: 12,
-                    color: Colors.white.withOpacity(0.8),
-                    fontWeight: FontWeight.w600,
-                    letterSpacing: 1.0,
+                    color: AppColors.textSecondary,
                   ),
                 ),
               ],
             ),
-          ),
-
-          const SizedBox(height: 24),
-
-          // Stats Row
-          Row(
-            children: [
-              Expanded(
-                child: _buildCreditStat(
-                  label: 'Total Earned',
-                  value: _totalEarned.toString(),
-                  color: AppColors.neonGreen,
-                ),
-              ),
-              Container(
-                width: 1,
-                height: 40,
-                color: AppColors.electricBlue.withOpacity(0.3),
-              ),
-              Expanded(
-                child: _buildCreditStat(
-                  label: 'Total Spent',
-                  value: _totalSpent.toString(),
-                  color: AppColors.warmOrange,
-                ),
-              ),
-            ],
           ),
         ],
       ),
     );
   }
 
-  Widget _buildCreditStat({
-    required String label,
-    required String value,
-    required Color color,
-  }) {
-    return Column(
+  Widget _buildContactItem(IconData icon, String title, String subtitle, Color color) {
+    return Row(
       children: [
-        Text(
-          value,
-          style: GoogleFonts.inter(
-            fontSize: 20,
-            fontWeight: FontWeight.bold,
+        Container(
+          padding: const EdgeInsets.all(8),
+          decoration: BoxDecoration(
+            color: color.withOpacity(0.2),
+            borderRadius: BorderRadius.circular(8),
+          ),
+          child: Icon(
+            icon,
             color: color,
+            size: 16,
           ),
         ),
-        const SizedBox(height: 4),
-        Text(
-          label,
-          style: GoogleFonts.inter(
-            fontSize: 12,
-            color: AppColors.textSecondary,
-            fontWeight: FontWeight.w500,
-          ),
-          textAlign: TextAlign.center,
-        ),
-      ],
-    );
-  }
-
-  Widget _buildEarnCreditsSection() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          'EARN CREDITS',
-          style: GoogleFonts.inter(
-            fontSize: 18,
-            fontWeight: FontWeight.bold,
-            color: AppColors.electricBlue,
-            letterSpacing: 1.0,
-          ),
-        ),
-        const SizedBox(height: 16),
-        GridView.builder(
-          shrinkWrap: true,
-          physics: const NeverScrollableScrollPhysics(),
-          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: 2,
-            mainAxisSpacing: 12,
-            crossAxisSpacing: 12,
-            childAspectRatio: 1.2,
-          ),
-          itemCount: _earnMethods.length,
-          itemBuilder: (context, index) {
-            final method = _earnMethods[index];
-            return AnimationConfiguration.staggeredGrid(
-              position: index,
-              duration: const Duration(milliseconds: 600),
-              columnCount: 2,
-              child: ScaleAnimation(
-                child: FadeInAnimation(
-                  child: _buildCreditMethodCard(method, true),
-                ),
-              ),
-            );
-          },
-        ),
-      ],
-    );
-  }
-
-  Widget _buildSpendCreditsSection() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          'SPEND CREDITS',
-          style: GoogleFonts.inter(
-            fontSize: 18,
-            fontWeight: FontWeight.bold,
-            color: AppColors.electricBlue,
-            letterSpacing: 1.0,
-          ),
-        ),
-        const SizedBox(height: 16),
-        GridView.builder(
-          shrinkWrap: true,
-          physics: const NeverScrollableScrollPhysics(),
-          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: 2,
-            mainAxisSpacing: 12,
-            crossAxisSpacing: 12,
-            childAspectRatio: 1.2,
-          ),
-          itemCount: _spendMethods.length,
-          itemBuilder: (context, index) {
-            final method = _spendMethods[index];
-            return AnimationConfiguration.staggeredGrid(
-              position: index,
-              duration: const Duration(milliseconds: 600),
-              columnCount: 2,
-              child: ScaleAnimation(
-                child: FadeInAnimation(
-                  child: _buildCreditMethodCard(method, false),
-                ),
-              ),
-            );
-          },
-        ),
-      ],
-    );
-  }
-
-  Widget _buildCreditMethodCard(Map<String, dynamic> method, bool isEarn) {
-    return GlassCard(
-      padding: const EdgeInsets.all(16),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
+        const SizedBox(width: 16),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Container(
-                padding: const EdgeInsets.all(8),
-                decoration: BoxDecoration(
-                  color: (method['color'] as Color).withOpacity(0.1),
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Icon(
-                  method['icon'] as IconData,
-                  color: method['color'] as Color,
-                  size: 20,
+              Text(
+                title,
+                style: const TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w600,
+                  color: Colors.white,
                 ),
               ),
-              if (isEarn) ...[
-                const Spacer(),
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                  decoration: BoxDecoration(
-                    color: AppColors.neonGreen.withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: Text(
-                    '+${method['credits']}',
-                    style: GoogleFonts.inter(
-                      fontSize: 10,
-                      fontWeight: FontWeight.bold,
-                      color: AppColors.neonGreen,
-                    ),
-                  ),
+              Text(
+                subtitle,
+                style: TextStyle(
+                  fontSize: 12,
+                  color: AppColors.textSecondary,
                 ),
-              ],
+              ),
             ],
           ),
+        ),
+      ],
+    );
+  }
 
-          const SizedBox(height: 12),
-
-          Text(
-            method['title'] as String,
-            style: GoogleFonts.inter(
-              fontSize: 14,
-              fontWeight: FontWeight.bold,
-              color: AppColors.textPrimary,
+  Widget _buildLegalItem(String title, String description) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 8),
+      child: GlassCard(
+        padding: const EdgeInsets.all(16),
+        child: Row(
+          children: [
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    title,
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.white,
+                    ),
+                  ),
+                  Text(
+                    description,
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: AppColors.textSecondary,
+                    ),
+                  ),
+                ],
+              ),
             ),
-            maxLines: 2,
-            overflow: TextOverflow.ellipsis,
-          ),
-
-          const SizedBox(height: 4),
-
-          Text(
-            method['description'] as String,
-            style: GoogleFonts.inter(
-              fontSize: 11,
+            Icon(
+              Icons.chevron_right,
               color: AppColors.textSecondary,
-              fontWeight: FontWeight.w400,
+              size: 20,
             ),
-            maxLines: 2,
-            overflow: TextOverflow.ellipsis,
-          ),
-        ],
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildSocialButton(IconData icon, Color color) {
+    return Container(
+      width: 48,
+      height: 48,
+      decoration: BoxDecoration(
+        color: color.withOpacity(0.2),
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Icon(
+        icon,
+        color: color,
+        size: 24,
       ),
     );
   }

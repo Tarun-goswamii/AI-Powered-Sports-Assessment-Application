@@ -1,5 +1,6 @@
 // lib/features/community/presentation/screens/community_screen.dart
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../shared/presentation/widgets/glass_card.dart';
 import '../../../../shared/presentation/widgets/neon_button.dart';
@@ -13,172 +14,97 @@ class CommunityScreen extends StatefulWidget {
 
 class _CommunityScreenState extends State<CommunityScreen>
     with TickerProviderStateMixin {
-  final List<Map<String, dynamic>> posts = [
-    {
-      'id': '1',
-      'user': 'Alex Johnson',
-      'avatar': 'AJ',
-      'time': '2h ago',
-      'content': 'Just completed my vertical jump test! Scored 42cm - not bad for a beginner! 🎯',
-      'likes': 24,
-      'comments': 8,
-      'shares': 3,
-      'type': 'achievement',
-    },
-    {
-      'id': '2',
-      'user': 'Sarah Chen',
-      'avatar': 'SC',
-      'time': '4h ago',
-      'content': 'Looking for training partners in Mumbai. Anyone interested in shuttle run practice sessions?',
-      'likes': 12,
-      'comments': 15,
-      'shares': 2,
-      'type': 'question',
-    },
-    {
-      'id': '3',
-      'user': 'Mike Rodriguez',
-      'avatar': 'MR',
-      'time': '6h ago',
-      'content': 'New personal best in endurance run! 2100m in 12 minutes. The training plan from my mentor really works! 💪',
-      'likes': 45,
-      'comments': 22,
-      'shares': 7,
-      'type': 'achievement',
-    },
-    {
-      'id': '4',
-      'user': 'Priya Patel',
-      'avatar': 'PP',
-      'time': '8h ago',
-      'content': 'Nutrition question: What\'s the best post-workout meal for muscle recovery?',
-      'likes': 18,
-      'comments': 31,
-      'shares': 5,
-      'type': 'question',
-    },
-  ];
+  late TabController _tabController;
 
-  final List<Map<String, dynamic>> events = [
-    {
-      'title': 'Weekly Shuttle Run Challenge',
-      'date': 'Tomorrow, 6:00 PM',
-      'location': 'Central Park, Mumbai',
-      'participants': 23,
-      'maxParticipants': 30,
-    },
-    {
-      'title': 'Vertical Jump Workshop',
-      'date': 'Saturday, 10:00 AM',
-      'location': 'Sports Academy, Delhi',
-      'participants': 15,
-      'maxParticipants': 20,
-    },
-  ];
+  @override
+  void initState() {
+    super.initState();
+    _tabController = TabController(length: 3, vsync: this);
+  }
+
+  @override
+  void dispose() {
+    _tabController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: AppColors.background,
-      appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        title: const Text(
-          'Community',
-          style: TextStyle(
-            color: Colors.white,
-            fontSize: 20,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        actions: [
-          IconButton(
-            onPressed: _createPost,
-            icon: const Icon(Icons.add, color: Colors.white),
-          ),
-          IconButton(
-            onPressed: _openMessages,
-            icon: const Icon(Icons.message_outlined, color: Colors.white),
-          ),
-        ],
+    return Container(
+      decoration: BoxDecoration(
+        gradient: AppColors.backgroundGradient,
       ),
-      body: Container(
-        decoration: BoxDecoration(
-          gradient: AppColors.backgroundGradient,
-        ),
+      child: SafeArea(
         child: Column(
           children: [
-            // Quick Actions
+            // Header
             Padding(
-              padding: const EdgeInsets.all(20.0),
+              padding: const EdgeInsets.all(20),
               child: Row(
                 children: [
-                  Expanded(
-                    child: NeonButton(
-                      text: 'Create Post',
-                      size: NeonButtonSize.small,
-                      onPressed: _createPost,
+                  IconButton(
+                    onPressed: () => context.go('/home'),
+                    icon: const Icon(Icons.arrow_back, color: Colors.white),
+                    style: IconButton.styleFrom(
+                      backgroundColor: AppColors.card.withOpacity(0.5),
+                      padding: const EdgeInsets.all(12),
                     ),
                   ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: NeonButton(
-                      text: 'Find Events',
-                      variant: NeonButtonVariant.secondary,
-                      size: NeonButtonSize.small,
-                      onPressed: _findEvents,
+                  const SizedBox(width: 16),
+                  const Expanded(
+                    child: Text(
+                      'Community',
+                      style: TextStyle(
+                        fontSize: 28,
+                        fontWeight: FontWeight.w700,
+                        color: Colors.white,
+                      ),
                     ),
                   ),
-                ],
-              ),
-            ),
-
-            // Upcoming Events
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text(
-                    'Upcoming Events',
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
-                    ),
-                  ),
-                  const SizedBox(height: 12),
-                  SizedBox(
-                    height: 120,
-                    child: ListView.builder(
-                      scrollDirection: Axis.horizontal,
-                      itemCount: events.length,
-                      itemBuilder: (context, index) {
-                        return Padding(
-                          padding: const EdgeInsets.only(right: 12.0),
-                          child: _buildEventCard(events[index]),
-                        );
-                      },
-                    ),
+                  IconButton(
+                    onPressed: () => context.go('/leaderboard'),
+                    icon: const Icon(Icons.leaderboard, color: Colors.white),
                   ),
                 ],
               ),
             ),
 
-            const SizedBox(height: 20),
+            // Tab Bar
+            Container(
+              margin: const EdgeInsets.symmetric(horizontal: 20),
+              decoration: BoxDecoration(
+                color: AppColors.card.withOpacity(0.3),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: TabBar(
+                controller: _tabController,
+                indicator: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [AppColors.royalPurple, AppColors.electricBlue],
+                  ),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                indicatorSize: TabBarIndicatorSize.tab,
+                dividerColor: Colors.transparent,
+                labelColor: Colors.white,
+                unselectedLabelColor: AppColors.textSecondary,
+                tabs: const [
+                  Tab(text: 'Feed'),
+                  Tab(text: 'Challenges'),
+                  Tab(text: 'Groups'),
+                ],
+              ),
+            ),
 
-            // Feed
+            // Tab Content
             Expanded(
-              child: ListView.builder(
-                padding: const EdgeInsets.symmetric(horizontal: 20.0),
-                itemCount: posts.length,
-                itemBuilder: (context, index) {
-                  return Padding(
-                    padding: const EdgeInsets.only(bottom: 16.0),
-                    child: _buildPostCard(posts[index]),
-                  );
-                },
+              child: TabBarView(
+                controller: _tabController,
+                children: [
+                  _buildFeedTab(),
+                  _buildChallengesTab(),
+                  _buildGroupsTab(),
+                ],
               ),
             ),
           ],
@@ -187,109 +113,189 @@ class _CommunityScreenState extends State<CommunityScreen>
     );
   }
 
-  Widget _buildEventCard(Map<String, dynamic> event) {
-    return GlassCard(
-      width: 280,
-      padding: const EdgeInsets.all(16),
+  Widget _buildFeedTab() {
+    return SingleChildScrollView(
+      padding: const EdgeInsets.all(20),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            event['title'],
-            style: const TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.bold,
-              color: Colors.white,
-            ),
-            maxLines: 2,
-            overflow: TextOverflow.ellipsis,
+          // Create Post Button
+          NeonButton(
+            text: '+ Share Your Achievement',
+            onPressed: () {},
+            size: NeonButtonSize.medium,
           ),
-          const SizedBox(height: 8),
-          Row(
-            children: [
-              Icon(
-                Icons.calendar_today,
-                size: 14,
-                color: AppColors.textSecondary,
-              ),
-              const SizedBox(width: 4),
-              Text(
-                event['date'],
-                style: TextStyle(
-                  fontSize: 12,
-                  color: AppColors.textSecondary,
-                ),
-              ),
-            ],
+          const SizedBox(height: 24),
+
+          // Posts
+          _buildPost(
+            'Rahul Sharma',
+            'Just completed my 40m sprint test! 5.1 seconds - personal best! 🏃‍♂️',
+            '2 hours ago',
+            24,
+            8,
+            AppColors.neonGreen,
           ),
-          const SizedBox(height: 4),
-          Row(
-            children: [
-              Icon(
-                Icons.location_on,
-                size: 14,
-                color: AppColors.textSecondary,
-              ),
-              const SizedBox(width: 4),
-              Expanded(
-                child: Text(
-                  event['location'],
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: AppColors.textSecondary,
-                  ),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                ),
-              ),
-            ],
+          const SizedBox(height: 16),
+          _buildPost(
+            'Priya Patel',
+            'Vertical jump improved by 5cm this week! Thanks to the training plan. 💪',
+            '4 hours ago',
+            18,
+            12,
+            AppColors.electricBlue,
           ),
-          const SizedBox(height: 8),
-          Row(
-            children: [
-              Icon(
-                Icons.people,
-                size: 14,
-                color: AppColors.electricBlue,
-              ),
-              const SizedBox(width: 4),
-              Text(
-                '${event['participants']}/${event['maxParticipants']} joined',
-                style: TextStyle(
-                  fontSize: 12,
-                  color: AppColors.electricBlue,
-                ),
-              ),
-              const Spacer(),
-              NeonButton(
-                text: 'Join',
-                size: NeonButtonSize.small,
-                onPressed: () => _joinEvent(event),
-              ),
-            ],
+          const SizedBox(height: 16),
+          _buildPost(
+            'Amit Kumar',
+            'Anyone up for a community challenge? Let\'s see who can improve their agility test the most!',
+            '6 hours ago',
+            32,
+            15,
+            AppColors.warmOrange,
+          ),
+          const SizedBox(height: 16),
+          _buildPost(
+            'Sneha Reddy',
+            'Nutrition tip: Complex carbs before workouts give you sustained energy. Try sweet potatoes! 🥔',
+            '8 hours ago',
+            41,
+            22,
+            AppColors.royalPurple,
           ),
         ],
       ),
     );
   }
 
-  Widget _buildPostCard(Map<String, dynamic> post) {
-    return GlassCard(
+  Widget _buildChallengesTab() {
+    return SingleChildScrollView(
       padding: const EdgeInsets.all(20),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // User Info
+          const Text(
+            'Active Challenges',
+            style: TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.w600,
+              color: Colors.white,
+            ),
+          ),
+          const SizedBox(height: 16),
+
+          // Challenge Cards
+          _buildChallengeCard(
+            'Monthly Sprint Challenge',
+            'Beat your personal best in 40m sprint',
+            'Ends in 12 days',
+            156,
+            AppColors.neonGreen,
+          ),
+          const SizedBox(height: 16),
+          _buildChallengeCard(
+            'Strength Building',
+            'Max push-ups in 1 minute',
+            'Ends in 18 days',
+            89,
+            AppColors.electricBlue,
+          ),
+          const SizedBox(height: 16),
+          _buildChallengeCard(
+            'Endurance Run',
+            'Longest distance in 30 minutes',
+            'Ends in 25 days',
+            203,
+            AppColors.warmOrange,
+          ),
+
+          const SizedBox(height: 32),
+          const Text(
+            'Completed Challenges',
+            style: TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.w600,
+              color: Colors.white,
+            ),
+          ),
+          const SizedBox(height: 16),
+          _buildCompletedChallenge('Agility Master', 'Top 10% in agility test', AppColors.royalPurple),
+          const SizedBox(height: 12),
+          _buildCompletedChallenge('Speed Demon', 'Sub 5.0s in 40m sprint', AppColors.neonGreen),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildGroupsTab() {
+    return SingleChildScrollView(
+      padding: const EdgeInsets.all(20),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(
+            'Sports Groups',
+            style: TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.w600,
+              color: Colors.white,
+            ),
+          ),
+          const SizedBox(height: 16),
+
+          // Groups
+          _buildGroupCard(
+            'Sprinters Club',
+            'For all sprint enthusiasts',
+            1247,
+            true,
+            AppColors.neonGreen,
+          ),
+          const SizedBox(height: 16),
+          _buildGroupCard(
+            'Strength Training',
+            'Build power and muscle',
+            892,
+            true,
+            AppColors.electricBlue,
+          ),
+          const SizedBox(height: 16),
+          _buildGroupCard(
+            'Endurance Athletes',
+            'Long distance runners',
+            654,
+            false,
+            AppColors.warmOrange,
+          ),
+          const SizedBox(height: 16),
+          _buildGroupCard(
+            'Youth Athletes',
+            'Under 18 competitive athletes',
+            432,
+            true,
+            AppColors.royalPurple,
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildPost(String author, String content, String time, int likes, int comments, Color accentColor) {
+    return GlassCard(
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
           Row(
             children: [
               CircleAvatar(
                 radius: 20,
-                backgroundColor: AppColors.royalPurple,
+                backgroundColor: accentColor.withOpacity(0.2),
                 child: Text(
-                  post['avatar'],
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontWeight: FontWeight.bold,
+                  author[0],
+                  style: TextStyle(
+                    color: accentColor,
+                    fontWeight: FontWeight.w600,
                   ),
                 ),
               ),
@@ -299,15 +305,15 @@ class _CommunityScreenState extends State<CommunityScreen>
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      post['user'],
+                      author,
                       style: const TextStyle(
                         fontSize: 16,
-                        fontWeight: FontWeight.bold,
+                        fontWeight: FontWeight.w600,
                         color: Colors.white,
                       ),
                     ),
                     Text(
-                      post['time'],
+                      time,
                       style: TextStyle(
                         fontSize: 12,
                         color: AppColors.textSecondary,
@@ -316,49 +322,50 @@ class _CommunityScreenState extends State<CommunityScreen>
                   ],
                 ),
               ),
-              IconButton(
-                onPressed: () => _showPostMenu(post),
-                icon: const Icon(
-                  Icons.more_vert,
-                  color: Colors.white,
-                ),
-              ),
             ],
           ),
-
-          const SizedBox(height: 16),
-
-          // Post Content
+          const SizedBox(height: 12),
           Text(
-            post['content'],
+            content,
             style: const TextStyle(
               fontSize: 14,
               color: Colors.white,
-              height: 1.5,
+              height: 1.4,
             ),
           ),
-
           const SizedBox(height: 16),
-
-          // Engagement Stats
           Row(
             children: [
-              _buildEngagementButton(
-                icon: Icons.thumb_up_outlined,
-                count: post['likes'],
-                onPressed: () => _likePost(post),
+              IconButton(
+                onPressed: () {},
+                icon: Icon(
+                  Icons.favorite_border,
+                  color: AppColors.textSecondary,
+                  size: 20,
+                ),
+              ),
+              Text(
+                '$likes',
+                style: TextStyle(
+                  fontSize: 12,
+                  color: AppColors.textSecondary,
+                ),
               ),
               const SizedBox(width: 16),
-              _buildEngagementButton(
-                icon: Icons.comment_outlined,
-                count: post['comments'],
-                onPressed: () => _commentOnPost(post),
+              IconButton(
+                onPressed: () {},
+                icon: Icon(
+                  Icons.comment_outlined,
+                  color: AppColors.textSecondary,
+                  size: 20,
+                ),
               ),
-              const SizedBox(width: 16),
-              _buildEngagementButton(
-                icon: Icons.share_outlined,
-                count: post['shares'],
-                onPressed: () => _sharePost(post),
+              Text(
+                '$comments',
+                style: TextStyle(
+                  fontSize: 12,
+                  color: AppColors.textSecondary,
+                ),
               ),
             ],
           ),
@@ -367,87 +374,180 @@ class _CommunityScreenState extends State<CommunityScreen>
     );
   }
 
-  Widget _buildEngagementButton({
-    required IconData icon,
-    required int count,
-    required VoidCallback onPressed,
-  }) {
-    return InkWell(
-      onTap: onPressed,
-      borderRadius: BorderRadius.circular(8),
-      child: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: Row(
-          children: [
-            Icon(
-              icon,
-              size: 18,
+  Widget _buildChallengeCard(String title, String description, String timeLeft, int participants, Color color) {
+    return GlassCard(
+      padding: const EdgeInsets.all(20),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                width: 12,
+                height: 12,
+                decoration: BoxDecoration(
+                  color: color,
+                  borderRadius: BorderRadius.circular(6),
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Text(
+                  title,
+                  style: const TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.w600,
+                    color: Colors.white,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 8),
+          Text(
+            description,
+            style: TextStyle(
+              fontSize: 14,
               color: AppColors.textSecondary,
             ),
-            const SizedBox(width: 4),
-            Text(
-              count.toString(),
-              style: TextStyle(
-                fontSize: 12,
-                color: AppColors.textSecondary,
+          ),
+          const SizedBox(height: 16),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                timeLeft,
+                style: TextStyle(
+                  fontSize: 12,
+                  color: color,
+                  fontWeight: FontWeight.w500,
+                ),
               ),
-            ),
-          ],
-        ),
+              Text(
+                '$participants participants',
+                style: TextStyle(
+                  fontSize: 12,
+                  color: AppColors.textSecondary,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 16),
+          NeonButton(
+            text: 'Join Challenge',
+            onPressed: () {},
+            size: NeonButtonSize.small,
+          ),
+        ],
       ),
     );
   }
 
-  void _createPost() {
-    // TODO: Navigate to create post screen
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Create post feature coming soon!')),
+  Widget _buildCompletedChallenge(String title, String achievement, Color color) {
+    return GlassCard(
+      padding: const EdgeInsets.all(16),
+      child: Row(
+        children: [
+          Icon(
+            Icons.emoji_events,
+            color: color,
+            size: 24,
+          ),
+          const SizedBox(width: 16),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title,
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                    color: Colors.white,
+                  ),
+                ),
+                Text(
+                  achievement,
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: AppColors.textSecondary,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          Icon(
+            Icons.check_circle,
+            color: color,
+            size: 20,
+          ),
+        ],
+      ),
     );
   }
 
-  void _openMessages() {
-    // TODO: Navigate to messages screen
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Messages feature coming soon!')),
-    );
-  }
-
-  void _findEvents() {
-    // TODO: Navigate to events screen
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Events feature coming soon!')),
-    );
-  }
-
-  void _joinEvent(Map<String, dynamic> event) {
-    // TODO: Join event logic
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('Joined ${event['title']}')),
-    );
-  }
-
-  void _showPostMenu(Map<String, dynamic> post) {
-    // TODO: Show post options menu
-  }
-
-  void _likePost(Map<String, dynamic> post) {
-    // TODO: Like post logic
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Post liked!')),
-    );
-  }
-
-  void _commentOnPost(Map<String, dynamic> post) {
-    // TODO: Navigate to comments
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Comments feature coming soon!')),
-    );
-  }
-
-  void _sharePost(Map<String, dynamic> post) {
-    // TODO: Share post logic
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Post shared!')),
+  Widget _buildGroupCard(String name, String description, int members, bool isJoined, Color color) {
+    return GlassCard(
+      padding: const EdgeInsets.all(20),
+      child: Row(
+        children: [
+          Container(
+            width: 50,
+            height: 50,
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: [color, color.withOpacity(0.6)],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Icon(
+              Icons.group,
+              color: Colors.white,
+              size: 24,
+            ),
+          ),
+          const SizedBox(width: 16),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  name,
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                    color: Colors.white,
+                  ),
+                ),
+                Text(
+                  description,
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: AppColors.textSecondary,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  '$members members',
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: color,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          NeonButton(
+            text: isJoined ? 'Joined' : 'Join',
+            onPressed: () {},
+            size: NeonButtonSize.small,
+            variant: isJoined ? NeonButtonVariant.outline : NeonButtonVariant.primary,
+          ),
+        ],
+      ),
     );
   }
 }
