@@ -511,6 +511,342 @@ class ConvexService {
     'rank': 5,
     'achievements': ['speed_demon', 'consistency_master'],
   };
+
+  // Mentor methods
+  Future<List<Map<String, dynamic>>> getMentors() async {
+    if (!AppConfig.enableConvexBackend) return _getMockMentors();
+
+    try {
+      final url = Uri.parse('$baseUrl/api/v1/query');
+      final response = await http.post(
+        url,
+        headers: _getHeaders(),
+        body: jsonEncode({
+          'functionName': 'getMentors',
+          'args': [],
+        }),
+      );
+
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> data = jsonDecode(response.body);
+        return List<Map<String, dynamic>>.from(data['value'] ?? []);
+      } else {
+        throw Exception('Failed to fetch mentors: ${response.statusCode}');
+      }
+    } catch (e) {
+      print('❌ CONVEX getMentors failed: $e');
+      return _getMockMentors();
+    }
+  }
+
+  Future<List<Map<String, dynamic>>> getUserMentorSessions(String userId) async {
+    if (!AppConfig.enableConvexBackend) return _getMockUserMentorSessions(userId);
+
+    try {
+      final url = Uri.parse('$baseUrl/api/v1/query');
+      final response = await http.post(
+        url,
+        headers: _getHeaders(),
+        body: jsonEncode({
+          'functionName': 'getUserMentorSessions',
+          'args': [userId],
+        }),
+      );
+
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> data = jsonDecode(response.body);
+        return List<Map<String, dynamic>>.from(data['value'] ?? []);
+      } else {
+        throw Exception('Failed to fetch mentor sessions: ${response.statusCode}');
+      }
+    } catch (e) {
+      print('❌ CONVEX getUserMentorSessions failed: $e');
+      return _getMockUserMentorSessions(userId);
+    }
+  }
+
+  Future<List<Map<String, dynamic>>> getUserFavoriteMentors(String userId) async {
+    if (!AppConfig.enableConvexBackend) return _getMockUserFavoriteMentors(userId);
+
+    try {
+      final url = Uri.parse('$baseUrl/api/v1/query');
+      final response = await http.post(
+        url,
+        headers: _getHeaders(),
+        body: jsonEncode({
+          'functionName': 'getUserFavoriteMentors',
+          'args': [userId],
+        }),
+      );
+
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> data = jsonDecode(response.body);
+        return List<Map<String, dynamic>>.from(data['value'] ?? []);
+      } else {
+        throw Exception('Failed to fetch favorite mentors: ${response.statusCode}');
+      }
+    } catch (e) {
+      print('❌ CONVEX getUserFavoriteMentors failed: $e');
+      return _getMockUserFavoriteMentors(userId);
+    }
+  }
+
+  Future<List<Map<String, dynamic>>> getUserAchievements(String userId) async {
+    if (!AppConfig.enableConvexBackend) return _getMockUserAchievements(userId);
+
+    try {
+      final url = Uri.parse('$baseUrl/api/v1/query');
+      final response = await http.post(
+        url,
+        headers: _getHeaders(),
+        body: jsonEncode({
+          'functionName': 'getUserAchievements',
+          'args': [userId],
+        }),
+      );
+
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> data = jsonDecode(response.body);
+        return List<Map<String, dynamic>>.from(data['value'] ?? []);
+      } else {
+        throw Exception('Failed to fetch user achievements: ${response.statusCode}');
+      }
+    } catch (e) {
+      print('❌ CONVEX getUserAchievements failed: $e');
+      return _getMockUserAchievements(userId);
+    }
+  }
+
+  Future<List<Map<String, dynamic>>> getUserBodyLogs(String userId) async {
+    if (!AppConfig.enableConvexBackend) return _getMockUserBodyLogs(userId);
+
+    try {
+      final url = Uri.parse('$baseUrl/api/v1/query');
+      final response = await http.post(
+        url,
+        headers: _getHeaders(),
+        body: jsonEncode({
+          'functionName': 'getUserBodyLogs',
+          'args': [userId],
+        }),
+      );
+
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> data = jsonDecode(response.body);
+        return List<Map<String, dynamic>>.from(data['value'] ?? []);
+      } else {
+        throw Exception('Failed to fetch body logs: ${response.statusCode}');
+      }
+    } catch (e) {
+      print('❌ CONVEX getUserBodyLogs failed: $e');
+      return _getMockUserBodyLogs(userId);
+    }
+  }
+
+  // Mock data for mentors
+  List<Map<String, dynamic>> _getMockMentors() => [
+    {
+      'id': '1',
+      'name': 'Coach Rajesh Kumar',
+      'subtitle': 'Former National Sprinter',
+      'specialty': 'Sprint Training Specialist',
+      'description': 'Expert in sprint training with 15+ years of experience. Former national champion.',
+      'rating': 4.9,
+      'sessionsCount': 156,
+      'price': '₹500/session',
+      'categories': ['Sprint', 'Speed'],
+      'isOnline': true,
+      'avatarUrl': 'https://example.com/avatar1.jpg',
+      'createdAt': DateTime.now().toIso8601String(),
+      'updatedAt': DateTime.now().toIso8601String(),
+    },
+    {
+      'id': '2',
+      'name': 'Dr. Priya Sharma',
+      'subtitle': 'Sports Nutritionist',
+      'specialty': 'Nutrition & Diet Expert',
+      'description': 'Certified sports nutritionist helping athletes optimize their diet for peak performance.',
+      'rating': 4.8,
+      'sessionsCount': 89,
+      'price': '₹400/session',
+      'categories': ['Nutrition'],
+      'isOnline': false,
+      'avatarUrl': 'https://example.com/avatar2.jpg',
+      'createdAt': DateTime.now().toIso8601String(),
+      'updatedAt': DateTime.now().toIso8601String(),
+    },
+    {
+      'id': '3',
+      'name': 'Mike Johnson',
+      'subtitle': 'Strength Coach',
+      'specialty': 'Power & Conditioning',
+      'description': 'Olympic weightlifting coach specializing in strength and conditioning programs.',
+      'rating': 4.7,
+      'sessionsCount': 203,
+      'price': '₹600/session',
+      'categories': ['Strength', 'Power'],
+      'isOnline': true,
+      'avatarUrl': 'https://example.com/avatar3.jpg',
+      'createdAt': DateTime.now().toIso8601String(),
+      'updatedAt': DateTime.now().toIso8601String(),
+    },
+    {
+      'id': '4',
+      'name': 'Dr. Amit Patel',
+      'subtitle': 'Sports Physiotherapist',
+      'specialty': 'Injury Prevention & Recovery',
+      'description': 'Experienced physiotherapist focused on injury prevention and rehabilitation.',
+      'rating': 4.9,
+      'sessionsCount': 127,
+      'price': '₹550/session',
+      'categories': ['Recovery', 'Physiotherapy'],
+      'isOnline': false,
+      'avatarUrl': 'https://example.com/avatar4.jpg',
+      'createdAt': DateTime.now().toIso8601String(),
+      'updatedAt': DateTime.now().toIso8601String(),
+    },
+  ];
+
+  List<Map<String, dynamic>> _getMockUserMentorSessions(String userId) => [
+    {
+      'id': '1',
+      'mentorId': '1',
+      'userId': userId,
+      'topic': 'Sprint Technique Analysis',
+      'scheduledAt': DateTime.now().add(const Duration(days: 1)).toIso8601String(),
+      'status': 'upcoming',
+      'type': 'video_call',
+      'createdAt': DateTime.now().toIso8601String(),
+      'updatedAt': DateTime.now().toIso8601String(),
+      'mentor': {
+        'id': '1',
+        'name': 'Coach Rajesh Kumar',
+        'subtitle': 'Former National Sprinter',
+        'specialty': 'Sprint Training Specialist',
+        'rating': 4.9,
+        'price': '₹500/session',
+        'avatarUrl': 'https://example.com/avatar1.jpg',
+      },
+    },
+    {
+      'id': '2',
+      'mentorId': '2',
+      'userId': userId,
+      'topic': 'Nutrition Plan Review',
+      'scheduledAt': DateTime.now().add(const Duration(days: 2)).toIso8601String(),
+      'status': 'upcoming',
+      'type': 'chat_session',
+      'createdAt': DateTime.now().toIso8601String(),
+      'updatedAt': DateTime.now().toIso8601String(),
+      'mentor': {
+        'id': '2',
+        'name': 'Dr. Priya Sharma',
+        'subtitle': 'Sports Nutritionist',
+        'specialty': 'Nutrition & Diet Expert',
+        'rating': 4.8,
+        'price': '₹400/session',
+        'avatarUrl': 'https://example.com/avatar2.jpg',
+      },
+    },
+    {
+      'id': '3',
+      'mentorId': '3',
+      'userId': userId,
+      'topic': 'Strength Training Program',
+      'scheduledAt': DateTime.now().subtract(const Duration(days: 2)).toIso8601String(),
+      'status': 'completed',
+      'type': 'video_call',
+      'rating': 5.0,
+      'review': 'Excellent session, very knowledgeable coach.',
+      'createdAt': DateTime.now().toIso8601String(),
+      'updatedAt': DateTime.now().toIso8601String(),
+      'mentor': {
+        'id': '3',
+        'name': 'Mike Johnson',
+        'subtitle': 'Strength Coach',
+        'specialty': 'Power & Conditioning',
+        'rating': 4.7,
+        'price': '₹600/session',
+        'avatarUrl': 'https://example.com/avatar3.jpg',
+      },
+    },
+  ];
+
+  List<Map<String, dynamic>> _getMockUserFavoriteMentors(String userId) => [
+    {
+      'id': '1',
+      'name': 'Coach Rajesh Kumar',
+      'subtitle': 'Former National Sprinter',
+      'specialty': 'Sprint Training Specialist',
+      'rating': 4.9,
+      'sessionsCount': 156,
+      'price': '₹500/session',
+      'categories': ['Sprint', 'Speed'],
+      'isOnline': true,
+      'avatarUrl': 'https://example.com/avatar1.jpg',
+      'createdAt': DateTime.now().toIso8601String(),
+      'updatedAt': DateTime.now().toIso8601String(),
+    },
+    {
+      'id': '3',
+      'name': 'Mike Johnson',
+      'subtitle': 'Strength Coach',
+      'specialty': 'Power & Conditioning',
+      'rating': 4.7,
+      'sessionsCount': 203,
+      'price': '₹600/session',
+      'categories': ['Strength', 'Power'],
+      'isOnline': true,
+      'avatarUrl': 'https://example.com/avatar3.jpg',
+      'createdAt': DateTime.now().toIso8601String(),
+      'updatedAt': DateTime.now().toIso8601String(),
+    },
+  ];
+
+  List<Map<String, dynamic>> _getMockUserAchievements(String userId) => [
+    {
+      'id': '1',
+      'achievementId': 'first_test',
+      'unlockedAt': DateTime.now().subtract(const Duration(days: 7)).toIso8601String(),
+    },
+    {
+      'id': '2',
+      'achievementId': 'speed_demon',
+      'unlockedAt': DateTime.now().subtract(const Duration(days: 5)).toIso8601String(),
+    },
+    {
+      'id': '3',
+      'achievementId': 'consistency_master',
+      'unlockedAt': DateTime.now().subtract(const Duration(days: 3)).toIso8601String(),
+    },
+  ];
+
+  List<Map<String, dynamic>> _getMockUserBodyLogs(String userId) => [
+    {
+      'id': '1',
+      'userId': userId,
+      'date': DateTime.now().subtract(const Duration(days: 1)).toIso8601String(),
+      'weight': 75.5,
+      'height': 175.0,
+      'bodyFat': 12.5,
+      'muscleMass': 65.0,
+      'notes': 'Feeling good after the workout',
+      'createdAt': DateTime.now().toIso8601String(),
+      'updatedAt': DateTime.now().toIso8601String(),
+    },
+    {
+      'id': '2',
+      'userId': userId,
+      'date': DateTime.now().subtract(const Duration(days: 3)).toIso8601String(),
+      'weight': 76.0,
+      'height': 175.0,
+      'bodyFat': 13.0,
+      'muscleMass': 64.5,
+      'notes': 'Need to focus on diet',
+      'createdAt': DateTime.now().toIso8601String(),
+      'updatedAt': DateTime.now().toIso8601String(),
+    },
+  ];
 }
 
 /// Riverpod provider for CONVEX service

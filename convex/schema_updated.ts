@@ -110,4 +110,50 @@ export default defineSchema({
   })
     .index("by_user", ["userId"])
     .index("by_date", ["date"]),
+
+  // Community tables
+  community_posts: defineTable({
+    userId: v.id("users"),
+    content: v.string(),
+    type: v.string(), // 'achievement', 'general', 'question', etc.
+    likes: v.number(),
+    comments: v.number(),
+    createdAt: v.number(),
+  })
+    .index("by_user", ["userId"])
+    .index("by_type", ["type"])
+    .index("by_createdAt", ["createdAt"]),
+
+  challenges: defineTable({
+    title: v.string(),
+    description: v.string(),
+    reward: v.number(),
+    startDate: v.number(),
+    endDate: v.number(),
+    isActive: v.boolean(),
+    participants: v.number(),
+    createdAt: v.number(),
+  })
+    .index("by_active", ["isActive"])
+    .index("by_endDate", ["endDate"]),
+
+  community_groups: defineTable({
+    name: v.string(),
+    description: v.string(),
+    category: v.string(),
+    memberCount: v.number(),
+    isPublic: v.boolean(),
+    createdAt: v.number(),
+  })
+    .index("by_category", ["category"])
+    .index("by_public", ["isPublic"]),
+
+  group_members: defineTable({
+    userId: v.id("users"),
+    groupId: v.id("community_groups"),
+    joinedAt: v.number(),
+  })
+    .index("by_user", ["userId"])
+    .index("by_group", ["groupId"])
+    .index("by_user_group", ["userId", "groupId"]),
 });

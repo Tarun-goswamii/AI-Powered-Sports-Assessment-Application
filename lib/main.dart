@@ -24,8 +24,8 @@ void main() async {
 
   // Skip service initialization during startup to prevent delays
   // Services will be initialized on-demand when needed
-  // final serviceManager = ServiceManager();
-  // await serviceManager.initialize();
+  final serviceManager = ServiceManager();
+  await serviceManager.initialize();
 
   // Set system UI overlay style for dark theme
   SystemChrome.setSystemUIOverlayStyle(

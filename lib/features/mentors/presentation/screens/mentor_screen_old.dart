@@ -1,10 +1,10 @@
+// lib/features/mentors/presentation/screens/mentor_screen.dart
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/services/service_manager.dart';
 import '../../../../core/models/mentor_model.dart';
-import '../../../../core/models/mentor_session_model.dart';
 import '../../../../shared/presentation/widgets/glass_card.dart';
 import '../../../../shared/presentation/widgets/neon_button.dart';
 
@@ -238,31 +238,49 @@ class _MentorScreenState extends ConsumerState<MentorScreen>
           const SizedBox(height: 24),
 
           // Mentor Cards
-          if (_isLoadingMentors)
-            const Center(child: CircularProgressIndicator())
-          else if (_mentors.isEmpty)
-            const Center(
-              child: Text(
-                'No mentors available',
-                style: TextStyle(color: Colors.white),
-              ),
-            )
-          else
-            ..._mentors.map((mentor) => Column(
-              children: [
-                _buildMentorCard(
-                  mentor.name,
-                  mentor.subtitle,
-                  mentor.specialty,
-                  mentor.rating,
-                  mentor.sessionsCount,
-                  '\$${mentor.hourlyRate.toStringAsFixed(0)}/hr',
-                  _getMentorColor(mentor.specialty),
-                  mentor.isAvailable,
-                ),
-                const SizedBox(height: 16),
-              ],
-            )),
+          _buildMentorCard(
+            'Coach Rajesh Kumar',
+            'Former National Sprinter',
+            'Sprint Training Specialist',
+            4.9,
+            156,
+            '₹500/session',
+            AppColors.neonGreen,
+            true,
+          ),
+          const SizedBox(height: 16),
+          _buildMentorCard(
+            'Dr. Priya Sharma',
+            'Sports Nutritionist',
+            'Nutrition & Diet Expert',
+            4.8,
+            89,
+            '₹400/session',
+            AppColors.electricBlue,
+            false,
+          ),
+          const SizedBox(height: 16),
+          _buildMentorCard(
+            'Mike Johnson',
+            'Strength Coach',
+            'Power & Conditioning',
+            4.7,
+            203,
+            '₹600/session',
+            AppColors.warmOrange,
+            true,
+          ),
+          const SizedBox(height: 16),
+          _buildMentorCard(
+            'Dr. Amit Patel',
+            'Sports Physiotherapist',
+            'Injury Prevention & Recovery',
+            4.9,
+            127,
+            '₹550/session',
+            AppColors.royalPurple,
+            false,
+          ),
         ],
       ),
     );
@@ -285,28 +303,21 @@ class _MentorScreenState extends ConsumerState<MentorScreen>
           const SizedBox(height: 16),
 
           // Upcoming Sessions
-          if (_isLoadingSessions)
-            const Center(child: CircularProgressIndicator())
-          else if (_sessions.where((s) => s.status == 'upcoming').isEmpty)
-            const Center(
-              child: Text(
-                'No upcoming sessions',
-                style: TextStyle(color: Colors.white),
-              ),
-            )
-          else
-            ..._sessions.where((s) => s.status == 'upcoming').map((session) => Column(
-              children: [
-                _buildSessionCard(
-                  session.mentorName ?? 'Unknown Mentor',
-                  session.topic,
-                  DateTime.fromMillisecondsSinceEpoch(session.scheduledAt).toString(),
-                  session.type,
-                  AppColors.neonGreen,
-                ),
-                const SizedBox(height: 16),
-              ],
-            )),
+          _buildSessionCard(
+            'Coach Rajesh Kumar',
+            'Sprint Technique Analysis',
+            'Tomorrow, 3:00 PM',
+            'Video Call',
+            AppColors.neonGreen,
+          ),
+          const SizedBox(height: 16),
+          _buildSessionCard(
+            'Dr. Priya Sharma',
+            'Nutrition Plan Review',
+            'Friday, 2:00 PM',
+            'Chat Session',
+            AppColors.electricBlue,
+          ),
 
           const SizedBox(height: 32),
           const Text(
@@ -320,28 +331,21 @@ class _MentorScreenState extends ConsumerState<MentorScreen>
           const SizedBox(height: 16),
 
           // Past Sessions
-          if (_isLoadingSessions)
-            const SizedBox() // Already showing loading above
-          else if (_sessions.where((s) => s.status == 'completed').isEmpty)
-            const Center(
-              child: Text(
-                'No past sessions',
-                style: TextStyle(color: Colors.white),
-              ),
-            )
-          else
-            ..._sessions.where((s) => s.status == 'completed').map((session) => Column(
-              children: [
-                _buildPastSessionCard(
-                  session.mentorName ?? 'Unknown Mentor',
-                  session.topic,
-                  'Completed ${session.completedAt?.toString() ?? 'recently'}',
-                  session.rating ?? 0.0,
-                  AppColors.warmOrange,
-                ),
-                const SizedBox(height: 12),
-              ],
-            )),
+          _buildPastSessionCard(
+            'Mike Johnson',
+            'Strength Training Program',
+            'Completed 2 days ago',
+            5.0,
+            AppColors.warmOrange,
+          ),
+          const SizedBox(height: 12),
+          _buildPastSessionCard(
+            'Dr. Amit Patel',
+            'Recovery Techniques',
+            'Completed 1 week ago',
+            4.8,
+            AppColors.royalPurple,
+          ),
         ],
       ),
     );
@@ -364,51 +368,30 @@ class _MentorScreenState extends ConsumerState<MentorScreen>
           const SizedBox(height: 16),
 
           // Favorite Mentors
-          if (_isLoadingFavorites)
-            const Center(child: CircularProgressIndicator())
-          else if (_favorites.isEmpty)
-            const Center(
-              child: Text(
-                'No favorite mentors yet',
-                style: TextStyle(color: Colors.white),
-              ),
-            )
-          else
-            ..._favorites.map((mentor) => Column(
-              children: [
-                _buildMentorCard(
-                  mentor.name,
-                  mentor.subtitle,
-                  mentor.specialty,
-                  mentor.rating,
-                  mentor.sessionsCount,
-                  '\$${mentor.hourlyRate.toStringAsFixed(0)}/hr',
-                  _getMentorColor(mentor.specialty),
-                  mentor.isAvailable,
-                ),
-                const SizedBox(height: 16),
-              ],
-            )),
+          _buildMentorCard(
+            'Coach Rajesh Kumar',
+            'Former National Sprinter',
+            'Sprint Training Specialist',
+            4.9,
+            156,
+            '₹500/session',
+            AppColors.neonGreen,
+            true,
+          ),
+          const SizedBox(height: 16),
+          _buildMentorCard(
+            'Mike Johnson',
+            'Strength Coach',
+            'Power & Conditioning',
+            4.7,
+            203,
+            '₹600/session',
+            AppColors.warmOrange,
+            true,
+          ),
         ],
       ),
     );
-  }
-
-  Color _getMentorColor(String specialty) {
-    switch (specialty.toLowerCase()) {
-      case 'sprint':
-      case 'speed':
-        return AppColors.neonGreen;
-      case 'nutrition':
-        return AppColors.electricBlue;
-      case 'strength':
-        return AppColors.warmOrange;
-      case 'recovery':
-      case 'physiotherapy':
-        return AppColors.royalPurple;
-      default:
-        return AppColors.neonGreen;
-    }
   }
 
   Widget _buildFilterChip(String label, bool isSelected) {
@@ -450,7 +433,7 @@ class _MentorScreenState extends ConsumerState<MentorScreen>
                     radius: 30,
                     backgroundColor: accentColor.withOpacity(0.2),
                     child: Text(
-                      name.isNotEmpty ? name[0] : '?',
+                      name[0],
                       style: TextStyle(
                         color: accentColor,
                         fontSize: 24,
@@ -518,7 +501,7 @@ class _MentorScreenState extends ConsumerState<MentorScreen>
                       ),
                       const SizedBox(width: 4),
                       Text(
-                        rating.toStringAsFixed(1),
+                        rating.toString(),
                         style: const TextStyle(
                           fontSize: 14,
                           fontWeight: FontWeight.w600,
@@ -682,7 +665,7 @@ class _MentorScreenState extends ConsumerState<MentorScreen>
               ),
               const SizedBox(width: 4),
               Text(
-                rating.toStringAsFixed(1),
+                rating.toString(),
                 style: const TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.w600,

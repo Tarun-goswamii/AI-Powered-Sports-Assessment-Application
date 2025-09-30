@@ -4,7 +4,6 @@ import 'package:go_router/go_router.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/services/service_manager.dart';
 import '../../../../core/models/mentor_model.dart';
-import '../../../../core/models/mentor_session_model.dart';
 import '../../../../shared/presentation/widgets/glass_card.dart';
 import '../../../../shared/presentation/widgets/neon_button.dart';
 
@@ -252,13 +251,13 @@ class _MentorScreenState extends ConsumerState<MentorScreen>
               children: [
                 _buildMentorCard(
                   mentor.name,
-                  mentor.subtitle,
+                  mentor.bio,
                   mentor.specialty,
                   mentor.rating,
-                  mentor.sessionsCount,
-                  '\$${mentor.hourlyRate.toStringAsFixed(0)}/hr',
+                  mentor.sessionCount,
+                  '₹${mentor.hourlyRate}/session',
                   _getMentorColor(mentor.specialty),
-                  mentor.isAvailable,
+                  mentor.isOnline,
                 ),
                 const SizedBox(height: 16),
               ],
@@ -287,7 +286,7 @@ class _MentorScreenState extends ConsumerState<MentorScreen>
           // Upcoming Sessions
           if (_isLoadingSessions)
             const Center(child: CircularProgressIndicator())
-          else if (_sessions.where((s) => s.status == 'upcoming').isEmpty)
+          else if (_sessions.isEmpty)
             const Center(
               child: Text(
                 'No upcoming sessions',
@@ -298,10 +297,10 @@ class _MentorScreenState extends ConsumerState<MentorScreen>
             ..._sessions.where((s) => s.status == 'upcoming').map((session) => Column(
               children: [
                 _buildSessionCard(
-                  session.mentorName ?? 'Unknown Mentor',
+                  session.mentorName,
                   session.topic,
-                  DateTime.fromMillisecondsSinceEpoch(session.scheduledAt).toString(),
-                  session.type,
+                  session.scheduledTime.toString(), // Format this properly
+                  session.sessionType,
                   AppColors.neonGreen,
                 ),
                 const SizedBox(height: 16),
@@ -322,18 +321,11 @@ class _MentorScreenState extends ConsumerState<MentorScreen>
           // Past Sessions
           if (_isLoadingSessions)
             const SizedBox() // Already showing loading above
-          else if (_sessions.where((s) => s.status == 'completed').isEmpty)
-            const Center(
-              child: Text(
-                'No past sessions',
-                style: TextStyle(color: Colors.white),
-              ),
-            )
           else
             ..._sessions.where((s) => s.status == 'completed').map((session) => Column(
               children: [
                 _buildPastSessionCard(
-                  session.mentorName ?? 'Unknown Mentor',
+                  session.mentorName,
                   session.topic,
                   'Completed ${session.completedAt?.toString() ?? 'recently'}',
                   session.rating ?? 0.0,
@@ -378,13 +370,13 @@ class _MentorScreenState extends ConsumerState<MentorScreen>
               children: [
                 _buildMentorCard(
                   mentor.name,
-                  mentor.subtitle,
+                  mentor.bio,
                   mentor.specialty,
                   mentor.rating,
-                  mentor.sessionsCount,
-                  '\$${mentor.hourlyRate.toStringAsFixed(0)}/hr',
+                  mentor.sessionCount,
+                  '₹${mentor.hourlyRate}/session',
                   _getMentorColor(mentor.specialty),
-                  mentor.isAvailable,
+                  mentor.isOnline,
                 ),
                 const SizedBox(height: 16),
               ],

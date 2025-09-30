@@ -1,20 +1,60 @@
-// lib/features/profile/presentation/screens/profile_screen.dart
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../core/theme/app_colors.dart';
+import '../../../../core/services/service_manager.dart';
 import '../../../../shared/presentation/widgets/glass_card.dart';
 import '../../../../shared/presentation/widgets/neon_button.dart';
 
-class ProfileScreen extends StatefulWidget {
+class ProfileScreen extends ConsumerStatefulWidget {
   const ProfileScreen({super.key});
 
   @override
-  State<ProfileScreen> createState() => _ProfileScreenState();
+  ConsumerState<ProfileScreen> createState() => _ProfileScreenState();
 }
 
-class _ProfileScreenState extends State<ProfileScreen> {
+class _ProfileScreenState extends ConsumerState<ProfileScreen> {
+  Map<String, dynamic>? _userProfile;
+  bool _isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadUserProfile();
+  }
+
+  Future<void> _loadUserProfile() async {
+    setState(() => _isLoading = true);
+    try {
+      final authService = ref.read(authServiceProvider);
+      final userId = authService.currentUser?.uid;
+      if (userId != null) {
+        final convexService = ref.read(convexServiceProvider);
+        final profile = await convexService.getUserDetailedProfile(userId);
+        if (mounted) {
+          setState(() {
+            _userProfile = profile;
+            _isLoading = false;
+          });
+        }
+      } else {
+        if (mounted) {
+          setState(() => _isLoading = false);
+        }
+      }
+    } catch (e) {
+      print('Error loading user profile: $e');
+      if (mounted) {
+        setState(() => _isLoading = false);
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
+    final authService = ref.watch(authServiceProvider);
+    final user = authService.currentUser;
+
     return Container(
       decoration: BoxDecoration(
         gradient: AppColors.backgroundGradient,
@@ -56,9 +96,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         CircleAvatar(
                           radius: 50,
                           backgroundColor: AppColors.royalPurple.withOpacity(0.2),
-                          child: const Text(
-                            'A',
-                            style: TextStyle(
+                          child: Text(
+                            user?.displayName?.isNotEmpty == true
+                                ? user!.displayName![0].toUpperCase()
+                                : user?.email?.isNotEmpty == true
+                                    ? user!.email![0].toUpperCase()
+                                    : 'A',
+                            style: const TextStyle(
                               color: AppColors.royalPurple,
                               fontSize: 36,
                               fontWeight: FontWeight.w600,
@@ -85,9 +129,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       ],
                     ),
                     const SizedBox(height: 16),
-                    const Text(
-                      'Athlete Name',
-                      style: TextStyle(
+                    Text(
+                      user?.displayName ?? 'Athlete',
+                      style: const TextStyle(
                         fontSize: 24,
                         fontWeight: FontWeight.w700,
                         color: Colors.white,
@@ -95,7 +139,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      'athlete@email.com',
+                      user?.email ?? 'athlete@email.com',
                       style: TextStyle(
                         fontSize: 14,
                         color: AppColors.textSecondary,
@@ -105,21 +149,30 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        _buildStatItem('Level 12', 'Athlete Level'),
+                        _buildStatItem(
+                          'Level ${_userProfile?['stats']?['level'] ?? 1}',
+                          'Athlete Level'
+                        ),
                         Container(
                           width: 1,
                           height: 40,
                           color: AppColors.border,
                           margin: const EdgeInsets.symmetric(horizontal: 20),
                         ),
-                        _buildStatItem('247', 'Tests Completed'),
+                        _buildStatItem(
+                          '${_userProfile?['stats']?['completedTests'] ?? 0}',
+                          'Tests Completed'
+                        ),
                         Container(
                           width: 1,
                           height: 40,
                           color: AppColors.border,
                           margin: const EdgeInsets.symmetric(horizontal: 20),
                         ),
-                        _buildStatItem('4.8', 'Avg Rating'),
+                        _buildStatItem(
+                          '${_userProfile?['stats']?['averageScore']?.toStringAsFixed(1) ?? '0.0'}',
+                          'Avg Rating'
+                        ),
                       ],
                     ),
                   ],
@@ -172,9 +225,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.end,
                       children: [
-                        const Text(
-                          '1,250',
-                          style: TextStyle(
+                        Text(
+                          '${_userProfile?['credits'] ?? 100}',
+                          style: const TextStyle(
                             fontSize: 24,
                             fontWeight: FontWeight.w700,
                             color: AppColors.warmOrange,
