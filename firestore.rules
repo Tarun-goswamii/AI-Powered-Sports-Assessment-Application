@@ -1,0 +1,205 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Helper functions
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+
+    function isAdmin() {
+      return isAuthenticated() && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
+    }
+
+    function isValidUser() {
+      return isAuthenticated() &&
+             request.auth.token.email_verified == true &&
+             request.auth.token.email.matches('.+@.+\\..+');
+    }
+
+    // Users collection
+    match /users/{userId} {
+      // Allow read/write for the user themselves
+      allow read, write: if isOwner(userId);
+
+      // Allow read for authenticated users (for profiles, leaderboards, etc.)
+      allow read: if isAuthenticated();
+
+      // Allow create for new users during registration
+      allow create: if isAuthenticated() &&
+                       request.auth.uid == userId &&
+                       request.resource.data.keys().hasAll(['id', 'email', 'name', 'createdAt']) &&
+                       request.resource.data.id == userId &&
+                       request.resource.data.email == request.auth.token.email;
+
+      // Allow update for profile updates
+      allow update: if isOwner(userId) &&
+                       // Only allow updating specific fields
+                       request.resource.data.diff(resource.data).affectedKeys()
+                         .hasOnly(['name', 'updatedAt', 'avatarUrl', 'bio', 'preferences']);
+    }
+
+    // Tests collection
+    match /tests/{testId} {
+      // Allow read for all authenticated users
+      allow read: if isAuthenticated();
+
+      // Allow write only for admins
+      allow write: if isAdmin();
+
+      // Allow create with proper validation
+      allow create: if isAdmin() &&
+                       request.resource.data.keys().hasAll(['id', 'title', 'description', 'category', 'difficulty', 'duration', 'isActive', 'createdAt']) &&
+                       request.resource.data.isActive is bool;
+    }
+
+    // Test Results collection
+    match /test_results/{resultId} {
+      // Allow read for the owner and admins
+      allow read: if isOwner(resource.data.userId) || isAdmin();
+
+      // Allow create for authenticated users
+      allow create: if isAuthenticated() &&
+                       request.auth.uid == request.resource.data.userId &&
+                       request.resource.data.keys().hasAll(['id', 'userId', 'testId', 'score', 'completedAt']) &&
+                       request.resource.data.score is number &&
+                       request.resource.data.score >= 0 &&
+                       request.resource.data.score <= 100;
+
+      // Allow update only for the owner (for corrections, etc.)
+      allow update: if isOwner(resource.data.userId) &&
+                       // Only allow updating specific fields
+                       request.resource.data.diff(resource.data).affectedKeys()
+                         .hasOnly(['score', 'notes', 'updatedAt']);
+
+      // Allow delete only for admins or the owner
+      allow delete: if isOwner(resource.data.userId) || isAdmin();
+    }
+
+    // Products collection (store items)
+    match /products/{productId} {
+      // Allow read for all authenticated users
+      allow read: if isAuthenticated();
+
+      // Allow write only for admins
+      allow write: if isAdmin();
+
+      // Validate product creation
+      allow create: if isAdmin() &&
+                       request.resource.data.keys().hasAll(['id', 'name', 'description', 'price', 'category', 'isActive']) &&
+                       request.resource.data.price is number &&
+                       request.resource.data.price >= 0;
+    }
+
+    // Credit Transactions collection
+    match /credit_transactions/{transactionId} {
+      // Allow read for the owner and admins
+      allow read: if isOwner(resource.data.userId) || isAdmin();
+
+      // Allow create for system operations (purchases, rewards, etc.)
+      allow create: if isAuthenticated() &&
+                       request.auth.uid == request.resource.data.userId &&
+                       request.resource.data.keys().hasAll(['id', 'userId', 'amount', 'type', 'description', 'createdAt']) &&
+                       request.resource.data.amount is number &&
+                       ['purchase', 'reward', 'refund', 'bonus'].hasAny([request.resource.data.type]);
+
+      // No updates or deletes allowed for security
+      allow update, delete: if false;
+    }
+
+    // Leaderboard collection
+    match /leaderboard/{entryId} {
+      // Allow read for all authenticated users
+      allow read: if isAuthenticated();
+
+      // Allow write only for system/admin operations
+      allow write: if isAdmin();
+
+      // Validate leaderboard entries
+      allow create: if isAdmin() &&
+                       request.resource.data.keys().hasAll(['userId', 'name', 'totalScore', 'rank', 'updatedAt']) &&
+                       request.resource.data.totalScore is number;
+    }
+
+    // Community Posts collection
+    match /community_posts/{postId} {
+      // Allow read for all authenticated users
+      allow read: if isAuthenticated();
+
+      // Allow create for authenticated users
+      allow create: if isAuthenticated() &&
+                       request.auth.uid == request.resource.data.userId &&
+                       request.resource.data.keys().hasAll(['id', 'userId', 'content', 'type', 'createdAt']) &&
+                       request.resource.data.content.size() <= 1000; // Limit content length
+
+      // Allow update/delete only for the owner or admins
+      allow update, delete: if isOwner(resource.data.userId) || isAdmin();
+
+      // Validate updates
+      allow update: if (isOwner(resource.data.userId) || isAdmin()) &&
+                       request.resource.data.diff(resource.data).affectedKeys()
+                         .hasOnly(['content', 'updatedAt', 'likes', 'comments']);
+    }
+
+    // Challenges collection
+    match /challenges/{challengeId} {
+      // Allow read for all authenticated users
+      allow read: if isAuthenticated();
+
+      // Allow write only for admins
+      allow write: if isAdmin();
+
+      // Validate challenge creation
+      allow create: if isAdmin() &&
+                       request.resource.data.keys().hasAll(['id', 'title', 'description', 'reward', 'startDate', 'endDate', 'isActive']) &&
+                       request.resource.data.reward is number &&
+                       request.resource.data.reward >= 0;
+    }
+
+    // Body Logs subcollection under users
+    match /users/{userId}/body_logs/{logId} {
+      // Allow read/write only for the owner
+      allow read, write: if isOwner(userId);
+
+      // Validate body log creation
+      allow create: if isOwner(userId) &&
+                       request.resource.data.keys().hasAll(['id', 'userId', 'date', 'weight', 'height', 'bodyFat', 'muscleMass', 'notes']) &&
+                       request.resource.data.weight is number &&
+                       request.resource.data.height is number;
+    }
+
+    // User Statistics subcollection
+    match /users/{userId}/statistics/{statId} {
+      // Allow read/write only for the owner and admins
+      allow read, write: if isOwner(userId) || isAdmin();
+
+      // System-generated statistics
+      allow create: if isAuthenticated() && request.auth.uid == userId;
+    }
+
+    // Global statistics (read-only for users)
+    match /global_stats/{statId} {
+      allow read: if isAuthenticated();
+      allow write: if isAdmin();
+    }
+
+    // Admin-only collections
+    match /admin_logs/{logId} {
+      allow read, write: if isAdmin();
+    }
+
+    match /system_config/{configId} {
+      allow read: if isAuthenticated();
+      allow write: if isAdmin();
+    }
+
+    // Deny all other access
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

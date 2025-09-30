@@ -1,26 +1,34 @@
-// lib/features/leaderboard/presentation/screens/leaderboard_screen.dart
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../core/theme/app_colors.dart';
+import '../../../../core/services/service_manager.dart';
 import '../../../../shared/presentation/widgets/glass_card.dart';
 import '../../../../shared/presentation/widgets/neon_button.dart';
 
-class LeaderboardScreen extends StatefulWidget {
+class LeaderboardScreen extends ConsumerStatefulWidget {
   const LeaderboardScreen({super.key});
 
   @override
-  State<LeaderboardScreen> createState() => _LeaderboardScreenState();
+  ConsumerState<LeaderboardScreen> createState() => _LeaderboardScreenState();
 }
 
-class _LeaderboardScreenState extends State<LeaderboardScreen>
+class _LeaderboardScreenState extends ConsumerState<LeaderboardScreen>
     with TickerProviderStateMixin {
   late TabController _tabController;
   String _selectedFilter = 'All Time';
+  Stream<List<Map<String, dynamic>>>? _leaderboardStream;
 
   @override
   void initState() {
     super.initState();
     _tabController = TabController(length: 4, vsync: this);
+    _initializeLeaderboardStream();
+  }
+
+  void _initializeLeaderboardStream() {
+    final convexService = ref.read(convexServiceProvider);
+    _leaderboardStream = convexService.subscribeToLeaderboard();
   }
 
   @override
@@ -125,16 +133,31 @@ class _LeaderboardScreenState extends State<LeaderboardScreen>
               ),
             ),
 
-            // Tab Content
+            // Tab Content with Real-time Data
             Expanded(
-              child: TabBarView(
-                controller: _tabController,
-                children: [
-                  _buildOverallTab(),
-                  _buildSprintTab(),
-                  _buildStrengthTab(),
-                  _buildAgilityTab(),
-                ],
+              child: StreamBuilder<List<Map<String, dynamic>>>(
+                stream: _leaderboardStream,
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return const Center(
+                      child: CircularProgressIndicator(
+                        valueColor: AlwaysStoppedAnimation<Color>(AppColors.royalPurple),
+                      ),
+                    );
+                  }
+
+                  final leaderboardData = snapshot.data ?? _getMockLeaderboardData();
+
+                  return TabBarView(
+                    controller: _tabController,
+                    children: [
+                      _buildOverallTab(leaderboardData),
+                      _buildSprintTab(leaderboardData),
+                      _buildStrengthTab(leaderboardData),
+                      _buildAgilityTab(leaderboardData),
+                    ],
+                  );
+                },
               ),
             ),
           ],
@@ -143,13 +166,15 @@ class _LeaderboardScreenState extends State<LeaderboardScreen>
     );
   }
 
-  Widget _buildOverallTab() {
+  Widget _buildOverallTab(List<Map<String, dynamic>> leaderboardData) {
+    final overallData = leaderboardData.where((item) => item['category'] == 'overall').toList();
+
     return SingleChildScrollView(
       padding: const EdgeInsets.all(20),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Top 3 Podium
+          // Top 3 Podium with Real Data
           GlassCard(
             padding: const EdgeInsets.all(20),
             child: Column(
@@ -165,10 +190,14 @@ class _LeaderboardScreenState extends State<LeaderboardScreen>
                 const SizedBox(height: 20),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    _buildPodiumItem('Rahul K.', '2,450 pts', 2, AppColors.electricBlue, Icons.workspace_premium),
-                    _buildPodiumItem('Priya S.', '2,680 pts', 1, AppColors.warmOrange, Icons.workspace_premium),
-                    _buildPodiumItem('Amit R.', '2,320 pts', 3, AppColors.royalPurple, Icons.workspace_premium),
+                  children: overallData.length >= 3 ? [
+                    _buildPodiumItem(overallData[1]['name'], '${overallData[1]['score']} pts', 2, AppColors.electricBlue, Icons.workspace_premium),
+                    _buildPodiumItem(overallData[0]['name'], '${overallData[0]['score']} pts', 1, AppColors.warmOrange, Icons.workspace_premium),
+                    _buildPodiumItem(overallData[2]['name'], '${overallData[2]['score']} pts', 3, AppColors.royalPurple, Icons.workspace_premium),
+                  ] : [
+                    _buildPodiumItem('Loading...', '0 pts', 2, AppColors.electricBlue, Icons.workspace_premium),
+                    _buildPodiumItem('Loading...', '0 pts', 1, AppColors.warmOrange, Icons.workspace_premium),
+                    _buildPodiumItem('Loading...', '0 pts', 3, AppColors.royalPurple, Icons.workspace_premium),
                   ],
                 ),
               ],
@@ -176,7 +205,7 @@ class _LeaderboardScreenState extends State<LeaderboardScreen>
           ),
           const SizedBox(height: 24),
 
-          // Rankings List
+          // Rankings List with Real Data
           const Text(
             'Full Rankings',
             style: TextStyle(
@@ -186,25 +215,27 @@ class _LeaderboardScreenState extends State<LeaderboardScreen>
             ),
           ),
           const SizedBox(height: 16),
-          _buildRankingItem(4, 'Sneha M.', '2,180 pts', '+15', AppColors.neonGreen),
-          _buildRankingItem(5, 'Vikram T.', '2,120 pts', '+8', AppColors.neonGreen),
-          _buildRankingItem(6, 'Anjali P.', '2,050 pts', '+22', AppColors.neonGreen),
-          _buildRankingItem(7, 'Rohit S.', '1,980 pts', '+5', AppColors.neonGreen),
-          _buildRankingItem(8, 'Kavita L.', '1,920 pts', '+12', AppColors.neonGreen),
-          _buildRankingItem(9, 'Arjun N.', '1,850 pts', '+3', AppColors.neonGreen),
-          _buildRankingItem(10, 'Meera K.', '1,780 pts', '+18', AppColors.neonGreen),
+          ...overallData.skip(3).map((player) => _buildRankingItem(
+            player['rank'],
+            player['name'],
+            '${player['score']} pts',
+            player['change'] ?? '+0',
+            AppColors.neonGreen,
+          )),
         ],
       ),
     );
   }
 
-  Widget _buildSprintTab() {
+  Widget _buildSprintTab(List<Map<String, dynamic>> leaderboardData) {
+    final sprintData = leaderboardData.where((item) => item['category'] == 'sprint').toList();
+
     return SingleChildScrollView(
       padding: const EdgeInsets.all(20),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Top 3 for Sprint
+          // Top 3 for Sprint with Real Data
           GlassCard(
             padding: const EdgeInsets.all(20),
             child: Column(
@@ -220,10 +251,14 @@ class _LeaderboardScreenState extends State<LeaderboardScreen>
                 const SizedBox(height: 20),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    _buildPodiumItem('Rahul K.', '5.2s avg', 2, AppColors.electricBlue, Icons.workspace_premium),
-                    _buildPodiumItem('Priya S.', '5.0s avg', 1, AppColors.warmOrange, Icons.workspace_premium),
-                    _buildPodiumItem('Amit R.', '5.4s avg', 3, AppColors.royalPurple, Icons.workspace_premium),
+                  children: sprintData.length >= 3 ? [
+                    _buildPodiumItem(sprintData[1]['name'], '${sprintData[1]['score']}s avg', 2, AppColors.electricBlue, Icons.workspace_premium),
+                    _buildPodiumItem(sprintData[0]['name'], '${sprintData[0]['score']}s avg', 1, AppColors.warmOrange, Icons.workspace_premium),
+                    _buildPodiumItem(sprintData[2]['name'], '${sprintData[2]['score']}s avg', 3, AppColors.royalPurple, Icons.workspace_premium),
+                  ] : [
+                    _buildPodiumItem('Loading...', '0s avg', 2, AppColors.electricBlue, Icons.workspace_premium),
+                    _buildPodiumItem('Loading...', '0s avg', 1, AppColors.warmOrange, Icons.workspace_premium),
+                    _buildPodiumItem('Loading...', '0s avg', 3, AppColors.royalPurple, Icons.workspace_premium),
                   ],
                 ),
               ],
@@ -231,7 +266,7 @@ class _LeaderboardScreenState extends State<LeaderboardScreen>
           ),
           const SizedBox(height: 24),
 
-          // Sprint Rankings
+          // Sprint Rankings with Real Data
           const Text(
             'Sprint Rankings',
             style: TextStyle(
@@ -241,21 +276,27 @@ class _LeaderboardScreenState extends State<LeaderboardScreen>
             ),
           ),
           const SizedBox(height: 16),
-          _buildRankingItem(4, 'Sneha M.', '5.6s avg', '+0.2', AppColors.neonGreen),
-          _buildRankingItem(5, 'Vikram T.', '5.7s avg', '+0.1', AppColors.neonGreen),
-          _buildRankingItem(6, 'Anjali P.', '5.8s avg', '+0.3', AppColors.neonGreen),
+          ...sprintData.skip(3).map((player) => _buildRankingItem(
+            player['rank'],
+            player['name'],
+            '${player['score']}s avg',
+            player['change'] ?? '+0.0',
+            AppColors.neonGreen,
+          )),
         ],
       ),
     );
   }
 
-  Widget _buildStrengthTab() {
+  Widget _buildStrengthTab(List<Map<String, dynamic>> leaderboardData) {
+    final strengthData = leaderboardData.where((item) => item['category'] == 'strength').toList();
+
     return SingleChildScrollView(
       padding: const EdgeInsets.all(20),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Top 3 for Strength
+          // Top 3 for Strength with Real Data
           GlassCard(
             padding: const EdgeInsets.all(20),
             child: Column(
@@ -271,10 +312,14 @@ class _LeaderboardScreenState extends State<LeaderboardScreen>
                 const SizedBox(height: 20),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    _buildPodiumItem('Amit R.', '85 push-ups', 2, AppColors.electricBlue, Icons.workspace_premium),
-                    _buildPodiumItem('Rahul K.', '92 push-ups', 1, AppColors.warmOrange, Icons.workspace_premium),
-                    _buildPodiumItem('Vikram T.', '78 push-ups', 3, AppColors.royalPurple, Icons.workspace_premium),
+                  children: strengthData.length >= 3 ? [
+                    _buildPodiumItem(strengthData[1]['name'], '${strengthData[1]['score']} reps', 2, AppColors.electricBlue, Icons.workspace_premium),
+                    _buildPodiumItem(strengthData[0]['name'], '${strengthData[0]['score']} reps', 1, AppColors.warmOrange, Icons.workspace_premium),
+                    _buildPodiumItem(strengthData[2]['name'], '${strengthData[2]['score']} reps', 3, AppColors.royalPurple, Icons.workspace_premium),
+                  ] : [
+                    _buildPodiumItem('Loading...', '0 reps', 2, AppColors.electricBlue, Icons.workspace_premium),
+                    _buildPodiumItem('Loading...', '0 reps', 1, AppColors.warmOrange, Icons.workspace_premium),
+                    _buildPodiumItem('Loading...', '0 reps', 3, AppColors.royalPurple, Icons.workspace_premium),
                   ],
                 ),
               ],
@@ -282,7 +327,7 @@ class _LeaderboardScreenState extends State<LeaderboardScreen>
           ),
           const SizedBox(height: 24),
 
-          // Strength Rankings
+          // Strength Rankings with Real Data
           const Text(
             'Strength Rankings',
             style: TextStyle(
@@ -292,21 +337,27 @@ class _LeaderboardScreenState extends State<LeaderboardScreen>
             ),
           ),
           const SizedBox(height: 16),
-          _buildRankingItem(4, 'Priya S.', '75 push-ups', '+5', AppColors.neonGreen),
-          _buildRankingItem(5, 'Sneha M.', '72 push-ups', '+3', AppColors.neonGreen),
-          _buildRankingItem(6, 'Anjali P.', '68 push-ups', '+7', AppColors.neonGreen),
+          ...strengthData.skip(3).map((player) => _buildRankingItem(
+            player['rank'],
+            player['name'],
+            '${player['score']} reps',
+            player['change'] ?? '+0',
+            AppColors.neonGreen,
+          )),
         ],
       ),
     );
   }
 
-  Widget _buildAgilityTab() {
+  Widget _buildAgilityTab(List<Map<String, dynamic>> leaderboardData) {
+    final agilityData = leaderboardData.where((item) => item['category'] == 'agility').toList();
+
     return SingleChildScrollView(
       padding: const EdgeInsets.all(20),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Top 3 for Agility
+          // Top 3 for Agility with Real Data
           GlassCard(
             padding: const EdgeInsets.all(20),
             child: Column(
@@ -322,10 +373,14 @@ class _LeaderboardScreenState extends State<LeaderboardScreen>
                 const SizedBox(height: 20),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    _buildPodiumItem('Priya S.', '12.3s avg', 2, AppColors.electricBlue, Icons.workspace_premium),
-                    _buildPodiumItem('Sneha M.', '11.8s avg', 1, AppColors.warmOrange, Icons.workspace_premium),
-                    _buildPodiumItem('Anjali P.', '12.7s avg', 3, AppColors.royalPurple, Icons.workspace_premium),
+                  children: agilityData.length >= 3 ? [
+                    _buildPodiumItem(agilityData[1]['name'], '${agilityData[1]['score']}s avg', 2, AppColors.electricBlue, Icons.workspace_premium),
+                    _buildPodiumItem(agilityData[0]['name'], '${agilityData[0]['score']}s avg', 1, AppColors.warmOrange, Icons.workspace_premium),
+                    _buildPodiumItem(agilityData[2]['name'], '${agilityData[2]['score']}s avg', 3, AppColors.royalPurple, Icons.workspace_premium),
+                  ] : [
+                    _buildPodiumItem('Loading...', '0s avg', 2, AppColors.electricBlue, Icons.workspace_premium),
+                    _buildPodiumItem('Loading...', '0s avg', 1, AppColors.warmOrange, Icons.workspace_premium),
+                    _buildPodiumItem('Loading...', '0s avg', 3, AppColors.royalPurple, Icons.workspace_premium),
                   ],
                 ),
               ],
@@ -333,7 +388,7 @@ class _LeaderboardScreenState extends State<LeaderboardScreen>
           ),
           const SizedBox(height: 24),
 
-          // Agility Rankings
+          // Agility Rankings with Real Data
           const Text(
             'Agility Rankings',
             style: TextStyle(
@@ -343,9 +398,13 @@ class _LeaderboardScreenState extends State<LeaderboardScreen>
             ),
           ),
           const SizedBox(height: 16),
-          _buildRankingItem(4, 'Rahul K.', '13.1s avg', '+0.4', AppColors.neonGreen),
-          _buildRankingItem(5, 'Amit R.', '13.5s avg', '+0.2', AppColors.neonGreen),
-          _buildRankingItem(6, 'Vikram T.', '13.8s avg', '+0.6', AppColors.neonGreen),
+          ...agilityData.skip(3).map((player) => _buildRankingItem(
+            player['rank'],
+            player['name'],
+            '${player['score']}s avg',
+            player['change'] ?? '+0.0',
+            AppColors.neonGreen,
+          )),
         ],
       ),
     );
@@ -477,5 +536,34 @@ class _LeaderboardScreenState extends State<LeaderboardScreen>
         ),
       ),
     );
+  }
+
+  // Mock data fallback
+  List<Map<String, dynamic>> _getMockLeaderboardData() {
+    return [
+      {'rank': 1, 'name': 'Rahul Sharma', 'score': 2680, 'category': 'overall', 'change': '+15'},
+      {'rank': 2, 'name': 'Priya Patel', 'score': 2450, 'category': 'overall', 'change': '+8'},
+      {'rank': 3, 'name': 'Amit Kumar', 'score': 2320, 'category': 'overall', 'change': '+22'},
+      {'rank': 4, 'name': 'Sneha Reddy', 'score': 2180, 'category': 'overall', 'change': '+5'},
+      {'rank': 5, 'name': 'Vikram Singh', 'score': 2120, 'category': 'overall', 'change': '+12'},
+
+      {'rank': 1, 'name': 'Priya Patel', 'score': 5.0, 'category': 'sprint', 'change': '+0.2'},
+      {'rank': 2, 'name': 'Rahul Sharma', 'score': 5.2, 'category': 'sprint', 'change': '+0.1'},
+      {'rank': 3, 'name': 'Amit Kumar', 'score': 5.4, 'category': 'sprint', 'change': '+0.3'},
+      {'rank': 4, 'name': 'Sneha Reddy', 'score': 5.6, 'category': 'sprint', 'change': '+0.1'},
+      {'rank': 5, 'name': 'Vikram Singh', 'score': 5.7, 'category': 'sprint', 'change': '+0.2'},
+
+      {'rank': 1, 'name': 'Rahul Sharma', 'score': 92, 'category': 'strength', 'change': '+5'},
+      {'rank': 2, 'name': 'Amit Kumar', 'score': 85, 'category': 'strength', 'change': '+3'},
+      {'rank': 3, 'name': 'Vikram Singh', 'score': 78, 'category': 'strength', 'change': '+7'},
+      {'rank': 4, 'name': 'Priya Patel', 'score': 75, 'category': 'strength', 'change': '+2'},
+      {'rank': 5, 'name': 'Sneha Reddy', 'score': 72, 'category': 'strength', 'change': '+4'},
+
+      {'rank': 1, 'name': 'Sneha Reddy', 'score': 11.8, 'category': 'agility', 'change': '+0.4'},
+      {'rank': 2, 'name': 'Priya Patel', 'score': 12.3, 'category': 'agility', 'change': '+0.2'},
+      {'rank': 3, 'name': 'Anjali Prasad', 'score': 12.7, 'category': 'agility', 'change': '+0.6'},
+      {'rank': 4, 'name': 'Rahul Sharma', 'score': 13.1, 'category': 'agility', 'change': '+0.3'},
+      {'rank': 5, 'name': 'Amit Kumar', 'score': 13.5, 'category': 'agility', 'change': '+0.5'},
+    ];
   }
 }

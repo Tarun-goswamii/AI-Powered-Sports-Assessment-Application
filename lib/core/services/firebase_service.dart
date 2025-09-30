@@ -1,10 +1,12 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../models/test_model.dart';
 import '../models/test_result_model.dart';
 import '../models/product_model.dart';
 import '../models/credit_points_model.dart';
 import '../models/simple_user_model.dart';
+import '../models/credit_transaction_model.dart' as ct;
 
 class FirebaseService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
@@ -95,7 +97,7 @@ class FirebaseService {
         .limit(limit)
         .get();
 
-    return snapshot.docs.map((doc) => doc.data() as Map<String, dynamic>).toList();
+    return snapshot.docs.map((doc) => doc.data() as Map<String, dynamic>? ?? {}).toList();
   }
 
   Future<void> updateLeaderboardEntry(String userId, Map<String, dynamic> data) async {
@@ -135,13 +137,14 @@ class FirebaseService {
   }
 
   Future<void> updateUserCredits(String userId, int amount, String reason) async {
-    final transaction = CreditTransactionModel(
+    final transaction = ct.CreditTransactionModel(
       id: DateTime.now().millisecondsSinceEpoch.toString(),
       userId: userId,
       amount: amount,
-      type: amount > 0 ? CreditTransactionType.earned : CreditTransactionType.spent,
-      reason: reason,
-      timestamp: DateTime.now(),
+      type: amount > 0 ? ct.CreditTransactionType.earned : ct.CreditTransactionType.spent,
+      description: reason,
+      createdAt: DateTime.now(),
+      expiresAt: DateTime.now().add(const Duration(days: 365)), // Credits don't expire
     );
 
     // Add transaction record
@@ -154,15 +157,15 @@ class FirebaseService {
     });
   }
 
-  Future<List<CreditTransactionModel>> getCreditTransactions(String userId, {int limit = 20}) async {
+  Future<List<ct.CreditTransactionModel>> getCreditTransactions(String userId, {int limit = 20}) async {
     final snapshot = await _creditTransactions
         .where('userId', isEqualTo: userId)
-        .orderBy('timestamp', descending: true)
+        .orderBy('createdAt', descending: true)
         .limit(limit)
         .get();
 
     return snapshot.docs
-        .map((doc) => CreditTransactionModel.fromJson(doc.data() as Map<String, dynamic>))
+        .map((doc) => ct.CreditTransactionModel.fromJson(doc.data() as Map<String, dynamic>))
         .toList();
   }
 
@@ -222,7 +225,7 @@ class FirebaseService {
         .limit(10)
         .snapshots()
         .map((snapshot) =>
-            snapshot.docs.map((doc) => doc.data()).toList());
+            snapshot.docs.map((doc) => doc.data() as Map<String, dynamic>).toList());
   }
 
   Stream<List<Map<String, dynamic>>> getCommunityPostsStream() {
@@ -233,7 +236,7 @@ class FirebaseService {
         .map((snapshot) =>
             snapshot.docs.map((doc) => {
               'id': doc.id,
-              ...doc.data()
+              ...(doc.data() as Map<String, dynamic>? ?? {})
             }).toList());
   }
 
@@ -265,10 +268,13 @@ class FirebaseService {
     final testResults = await getUserTestResults(userId);
     final credits = await getUserCredits(userId);
 
+    final validScores = testResults.where((r) => r.score != null).map((r) => r.score!).toList();
+    final averageScore = validScores.isEmpty ? 0.0 :
+        validScores.reduce((a, b) => a + b) / validScores.length;
+
     return {
       'totalTests': testResults.length,
-      'averageScore': testResults.isEmpty ? 0 :
-          testResults.map((r) => r.score).reduce((a, b) => a + b) / testResults.length,
+      'averageScore': averageScore,
       'credits': credits,
       'lastTestDate': testResults.isEmpty ? null : testResults.first.completedAt,
     };

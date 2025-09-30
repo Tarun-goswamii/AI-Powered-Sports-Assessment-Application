@@ -1,18 +1,20 @@
-// lib/features/auth/presentation/screens/auth_screen.dart
+// lib/features/auth/presentation/screens/auth_screen_simple.dart
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../core/theme/app_colors.dart';
-import '../../../../shared/presentation/widgets/glass_card.dart';
+import '../../../../core/services/auth_service.dart';
+import '../../../../core/services/service_manager.dart';
 import '../../../../shared/presentation/widgets/neon_button.dart';
 
-class AuthScreen extends StatefulWidget {
+class AuthScreen extends ConsumerStatefulWidget {
   const AuthScreen({super.key});
 
   @override
-  State<AuthScreen> createState() => _AuthScreenState();
+  ConsumerState<AuthScreen> createState() => _AuthScreenState();
 }
 
-class _AuthScreenState extends State<AuthScreen>
+class _AuthScreenState extends ConsumerState<AuthScreen>
     with TickerProviderStateMixin {
   late TabController _tabController;
   final _emailController = TextEditingController();
@@ -33,13 +35,15 @@ class _AuthScreenState extends State<AuthScreen>
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: AppColors.background,
-      body: Container(
-        decoration: BoxDecoration(
-          gradient: AppColors.backgroundGradient,
-        ),
-        child: SafeArea(
+    return Container(
+      width: double.infinity,
+      height: double.infinity,
+      decoration: BoxDecoration(
+        gradient: AppColors.backgroundGradient,
+      ),
+      child: Scaffold(
+        backgroundColor: Colors.transparent,
+        body: SafeArea(
           child: SingleChildScrollView(
             padding: const EdgeInsets.all(24),
             child: Column(
@@ -95,56 +99,66 @@ class _AuthScreenState extends State<AuthScreen>
                 ),
                 const SizedBox(height: 40),
                 // Auth Form
-                GlassCard(
-                  padding: const EdgeInsets.all(24),
-                  enableNeonGlow: true,
-                  neonGlowColor: AppColors.royalPurple,
-                  child: Column(
-                    children: [
-                      // Tab Bar
-                      Container(
-                        decoration: BoxDecoration(
-                          color: AppColors.card.withOpacity(0.5),
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: TabBar(
-                          controller: _tabController,
-                          indicator: BoxDecoration(
-                            gradient: LinearGradient(
-                              colors: [AppColors.royalPurple, AppColors.electricBlue],
+                Container(
+                  margin: const EdgeInsets.symmetric(horizontal: 16),
+                  decoration: AppColors.glassmorphismDecoration(
+                    borderRadius: BorderRadius.circular(20),
+                    enableNeonGlow: true,
+                    neonGlowColor: AppColors.royalPurple,
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.all(24),
+                    child: Column(
+                      children: [
+                        // Tab Bar
+                        Container(
+                          decoration: BoxDecoration(
+                            color: AppColors.glassmorphismBackground.withOpacity(0.3),
+                            borderRadius: BorderRadius.circular(12),
+                            border: Border.all(
+                              color: AppColors.glassmorphismBorder.withOpacity(0.5),
+                              width: 1,
                             ),
-                            borderRadius: BorderRadius.circular(8),
                           ),
-                          indicatorSize: TabBarIndicatorSize.tab,
-                          labelColor: Colors.white,
-                          unselectedLabelColor: AppColors.textSecondary,
-                          labelStyle: const TextStyle(
-                            fontWeight: FontWeight.w600,
-                            fontSize: 16,
+                          child: TabBar(
+                            controller: _tabController,
+                            indicator: BoxDecoration(
+                              gradient: LinearGradient(
+                                colors: [AppColors.royalPurple, AppColors.electricBlue],
+                              ),
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            indicatorSize: TabBarIndicatorSize.tab,
+                            labelColor: Colors.white,
+                            unselectedLabelColor: AppColors.textSecondary,
+                            labelStyle: const TextStyle(
+                              fontWeight: FontWeight.w600,
+                              fontSize: 16,
+                            ),
+                            unselectedLabelStyle: const TextStyle(
+                              fontWeight: FontWeight.w500,
+                              fontSize: 16,
+                            ),
+                            tabs: const [
+                              Tab(text: 'Login'),
+                              Tab(text: 'Sign Up'),
+                            ],
                           ),
-                          unselectedLabelStyle: const TextStyle(
-                            fontWeight: FontWeight.w500,
-                            fontSize: 16,
-                          ),
-                          tabs: const [
-                            Tab(text: 'Login'),
-                            Tab(text: 'Sign Up'),
-                          ],
                         ),
-                      ),
-                      const SizedBox(height: 24),
-                      // Tab Bar View
-                      SizedBox(
-                        height: _tabController.index == 0 ? 300 : 400,
-                        child: TabBarView(
-                          controller: _tabController,
-                          children: [
-                            _buildLoginForm(),
-                            _buildSignUpForm(),
-                          ],
+                        const SizedBox(height: 24),
+                        // Tab Bar View
+                        SizedBox(
+                          height: 400,
+                          child: TabBarView(
+                            controller: _tabController,
+                            children: [
+                              _buildLoginForm(),
+                              _buildSignUpForm(),
+                            ],
+                          ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                 ),
                 const SizedBox(height: 24),
@@ -193,7 +207,7 @@ class _AuthScreenState extends State<AuthScreen>
               borderSide: const BorderSide(color: AppColors.royalPurple, width: 2),
             ),
             filled: true,
-            fillColor: AppColors.inputBackground,
+            fillColor: AppColors.muted,
           ),
           keyboardType: TextInputType.emailAddress,
         ),
@@ -231,7 +245,7 @@ class _AuthScreenState extends State<AuthScreen>
               borderSide: const BorderSide(color: AppColors.royalPurple, width: 2),
             ),
             filled: true,
-            fillColor: AppColors.inputBackground,
+            fillColor: AppColors.muted,
           ),
         ),
         const SizedBox(height: 8),
@@ -304,7 +318,7 @@ class _AuthScreenState extends State<AuthScreen>
               borderSide: const BorderSide(color: AppColors.royalPurple, width: 2),
             ),
             filled: true,
-            fillColor: AppColors.inputBackground,
+            fillColor: AppColors.muted,
           ),
         ),
         const SizedBox(height: 16),
@@ -329,7 +343,7 @@ class _AuthScreenState extends State<AuthScreen>
               borderSide: const BorderSide(color: AppColors.royalPurple, width: 2),
             ),
             filled: true,
-            fillColor: AppColors.inputBackground,
+            fillColor: AppColors.muted,
           ),
           keyboardType: TextInputType.emailAddress,
         ),
@@ -367,7 +381,7 @@ class _AuthScreenState extends State<AuthScreen>
               borderSide: const BorderSide(color: AppColors.royalPurple, width: 2),
             ),
             filled: true,
-            fillColor: AppColors.inputBackground,
+            fillColor: AppColors.muted,
           ),
         ),
         const SizedBox(height: 16),
@@ -404,7 +418,7 @@ class _AuthScreenState extends State<AuthScreen>
               borderSide: const BorderSide(color: AppColors.royalPurple, width: 2),
             ),
             filled: true,
-            fillColor: AppColors.inputBackground,
+            fillColor: AppColors.muted,
           ),
         ),
         const SizedBox(height: 24),
@@ -521,41 +535,89 @@ class _AuthScreenState extends State<AuthScreen>
   }
 
   void _login() async {
-    // TODO: Implement login logic
+    if (_emailController.text.isEmpty || _passwordController.text.isEmpty) {
+      setState(() {
+        _errorMessage = 'Please fill in all fields';
+      });
+      return;
+    }
+
     setState(() {
       _isLoading = true;
       _errorMessage = null;
     });
 
-    await Future.delayed(const Duration(seconds: 2)); // Simulate API call
+    try {
+      final authService = ref.read(authServiceProvider);
+      await authService.signInWithEmailPassword(
+        _emailController.text.trim(),
+        _passwordController.text,
+      );
 
-    // Mock successful login
-    if (mounted) {
-      context.go('/home');
+      if (mounted) {
+        context.go('/home');
+      }
+    } catch (e) {
+      setState(() {
+        _errorMessage = e.toString();
+      });
+    } finally {
+      setState(() {
+        _isLoading = false;
+      });
     }
-
-    setState(() {
-      _isLoading = false;
-    });
   }
 
   void _signUp() async {
-    // TODO: Implement signup logic
+    if (_nameController.text.isEmpty ||
+        _emailController.text.isEmpty ||
+        _passwordController.text.isEmpty ||
+        _confirmPasswordController.text.isEmpty) {
+      setState(() {
+        _errorMessage = 'Please fill in all fields';
+      });
+      return;
+    }
+
+    if (_passwordController.text != _confirmPasswordController.text) {
+      setState(() {
+        _errorMessage = 'Passwords do not match';
+      });
+      return;
+    }
+
+    if (_passwordController.text.length < 6) {
+      setState(() {
+        _errorMessage = 'Password must be at least 6 characters';
+      });
+      return;
+    }
+
     setState(() {
       _isLoading = true;
       _errorMessage = null;
     });
 
-    await Future.delayed(const Duration(seconds: 2)); // Simulate API call
+    try {
+      final authService = ref.read(authServiceProvider);
+      await authService.signUpWithEmailPassword(
+        _emailController.text.trim(),
+        _passwordController.text,
+        _nameController.text.trim(),
+      );
 
-    // Mock successful signup
-    if (mounted) {
-      context.go('/home');
+      if (mounted) {
+        context.go('/home');
+      }
+    } catch (e) {
+      setState(() {
+        _errorMessage = e.toString();
+      });
+    } finally {
+      setState(() {
+        _isLoading = false;
+      });
     }
-
-    setState(() {
-      _isLoading = false;
-    });
   }
 
   void _forgotPassword() {

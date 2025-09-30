@@ -2,20 +2,22 @@ class AppConfig {
   static const String appName = 'Sports Assessment';
   static const String appVersion = '1.0.0';
 
-  // Firebase Configuration (replace with your values)
-  static const String firebaseApiKey = 'YOUR_FIREBASE_API_KEY';
-  static const String firebaseAuthDomain = 'YOUR_FIREBASE_AUTH_DOMAIN';
-  static const String firebaseProjectId = 'YOUR_FIREBASE_PROJECT_ID';
-  static const String firebaseStorageBucket = 'YOUR_FIREBASE_STORAGE_BUCKET';
-  static const String firebaseMessagingSenderId = 'YOUR_FIREBASE_MESSAGING_SENDER_ID';
-  static const String firebaseAppId = 'YOUR_FIREBASE_APP_ID';
+  // Firebase Configuration
+  static const String firebaseApiKey = 'AIzaSyAPifHu945t_OZ9HkFkLW9hlHRyFRy8Kug';
+  static const String firebaseAuthDomain = 'ai-sport-assessment.firebaseapp.com';
+  static const String firebaseProjectId = 'ai-sport-assessment';
+  static const String firebaseStorageBucket = 'ai-sport-assessment.firebasestorage.app';
+  static const String firebaseMessagingSenderId = '353205052706';
+  static const String firebaseAppId = '1:353205052706:android:5815e7b99f14911b32317b';
 
   // CONVEX Configuration
-  static const String convexUrl = 'YOUR_CONVEX_URL';
+  static const String convexUrl = 'https://pleasant-mandrill-295.convex.cloud';
+  static const String convexApiKey = 'dev:pleasant-mandrill-295|eyJ2MiI6IjcyNzA4NGI5MDVjYTQyYzg5YmM2NDg1NmI2ZjNmYjViIn0=';
+  static const String convexHttpActionUrl = 'https://pleasant-mandrill-295.convex.site';
   static const bool enableConvexBackend = true;
 
   // RESEND Configuration
-  static const String resendApiKey = 'YOUR_RESEND_API_KEY';
+  static const String resendApiKey = 're_gUTc5fg4_WoqiCG2N7BvgaUyhyUKW7gLU';
   static const bool enableResendEmails = true;
 
   // Environment flags

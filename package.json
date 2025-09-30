@@ -1,0 +1,19 @@
+{
+  "name": "sports-assessment-backend",
+  "version": "1.0.0",
+  "description": "Backend for AI Sports Talent Assessment App",
+  "main": "index.js",
+  "scripts": {
+    "deploy": "convex deploy"
+  },
+  "dependencies": {
+    "convex": "^1.27.3"
+  },
+  "keywords": [
+    "convex",
+    "backend",
+    "sports"
+  ],
+  "author": "Sports Assessment Team",
+  "license": "ISC"
+}

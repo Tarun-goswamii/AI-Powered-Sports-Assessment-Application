@@ -1,75 +1,171 @@
-import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import '../models/simple_user_model.dart';
+import 'resend_service.dart';
 
 class AuthService {
-  final SupabaseClient _supabase;
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
-  AuthService(this._supabase);
+  // Get current user stream
+  Stream<User?> get authStateChanges => _auth.authStateChanges();
+
+  // Get current user
+  User? get currentUser => _auth.currentUser;
 
   // Sign in with email and password
-  Future<AuthResponse> signInWithEmailPassword(String email, String password) async {
-    return await _supabase.auth.signInWithPassword(
-      email: email,
-      password: password,
-    );
+  Future<UserCredential> signInWithEmailPassword(String email, String password) async {
+    try {
+      final result = await _auth.signInWithEmailAndPassword(
+        email: email,
+        password: password,
+      );
+      return result;
+    } on FirebaseAuthException catch (e) {
+      throw _handleAuthException(e);
+    }
   }
 
   // Sign up with email and password
-  Future<AuthResponse> signUpWithEmailPassword(
+  Future<UserCredential> signUpWithEmailPassword(
     String email,
     String password,
-    Map<String, dynamic> userMetadata,
+    String name,
   ) async {
-    return await _supabase.auth.signUp(
-      email: email,
-      password: password,
-      data: userMetadata,
-    );
+    try {
+      final result = await _auth.createUserWithEmailAndPassword(
+        email: email,
+        password: password,
+      );
+
+      // Update display name
+      await result.user?.updateDisplayName(name);
+
+      // Create user profile in Firestore
+      await _createUserProfile(result.user!, name);
+
+      // Send account registration confirmation email
+      try {
+        await ResendService.sendAccountRegistrationEmail(
+          toEmail: email,
+          userName: name,
+        );
+        print('✅ Account registration confirmation email sent to $email');
+      } catch (emailError) {
+        print('⚠️ Failed to send registration email, but account created: $emailError');
+        // Don't fail the registration if email fails
+      }
+
+      return result;
+    } on FirebaseAuthException catch (e) {
+      throw _handleAuthException(e);
+    }
   }
 
   // Sign out
   Future<void> signOut() async {
-    await _supabase.auth.signOut();
-  }
-
-  // Get current user
-  User? getCurrentUser() {
-    return _supabase.auth.currentUser;
-  }
-
-  // Get current session
-  Session? getCurrentSession() {
-    return _supabase.auth.currentSession;
-  }
-
-  // Listen to auth state changes
-  Stream<AuthState> get onAuthStateChange {
-    return _supabase.auth.onAuthStateChange;
+    await _auth.signOut();
   }
 
   // Reset password
   Future<void> resetPassword(String email) async {
-    await _supabase.auth.resetPasswordForEmail(email);
+    try {
+      await _auth.sendPasswordResetEmail(email: email);
+    } on FirebaseAuthException catch (e) {
+      throw _handleAuthException(e);
+    }
   }
 
   // Update password
-  Future<UserResponse> updatePassword(String newPassword) async {
-    return await _supabase.auth.updateUser(
-      UserAttributes(password: newPassword),
-    );
+  Future<void> updatePassword(String newPassword) async {
+    try {
+      await _auth.currentUser?.updatePassword(newPassword);
+    } on FirebaseAuthException catch (e) {
+      throw _handleAuthException(e);
+    }
   }
 
-  // Update user metadata
-  Future<UserResponse> updateUserMetadata(Map<String, dynamic> metadata) async {
-    return await _supabase.auth.updateUser(
-      UserAttributes(data: metadata),
-    );
+  // Update user metadata (display name)
+  Future<void> updateUserMetadata(String displayName) async {
+    try {
+      await _auth.currentUser?.updateDisplayName(displayName);
+    } on FirebaseAuthException catch (e) {
+      throw _handleAuthException(e);
+    }
   }
 
   // Delete user account
   Future<void> deleteAccount() async {
-    final user = getCurrentUser();
-    if (user != null) {
-      await _supabase.auth.admin.deleteUser(user.id);
+    try {
+      final user = _auth.currentUser;
+      if (user != null) {
+        // Delete user data from Firestore first
+        await _firestore.collection('users').doc(user.uid).delete();
+        // Then delete the user account
+        await user.delete();
+      }
+    } on FirebaseAuthException catch (e) {
+      throw _handleAuthException(e);
+    }
+  }
+
+  // Create user profile in Firestore
+  Future<void> _createUserProfile(User user, String name) async {
+    final userProfile = SimpleUserModel(
+      id: user.uid,
+      email: user.email!,
+      name: name,
+      createdAt: DateTime.now(),
+      updatedAt: DateTime.now(),
+    );
+
+    await _firestore.collection('users').doc(user.uid).set(userProfile.toJson());
+  }
+
+  // Get user profile from Firestore
+  Future<SimpleUserModel?> getUserProfile(String userId) async {
+    try {
+      final doc = await _firestore.collection('users').doc(userId).get();
+      if (doc.exists) {
+        return SimpleUserModel.fromJson(doc.data()!);
+      }
+      return null;
+    } catch (e) {
+      return null;
+    }
+  }
+
+  // Update user profile
+  Future<void> updateUserProfile(String userId, Map<String, dynamic> data) async {
+    await _firestore.collection('users').doc(userId).update({
+      ...data,
+      'updatedAt': DateTime.now(),
+    });
+  }
+
+  // Handle Firebase Auth exceptions
+  String _handleAuthException(FirebaseAuthException e) {
+    switch (e.code) {
+      case 'user-not-found':
+        return 'No user found with this email.';
+      case 'wrong-password':
+        return 'Wrong password provided.';
+      case 'email-already-in-use':
+        return 'An account already exists with this email.';
+      case 'invalid-email':
+        return 'Invalid email address.';
+      case 'weak-password':
+        return 'Password is too weak.';
+      case 'user-disabled':
+        return 'This user account has been disabled.';
+      case 'too-many-requests':
+        return 'Too many requests. Try again later.';
+      case 'operation-not-allowed':
+        return 'This operation is not allowed.';
+      case 'requires-recent-login':
+        return 'This operation requires recent authentication. Please sign in again.';
+      default:
+        return 'An error occurred. Please try again.';
     }
   }
 }
