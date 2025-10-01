@@ -35,20 +35,20 @@ class MentorSessionModel extends Equatable {
 
   factory MentorSessionModel.fromJson(Map<String, dynamic> json) {
     return MentorSessionModel(
-      id: json['id'] as String? ?? json['_id'] as String,
+      id: json['_id'] as String? ?? json['id'] as String,
       mentorId: json['mentorId'] as String,
       userId: json['userId'] as String,
       topic: json['topic'] as String,
-      scheduledAt: json['scheduledAt'] as int,
+      scheduledAt: (json['scheduledAt'] as num).toInt(),
       status: json['status'] as String,
       type: json['type'] as String,
       completedAt: json['completedAt'] != null
-          ? DateTime.fromMillisecondsSinceEpoch(json['completedAt'] as int)
+          ? DateTime.fromMillisecondsSinceEpoch((json['completedAt'] as num).toInt())
           : null,
       rating: json['rating'] != null ? (json['rating'] as num).toDouble() : null,
       review: json['review'] as String?,
-      createdAt: DateTime.fromMillisecondsSinceEpoch(json['createdAt'] as int),
-      updatedAt: DateTime.fromMillisecondsSinceEpoch(json['updatedAt'] as int),
+      createdAt: DateTime.fromMillisecondsSinceEpoch((json['createdAt'] as num).toInt()),
+      updatedAt: DateTime.fromMillisecondsSinceEpoch((json['updatedAt'] as num).toInt()),
       mentorName: json['mentor']?['name'] as String?,
     );
   }

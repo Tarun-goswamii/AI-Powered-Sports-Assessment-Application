@@ -23,6 +23,15 @@ class ResendService {
     print('✅ RESEND service initialized with real API calls');
   }
 
+  /// Instance method to send email
+  Future<void> sendEmail({
+    required String to,
+    required String subject,
+    required String html,
+  }) async {
+    await _sendEmail(to: to, subject: subject, html: html);
+  }
+
   /// Send welcome email to new users
   static Future<void> sendWelcomeEmail({
     required String toEmail,
@@ -205,8 +214,8 @@ class ResendService {
     );
   }
 
-  /// General sendEmail method for custom emails
-  static Future<void> sendEmail({
+  /// General static sendEmail method for custom emails
+  static Future<void> sendCustomEmail({
     required String to,
     required String subject,
     required String html,

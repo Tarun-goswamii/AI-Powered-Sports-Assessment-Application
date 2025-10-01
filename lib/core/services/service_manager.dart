@@ -1,9 +1,10 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'mock_convex_service.dart';
-import 'mock_resend_service.dart';
+import 'resend_service.dart';
 import 'auth_service.dart';
 import 'firebase_auth_service.dart';
 import 'firebase_service.dart';
+import 'vapi_ai_service.dart';
 import '../config/app_config.dart';
 
 /// Service Manager to handle all external services
@@ -31,10 +32,13 @@ class ServiceManager {
 
     // Initialize RESEND service
     if (AppConfig.enableResendEmails) {
-      _resendService = ResendService();
-      await _resendService.initialize();
+      _resendService = ResendService.instance;
+      await ResendService.initialize();
       print('✅ RESEND service initialized with real API calls');
     }
+
+    // Initialize VAPI AI service
+    await VapiAiService.initialize();
 
     print('🎉 All services initialized successfully!');
   }
@@ -44,6 +48,7 @@ class ServiceManager {
     return {
       'convex': AppConfig.enableConvexBackend,
       'resend': AppConfig.enableResendEmails,
+      'vapi_ai': AppConfig.enableVapiChat,
     };
   }
 }
@@ -76,4 +81,9 @@ final firebaseAuthServiceProvider = Provider<FirebaseAuthService>((ref) {
 /// Firebase service provider
 final firebaseServiceProvider = Provider<FirebaseService>((ref) {
   return FirebaseService();
+});
+
+/// VAPI AI service provider
+final vapiAiServiceProvider = Provider<VapiAiService>((ref) {
+  return VapiAiService.instance;
 });

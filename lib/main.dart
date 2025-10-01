@@ -3,7 +3,6 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 import 'core/config/app_config.dart';
 import 'core/router/app_router.dart';
@@ -11,13 +10,29 @@ import 'core/theme/app_theme.dart';
 import 'core/theme/app_colors.dart';
 import 'core/utils/error_handler.dart';
 import 'core/services/service_manager.dart';
+import 'core/services/vapi_ai_service.dart';
 
 void main() async {
   // Ensure Flutter framework is initialized
   WidgetsFlutterBinding.ensureInitialized();
 
-  // Initialize Firebase (non-blocking)
-  Firebase.initializeApp();
+  // Initialize Firebase with proper error handling
+  try {
+    await Firebase.initializeApp(
+      options: const FirebaseOptions(
+        apiKey: AppConfig.firebaseApiKey,
+        authDomain: AppConfig.firebaseAuthDomain,
+        projectId: AppConfig.firebaseProjectId,
+        storageBucket: AppConfig.firebaseStorageBucket,
+        messagingSenderId: AppConfig.firebaseMessagingSenderId,
+        appId: AppConfig.firebaseAppId,
+      ),
+    );
+    print('✅ Firebase initialized successfully');
+  } catch (e) {
+    print('⚠️ Firebase initialization failed: $e');
+    // Continue without Firebase for fallback mode
+  }
 
   // Initialize Hive for local storage
   await Hive.initFlutter();
@@ -26,6 +41,9 @@ void main() async {
   // Services will be initialized on-demand when needed
   final serviceManager = ServiceManager();
   await serviceManager.initialize();
+
+  // Initialize VAPI AI service
+  await VapiAiService.initialize();
 
   // Set system UI overlay style for dark theme
   SystemChrome.setSystemUIOverlayStyle(

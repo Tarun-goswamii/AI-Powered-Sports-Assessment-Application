@@ -27,13 +27,13 @@ class AppLayout {
     Color(0xFF9CA3AF),      // Body Logs - gray
   ];
 
-  // Home Screen Layout specifications
-  static const EdgeInsets homeScreenPadding = EdgeInsets.symmetric(horizontal: 20.0, vertical: 16.0);
-  static const double homeScreenSpacing = 24.0;          // Space between sections
-  static const double progressCardHeight = 120.0;        // Progress card height
-  static const double quickAccessHeight = 140.0;         // Quick access cards section height
-  static const double quickAccessCardWidth = 120.0;      // Width of each quick access card
-  static const double quickStatsHeight = 80.0;          // Quick stats section height
+  // Home Screen Layout specifications (Updated to prevent overflow)
+  static const EdgeInsets homeScreenPadding = EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0);
+  static const double homeScreenSpacing = 20.0;          // Reduced space between sections
+  static const double progressCardHeight = 100.0;        // Reduced progress card height
+  static const double quickAccessHeight = 130.0;         // Reduced quick access cards section height
+  static const double quickAccessCardWidth = 110.0;      // Reduced width of each quick access card
+  static const double quickStatsHeight = 70.0;          // Reduced quick stats section height
 
   // Glass Card specifications (matching React glassmorphism)
   static const double glassCardDefaultPadding = 20.0;    // Default padding inside cards

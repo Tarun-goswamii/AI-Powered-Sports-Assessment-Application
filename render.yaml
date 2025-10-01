@@ -1,0 +1,17 @@
+# render.yaml - Render deployment configuration
+services:
+  - type: web
+    name: sports-assessment-ml
+    env: python
+    plan: free
+    buildCommand: pip install -r requirements.txt
+    startCommand: python python_ml_server.py
+    healthCheckPath: /health
+    envVars:
+      - key: PORT
+        generateValue: true
+      - key: PYTHON_VERSION
+        value: 3.11
+    scaling:
+      minInstances: 1
+      maxInstances: 1

@@ -2,6 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../models/simple_user_model.dart';
 import 'resend_service.dart';
+import 'convex_http_service.dart';
 
 class AuthService {
   final FirebaseAuth _auth = FirebaseAuth.instance;
@@ -44,6 +45,18 @@ class AuthService {
       // Create user profile in Firestore
       await _createUserProfile(result.user!, name);
 
+      // Also create user in Convex database for leaderboard functionality
+      try {
+        await ConvexHttpService().createUser(
+          email: email,
+          name: name,
+        );
+        print('✅ User created in Convex database for leaderboard integration');
+      } catch (convexError) {
+        print('⚠️ Failed to create user in Convex, but account created: $convexError');
+        // Don't fail the registration if Convex fails
+      }
+
       // Send account registration confirmation email
       try {
         await ResendService.sendAccountRegistrationEmail(
@@ -51,11 +64,19 @@ class AuthService {
           userName: name,
         );
         print('✅ Account registration confirmation email sent to $email');
+        
+        // Also send welcome email for better user experience
+        await ResendService.sendWelcomeEmail(
+          toEmail: email,
+          userName: name,
+        );
+        print('✅ Welcome email sent to $email');
       } catch (emailError) {
-        print('⚠️ Failed to send registration email, but account created: $emailError');
+        print('⚠️ Failed to send registration/welcome emails, but account created: $emailError');
         // Don't fail the registration if email fails
       }
 
+      print('🎉 Complete user registration: Firebase Auth + Firestore + Convex + Resend Email');
       return result;
     } on FirebaseAuthException catch (e) {
       throw _handleAuthException(e);

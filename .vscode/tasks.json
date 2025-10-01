@@ -1,0 +1,95 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "🚀 Deploy Convex & Run App",
+            "type": "shell",
+            "command": "npm",
+            "args": ["run", "deploy-and-run"],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": false,
+                "panel": "new",
+                "showReuseMessage": true,
+                "clear": false
+            },
+            "problemMatcher": [],
+            "detail": "Deploys Convex backend and runs Flutter app automatically"
+        },
+        {
+            "label": "📦 Deploy Convex Only",
+            "type": "shell",
+            "command": "npm",
+            "args": ["run", "deploy"],
+            "group": "build",
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": false,
+                "panel": "shared",
+                "showReuseMessage": true,
+                "clear": false
+            },
+            "problemMatcher": [],
+            "detail": "Deploys only the Convex backend"
+        },
+        {
+            "label": "🔄 Convex Dev Mode",
+            "type": "shell",
+            "command": "npm",
+            "args": ["run", "dev"],
+            "group": "build",
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": false,
+                "panel": "new",
+                "showReuseMessage": true,
+                "clear": false
+            },
+            "isBackground": true,
+            "problemMatcher": [],
+            "detail": "Runs Convex in development mode with auto-reload"
+        },
+        {
+            "label": "📱 Flutter Run",
+            "type": "shell",
+            "command": "flutter",
+            "args": ["run"],
+            "group": "build",
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": false,
+                "panel": "shared",
+                "showReuseMessage": true,
+                "clear": false
+            },
+            "isBackground": true,
+            "problemMatcher": [],
+            "detail": "Runs the Flutter app"
+        },
+        {
+            "label": "🛠️ Setup Project",
+            "type": "shell",
+            "command": "npm",
+            "args": ["run", "setup"],
+            "group": "build",
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": false,
+                "panel": "shared",
+                "showReuseMessage": true,
+                "clear": false
+            },
+            "problemMatcher": [],
+            "detail": "Initial project setup - deploy Convex and get Flutter dependencies"
+        }
+    ]
+}

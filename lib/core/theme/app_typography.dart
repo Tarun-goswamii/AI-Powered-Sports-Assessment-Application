@@ -1,91 +1,87 @@
 // lib/core/theme/app_typography.dart
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 
+/// EXACT TYPOGRAPHY SYSTEM FROM APP KA SAARANSH.md
 class AppTypography {
-  // Headings
-  static TextStyle get h1 => GoogleFonts.inter(
-        fontSize: 32,
-        fontWeight: FontWeight.w700,
-        height: 1.2,
-        letterSpacing: -0.5,
-      );
-
-  static TextStyle get h2 => GoogleFonts.inter(
-        fontSize: 24,
-        fontWeight: FontWeight.w600,
-        height: 1.3,
-        letterSpacing: -0.25,
-      );
-
-  static TextStyle get h3 => GoogleFonts.inter(
-        fontSize: 20,
-        fontWeight: FontWeight.w600,
-        height: 1.4,
-        letterSpacing: -0.15,
-      );
-
-  static TextStyle get h4 => GoogleFonts.inter(
-        fontSize: 18,
-        fontWeight: FontWeight.w600,
-        height: 1.4,
-        letterSpacing: -0.1,
-      );
-
-  // Body text
-  static TextStyle get bodyLarge => GoogleFonts.inter(
-        fontSize: 16,
-        fontWeight: FontWeight.w400,
-        height: 1.5,
-      );
-
-  static TextStyle get bodyMedium => GoogleFonts.inter(
-        fontSize: 14,
-        fontWeight: FontWeight.w400,
-        height: 1.5,
-      );
-
-  static TextStyle get bodySmall => GoogleFonts.inter(
-        fontSize: 12,
-        fontWeight: FontWeight.w400,
-        height: 1.5,
-      );
-
-  // Button text
-  static TextStyle get buttonLarge => GoogleFonts.inter(
-        fontSize: 16,
-        fontWeight: FontWeight.w600,
-        height: 1.2,
-        letterSpacing: 0.5,
-      );
-
-  static TextStyle get buttonMedium => GoogleFonts.inter(
-        fontSize: 14,
-        fontWeight: FontWeight.w600,
-        height: 1.2,
-        letterSpacing: 0.25,
-      );
-
-  static TextStyle get buttonSmall => GoogleFonts.inter(
-        fontSize: 12,
-        fontWeight: FontWeight.w600,
-        height: 1.2,
-        letterSpacing: 0.25,
-      );
-
-  // Caption
-  static TextStyle get caption => GoogleFonts.inter(
-        fontSize: 11,
-        fontWeight: FontWeight.w400,
-        height: 1.4,
-        letterSpacing: 0.25,
-      );
-
-  // Overline
-  static TextStyle get overline => GoogleFonts.inter(
-        fontSize: 10,
-        fontWeight: FontWeight.w500,
-        height: 1.4,
-        letterSpacing: 1.5,
-      );
+  // Font family: 'Inter', 'Roboto', -apple-system, BlinkMacSystemFont, system-ui, sans-serif
+  static const String fontFamily = 'Inter';
+  
+  // EXACT font weights from React CSS
+  static const FontWeight normal = FontWeight.w400;   // --font-weight-normal: 400
+  static const FontWeight medium = FontWeight.w500;   // --font-weight-medium: 500
+  static const FontWeight semiBold = FontWeight.w600; // Semi-bold
+  static const FontWeight bold = FontWeight.w700;     // Bold
+  
+  // EXACT text styles matching React CSS typography
+  static const TextStyle h1 = TextStyle(
+    fontSize: 24,           // --text-2xl equivalent
+    fontWeight: medium,     // --font-weight-medium: 500
+    height: 1.5,           // line-height: 1.5
+    fontFamily: fontFamily,
+    color: Colors.white,
+  );
+  
+  static const TextStyle h2 = TextStyle(
+    fontSize: 20,           // --text-xl equivalent  
+    fontWeight: medium,     // --font-weight-medium: 500
+    height: 1.5,           // line-height: 1.5
+    fontFamily: fontFamily,
+    color: Colors.white,
+  );
+  
+  static const TextStyle h3 = TextStyle(
+    fontSize: 18,           // --text-lg equivalent
+    fontWeight: medium,     // --font-weight-medium: 500
+    height: 1.5,           // line-height: 1.5
+    fontFamily: fontFamily,
+    color: Colors.white,
+  );
+  
+  static const TextStyle h4 = TextStyle(
+    fontSize: 16,           // --text-base equivalent
+    fontWeight: medium,     // --font-weight-medium: 500
+    height: 1.5,           // line-height: 1.5
+    fontFamily: fontFamily,
+    color: Colors.white,
+  );
+  
+  static const TextStyle bodyLarge = TextStyle(
+    fontSize: 16,           // --text-base equivalent
+    fontWeight: normal,     // --font-weight-normal: 400
+    height: 1.5,           // line-height: 1.5
+    fontFamily: fontFamily,
+    color: Colors.white,
+  );
+  
+  static const TextStyle bodyMedium = TextStyle(
+    fontSize: 14,           // --text-sm equivalent
+    fontWeight: normal,     // --font-weight-normal: 400
+    height: 1.5,           // line-height: 1.5
+    fontFamily: fontFamily,
+    color: Colors.white,
+  );
+  
+  static const TextStyle bodySmall = TextStyle(
+    fontSize: 12,           // --text-xs equivalent
+    fontWeight: normal,     // --font-weight-normal: 400
+    height: 1.5,           // line-height: 1.5
+    fontFamily: fontFamily,
+    color: Colors.white,
+  );
+  
+  static const TextStyle labelLarge = TextStyle(
+    fontSize: 16,           // --text-base equivalent
+    fontWeight: medium,     // --font-weight-medium: 500
+    height: 1.5,           // line-height: 1.5
+    fontFamily: fontFamily,
+    color: Colors.white,
+  );
+  
+  static const TextStyle buttonText = TextStyle(
+    fontSize: 16,           // --text-base equivalent
+    fontWeight: medium,     // --font-weight-medium: 500
+    height: 1.5,           // line-height: 1.5
+    fontFamily: fontFamily,
+    color: Colors.white,
+  );
 }

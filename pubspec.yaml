@@ -74,8 +74,19 @@ dependencies:
   json_annotation: ^4.8.1
   equatable: ^2.0.5
 
-  # Real-time Backend & Email Services (Mock implementations for now)
-  # CONVEX and RESEND packages have version conflicts, using custom implementations
+  # Real-time Backend & Email Services
+  # Convex HTTP client for backend integration
+  web_socket_channel: ^2.4.0
+  
+  # ML Model Integration
+  tflite_flutter: ^0.10.4
+  image: ^4.1.3
+  
+  # Video Processing for ML
+  # ffmpeg_kit_flutter: ^5.1.0  # Temporarily disabled due to build issues
+  
+  # Real-time features
+  socket_io_client: ^2.0.3
 
 dev_dependencies:
   flutter_test:

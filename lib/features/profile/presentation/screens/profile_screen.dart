@@ -4,7 +4,6 @@ import 'package:go_router/go_router.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/services/service_manager.dart';
 import '../../../../shared/presentation/widgets/glass_card.dart';
-import '../../../../shared/presentation/widgets/neon_button.dart';
 
 class ProfileScreen extends ConsumerStatefulWidget {
   const ProfileScreen({super.key});
@@ -15,7 +14,6 @@ class ProfileScreen extends ConsumerStatefulWidget {
 
 class _ProfileScreenState extends ConsumerState<ProfileScreen> {
   Map<String, dynamic>? _userProfile;
-  bool _isLoading = true;
 
   @override
   void initState() {
@@ -24,29 +22,20 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
   }
 
   Future<void> _loadUserProfile() async {
-    setState(() => _isLoading = true);
     try {
       final authService = ref.read(authServiceProvider);
       final userId = authService.currentUser?.uid;
       if (userId != null) {
         final convexService = ref.read(convexServiceProvider);
-        final profile = await convexService.getUserDetailedProfile(userId);
+        final profile = await convexService.getUser(userId);
         if (mounted) {
           setState(() {
             _userProfile = profile;
-            _isLoading = false;
           });
-        }
-      } else {
-        if (mounted) {
-          setState(() => _isLoading = false);
         }
       }
     } catch (e) {
       print('Error loading user profile: $e');
-      if (mounted) {
-        setState(() => _isLoading = false);
-      }
     }
   }
 
@@ -147,31 +136,37 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                     ),
                     const SizedBox(height: 16),
                     Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: [
-                        _buildStatItem(
-                          'Level ${_userProfile?['stats']?['level'] ?? 1}',
-                          'Athlete Level'
+                        Flexible(
+                          child: _buildStatItem(
+                            'Level ${_userProfile?['stats']?['level'] ?? 1}',
+                            'Athlete Level'
+                          ),
                         ),
                         Container(
                           width: 1,
-                          height: 40,
+                          height: 30, // Reduced height
                           color: AppColors.border,
-                          margin: const EdgeInsets.symmetric(horizontal: 20),
+                          margin: const EdgeInsets.symmetric(horizontal: 12), // Reduced margin
                         ),
-                        _buildStatItem(
-                          '${_userProfile?['stats']?['completedTests'] ?? 0}',
-                          'Tests Completed'
+                        Flexible(
+                          child: _buildStatItem(
+                            '${_userProfile?['stats']?['completedTests'] ?? 0}',
+                            'Tests Completed'
+                          ),
                         ),
                         Container(
                           width: 1,
-                          height: 40,
+                          height: 30, // Reduced height
                           color: AppColors.border,
-                          margin: const EdgeInsets.symmetric(horizontal: 20),
+                          margin: const EdgeInsets.symmetric(horizontal: 12), // Reduced margin
                         ),
-                        _buildStatItem(
-                          '${_userProfile?['stats']?['averageScore']?.toStringAsFixed(1) ?? '0.0'}',
-                          'Avg Rating'
+                        Flexible(
+                          child: _buildStatItem(
+                            '${_userProfile?['stats']?['averageScore']?.toStringAsFixed(1) ?? '0.0'}',
+                            'Avg Rating'
+                          ),
                         ),
                       ],
                     ),
@@ -347,23 +342,27 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
 
   Widget _buildStatItem(String value, String label) {
     return Column(
+      mainAxisSize: MainAxisSize.min, // Prevent overflow
       children: [
         Text(
           value,
           style: const TextStyle(
-            fontSize: 18,
+            fontSize: 16, // Reduced font size
             fontWeight: FontWeight.w700,
             color: Colors.white,
           ),
+          overflow: TextOverflow.ellipsis,
         ),
-        const SizedBox(height: 4),
+        const SizedBox(height: 2), // Reduced spacing
         Text(
           label,
           style: TextStyle(
-            fontSize: 12,
+            fontSize: 10, // Reduced font size
             color: AppColors.textSecondary,
           ),
           textAlign: TextAlign.center,
+          maxLines: 2, // Limit lines
+          overflow: TextOverflow.ellipsis,
         ),
       ],
     );
@@ -371,31 +370,36 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
 
   Widget _buildQuickActionCard(IconData icon, String title, Color color, VoidCallback onTap) {
     return GlassCard(
-      padding: const EdgeInsets.all(20),
+      padding: const EdgeInsets.all(16), // Reduced padding
       onTap: onTap,
       child: Column(
+        mainAxisSize: MainAxisSize.min, // Prevent overflow
         children: [
           Container(
-            padding: const EdgeInsets.all(12),
+            padding: const EdgeInsets.all(10), // Reduced padding
             decoration: BoxDecoration(
               color: color.withOpacity(0.2),
-              borderRadius: BorderRadius.circular(12),
+              borderRadius: BorderRadius.circular(10),
             ),
             child: Icon(
               icon,
               color: color,
-              size: 24,
+              size: 20, // Reduced size
             ),
           ),
-          const SizedBox(height: 12),
-          Text(
-            title,
-            style: const TextStyle(
-              fontSize: 14,
-              fontWeight: FontWeight.w600,
-              color: Colors.white,
+          const SizedBox(height: 8), // Reduced spacing
+          Flexible( // Allow text to resize
+            child: Text(
+              title,
+              style: const TextStyle(
+                fontSize: 12, // Reduced font size
+                fontWeight: FontWeight.w600,
+                color: Colors.white,
+              ),
+              textAlign: TextAlign.center,
+              maxLines: 2, // Limit lines
+              overflow: TextOverflow.ellipsis,
             ),
-            textAlign: TextAlign.center,
           ),
         ],
       ),

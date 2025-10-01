@@ -10,7 +10,7 @@ class ConvexService {
   factory ConvexService() => _instance;
   ConvexService._internal();
 
-  final String baseUrl = AppConfig.convexUrl;
+  final String baseUrl = AppConfig.apiBaseUrl;
 
   /// Initialize CONVEX client
   Future<void> initialize() async {
@@ -26,7 +26,7 @@ class ConvexService {
 
   /// Test CONVEX connection
   Future<void> _testConnection() async {
-    final url = Uri.parse('$baseUrl/api/messages');
+    final url = Uri.parse('$baseUrl/convex/getUserStats');
     final response = await http.get(url, headers: {
       'Accept': 'application/json',
     });

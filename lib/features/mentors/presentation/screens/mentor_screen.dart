@@ -99,86 +99,117 @@ class _MentorScreenState extends ConsumerState<MentorScreen>
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        gradient: AppColors.backgroundGradient,
-      ),
-      child: SafeArea(
-        child: Column(
-          children: [
-            // Header
-            Padding(
-              padding: const EdgeInsets.all(20),
-              child: Row(
-                children: [
-                  IconButton(
-                    onPressed: () => context.go('/home'),
-                    icon: const Icon(Icons.arrow_back, color: Colors.white),
-                    style: IconButton.styleFrom(
-                      backgroundColor: AppColors.card.withOpacity(0.5),
-                      padding: const EdgeInsets.all(12),
-                    ),
-                  ),
-                  const SizedBox(width: 16),
-                  const Expanded(
-                    child: Text(
-                      'Expert Mentors',
-                      style: TextStyle(
-                        fontSize: 28,
-                        fontWeight: FontWeight.w700,
-                        color: Colors.white,
+    return Scaffold(
+      backgroundColor: Colors.transparent,
+      body: Container(
+        decoration: BoxDecoration(
+          gradient: AppColors.backgroundGradient,
+        ),
+        child: SafeArea(
+          child: Column(
+            children: [
+              // Header
+              Padding(
+                padding: const EdgeInsets.all(20),
+                child: Row(
+                  children: [
+                    IconButton(
+                      onPressed: () => context.go('/home'),
+                      icon: const Icon(Icons.arrow_back, color: Colors.white),
+                      style: IconButton.styleFrom(
+                        backgroundColor: AppColors.card.withOpacity(0.5),
+                        padding: const EdgeInsets.all(12),
                       ),
                     ),
-                  ),
-                  IconButton(
-                    onPressed: () => context.go('/store'),
-                    icon: const Icon(Icons.store, color: Colors.white),
-                  ),
-                ],
-              ),
-            ),
-
-            // Tab Bar
-            Container(
-              margin: const EdgeInsets.symmetric(horizontal: 20),
-              decoration: BoxDecoration(
-                color: AppColors.card.withOpacity(0.3),
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: TabBar(
-                controller: _tabController,
-                indicator: BoxDecoration(
-                  gradient: LinearGradient(
-                    colors: [AppColors.royalPurple, AppColors.electricBlue],
-                  ),
-                  borderRadius: BorderRadius.circular(8),
+                    const SizedBox(width: 16),
+                    const Expanded(
+                      child: Text(
+                        'Expert Mentors',
+                        style: TextStyle(
+                          fontSize: 28,
+                          fontWeight: FontWeight.w700,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ),
+                    IconButton(
+                      onPressed: () => context.go('/store'),
+                      icon: const Icon(Icons.store, color: Colors.white),
+                    ),
+                  ],
                 ),
-                indicatorSize: TabBarIndicatorSize.tab,
-                dividerColor: Colors.transparent,
-                labelColor: Colors.white,
-                unselectedLabelColor: AppColors.textSecondary,
-                tabs: const [
-                  Tab(text: 'All Mentors'),
-                  Tab(text: 'My Sessions'),
-                  Tab(text: 'Favorites'),
-                ],
               ),
-            ),
 
-            // Tab Content
-            Expanded(
-              child: TabBarView(
-                controller: _tabController,
-                children: [
-                  _buildAllMentorsTab(),
-                  _buildMySessionsTab(),
-                  _buildFavoritesTab(),
-                ],
+              // Tab Bar
+              Container(
+                margin: const EdgeInsets.symmetric(horizontal: 20),
+                decoration: BoxDecoration(
+                  color: AppColors.card.withOpacity(0.3),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: TabBar(
+                  controller: _tabController,
+                  indicator: BoxDecoration(
+                    gradient: LinearGradient(
+                      colors: [AppColors.royalPurple, AppColors.electricBlue],
+                    ),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  indicatorSize: TabBarIndicatorSize.tab,
+                  dividerColor: Colors.transparent,
+                  labelColor: Colors.white,
+                  unselectedLabelColor: AppColors.textSecondary,
+                  tabs: const [
+                    Tab(text: 'All Mentors'),
+                    Tab(text: 'My Sessions'),
+                    Tab(text: 'Favorites'),
+                  ],
+                ),
               ),
-            ),
-          ],
+
+              // Tab Content
+              Expanded(
+                child: TabBarView(
+                  controller: _tabController,
+                  children: [
+                    _buildAllMentorsTab(),
+                    _buildMySessionsTab(),
+                    _buildFavoritesTab(),
+                  ],
+                ),
+              ),
+            ],
+          ),
         ),
       ),
+      floatingActionButton: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: [AppColors.royalPurple, AppColors.electricBlue],
+          ),
+          borderRadius: BorderRadius.circular(28),
+          boxShadow: AppColors.neonGlowPurple,
+        ),
+        child: FloatingActionButton.extended(
+          onPressed: () => context.go('/ai-coach'),
+          backgroundColor: Colors.transparent,
+          elevation: 0,
+          icon: const Icon(
+            Icons.smart_toy_rounded,
+            color: Colors.white,
+            size: 24,
+          ),
+          label: const Text(
+            'AI Coach',
+            style: TextStyle(
+              color: Colors.white,
+              fontWeight: FontWeight.w600,
+              fontSize: 16,
+            ),
+          ),
+        ),
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
     );
   }
 

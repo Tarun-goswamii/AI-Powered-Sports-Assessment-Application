@@ -10,6 +10,10 @@ import '../../features/test/presentation/screens/calibration_screen.dart';
 import '../../features/test/presentation/screens/recording_screen.dart';
 import '../../features/test/presentation/screens/test_completion_screen.dart';
 import '../../features/test/presentation/screens/personalized_solution_screen.dart';
+import '../../features/test/presentation/screens/camera_calibration_screen.dart';
+import '../../features/test/presentation/screens/video_recording_screen.dart';
+import '../../features/test/presentation/screens/video_analysis_screen.dart';
+import '../../features/test/presentation/screens/test_results_screen.dart';
 import '../../features/results/presentation/screens/combined_results_screen.dart';
 import '../../features/community/presentation/screens/community_screen.dart';
 import '../../features/mentors/presentation/screens/mentor_screen.dart';
@@ -23,6 +27,9 @@ import '../../features/leaderboard/presentation/screens/leaderboard_screen.dart'
 import '../../features/nutrition/presentation/screens/nutrition_screen.dart';
 import '../../features/recovery/presentation/screens/recovery_screen.dart';
 import '../../features/body_logs/presentation/screens/body_logs_screen.dart';
+import '../../features/demo/presentation/screens/integration_demo_screen.dart';
+import '../../features/ai_chat/ai_chat_screen.dart';
+import '../../core/services/video_analysis_service.dart';
 
 class AppRouter {
   static final GoRouter router = GoRouter(
@@ -41,8 +48,60 @@ class AppRouter {
         builder: (context, state) => const AuthScreen(),
       ),
       GoRoute(
+        path: '/demo',
+        builder: (context, state) => const IntegrationDemoScreen(),
+      ),
+      GoRoute(
         path: '/test-detail',
-        builder: (context, state) => const TestDetailScreen(),
+        builder: (context, state) {
+          final extra = state.extra as Map<String, dynamic>?;
+          final exerciseType = extra?['exercise_type'] as ExerciseType? ?? ExerciseType.sprint;
+          return TestDetailScreen(exerciseType: exerciseType);
+        },
+      ),
+      GoRoute(
+        path: '/test/calibration',
+        builder: (context, state) {
+          final extra = state.extra as Map<String, dynamic>?;
+          final exerciseType = extra?['exercise_type'] as ExerciseType? ?? ExerciseType.sprint;
+          return CameraCalibrationScreen(exerciseType: exerciseType);
+        },
+      ),
+      GoRoute(
+        path: '/test/recording',
+        builder: (context, state) {
+          final extra = state.extra as Map<String, dynamic>?;
+          final exerciseType = extra?['exercise_type'] as ExerciseType? ?? ExerciseType.sprint;
+          final cameraController = extra?['camera_controller'];
+          return VideoRecordingScreen(
+            exerciseType: exerciseType,
+            cameraController: cameraController,
+          );
+        },
+      ),
+      GoRoute(
+        path: '/test/analysis',
+        builder: (context, state) {
+          final extra = state.extra as Map<String, dynamic>?;
+          final videoPath = extra?['video_path'] as String? ?? '';
+          final exerciseType = extra?['exercise_type'] as ExerciseType? ?? ExerciseType.sprint;
+          return VideoAnalysisScreen(
+            videoPath: videoPath,
+            exerciseType: exerciseType,
+          );
+        },
+      ),
+      GoRoute(
+        path: '/test/results',
+        builder: (context, state) {
+          final extra = state.extra as Map<String, dynamic>?;
+          final results = extra?['results'] as ExerciseMetrics?;
+          final exerciseType = extra?['exercise_type'] as ExerciseType? ?? ExerciseType.sprint;
+          return TestResultsScreen(
+            results: results!,
+            exerciseType: exerciseType,
+          );
+        },
       ),
       GoRoute(
         path: '/calibration',
@@ -118,6 +177,10 @@ class AppRouter {
           GoRoute(
             path: '/body-logs',
             builder: (context, state) => const BodyLogsScreen(),
+          ),
+          GoRoute(
+            path: '/ai-coach',
+            builder: (context, state) => const AIChatScreen(),
           ),
         ],
       ),
@@ -231,8 +294,8 @@ class _AppShellState extends State<AppShell> with TickerProviderStateMixin {
             label: 'Community',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.school_rounded),
-            activeIcon: Icon(Icons.school_rounded, size: 28),
+            icon: Icon(Icons.supervisor_account_rounded),
+            activeIcon: Icon(Icons.supervisor_account_rounded, size: 28),
             label: 'Mentors',
           ),
           BottomNavigationBarItem(

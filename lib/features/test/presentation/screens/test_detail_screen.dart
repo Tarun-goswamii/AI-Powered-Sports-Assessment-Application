@@ -2,11 +2,17 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../core/theme/app_colors.dart';
+import '../../../../core/services/video_analysis_service.dart';
 import '../../../../shared/presentation/widgets/glass_card.dart';
 import '../../../../shared/presentation/widgets/neon_button.dart';
 
 class TestDetailScreen extends StatelessWidget {
-  const TestDetailScreen({super.key});
+  final ExerciseType exerciseType;
+  
+  const TestDetailScreen({
+    super.key,
+    this.exerciseType = ExerciseType.sprint, // Default for existing implementation
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -70,29 +76,29 @@ class TestDetailScreen extends StatelessWidget {
                                     ),
                                     borderRadius: BorderRadius.circular(16),
                                   ),
-                                  child: const Icon(
-                                    Icons.directions_run,
+                                  child: Icon(
+                                    _getExerciseIcon(exerciseType),
                                     color: Colors.white,
                                     size: 30,
                                   ),
                                 ),
                                 const SizedBox(width: 16),
-                                const Expanded(
+                                Expanded(
                                   child: Column(
                                     crossAxisAlignment: CrossAxisAlignment.start,
                                     children: [
                                       Text(
-                                        '40m Sprint Test',
-                                        style: TextStyle(
+                                        VideoAnalysisService.getExerciseName(exerciseType),
+                                        style: const TextStyle(
                                           fontSize: 20,
                                           fontWeight: FontWeight.w700,
                                           color: Colors.white,
                                         ),
                                       ),
-                                      SizedBox(height: 4),
+                                      const SizedBox(height: 4),
                                       Text(
-                                        'Speed & Acceleration Assessment',
-                                        style: TextStyle(
+                                        _getExerciseDescription(exerciseType),
+                                        style: const TextStyle(
                                           fontSize: 14,
                                           color: AppColors.textSecondary,
                                         ),
@@ -244,8 +250,11 @@ class TestDetailScreen extends StatelessWidget {
 
                       // Start Test Button
                       NeonButton(
-                        text: 'Start Test',
-                        onPressed: () => context.go('/calibration'),
+                        text: 'Start Calibration',
+                        onPressed: () => context.push(
+                          '/test/calibration',
+                          extra: {'exercise_type': exerciseType},
+                        ),
                         size: NeonButtonSize.large,
                       ),
                       const SizedBox(height: 40),
@@ -358,5 +367,47 @@ class TestDetailScreen extends StatelessWidget {
         ),
       ],
     );
+  }
+
+  IconData _getExerciseIcon(ExerciseType exerciseType) {
+    switch (exerciseType) {
+      case ExerciseType.pushup:
+        return Icons.fitness_center;
+      case ExerciseType.pullup:
+        return Icons.accessibility_new;
+      case ExerciseType.squat:
+        return Icons.airline_seat_legroom_reduced;
+      case ExerciseType.bicepCurl:
+        return Icons.sports_gymnastics;
+      case ExerciseType.shoulderPress:
+        return Icons.sports_martial_arts;
+      case ExerciseType.sprint:
+        return Icons.directions_run;
+      case ExerciseType.burpee:
+        return Icons.sports_handball;
+      case ExerciseType.plank:
+        return Icons.hotel;
+    }
+  }
+
+  String _getExerciseDescription(ExerciseType exerciseType) {
+    switch (exerciseType) {
+      case ExerciseType.pushup:
+        return 'Upper Body Strength Assessment';
+      case ExerciseType.pullup:
+        return 'Pull Strength & Endurance Test';
+      case ExerciseType.squat:
+        return 'Lower Body Power Assessment';
+      case ExerciseType.bicepCurl:
+        return 'Arm Strength & Form Analysis';
+      case ExerciseType.shoulderPress:
+        return 'Shoulder Stability Test';
+      case ExerciseType.sprint:
+        return 'Speed & Acceleration Assessment';
+      case ExerciseType.burpee:
+        return 'Full Body Conditioning Test';
+      case ExerciseType.plank:
+        return 'Core Strength & Endurance';
+    }
   }
 }

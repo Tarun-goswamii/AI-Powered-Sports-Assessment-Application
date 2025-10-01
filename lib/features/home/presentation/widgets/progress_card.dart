@@ -21,62 +21,67 @@ class ProgressCard extends StatelessWidget {
     final percentage = (progress * 100).round();
 
     return GlassCard(
-      padding: const EdgeInsets.all(24),
+      padding: const EdgeInsets.all(20), // Reduced padding
       enableNeonGlow: true,
       neonGlowColor: AppColors.royalPurple,
       onTap: onTap,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min, // Prevent overflow
         children: [
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Test Progress',
-                    style: const TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.w600,
-                      color: Colors.white,
-                      letterSpacing: 0.1,
+              Flexible( // Allow text to wrap if needed
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Test Progress',
+                      style: const TextStyle(
+                        fontSize: 16, // Reduced font size
+                        fontWeight: FontWeight.w600,
+                        color: Colors.white,
+                        letterSpacing: 0.1,
+                      ),
                     ),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    'Keep pushing forward!',
-                    style: TextStyle(
-                      fontSize: 12,
-                      color: AppColors.textSecondary.withOpacity(0.7),
-                      fontWeight: FontWeight.w400,
+                    const SizedBox(height: 2),
+                    Text(
+                      'Keep pushing forward!',
+                      style: TextStyle(
+                        fontSize: 11, // Reduced font size
+                        color: AppColors.textSecondary.withOpacity(0.7),
+                        fontWeight: FontWeight.w400,
+                      ),
                     ),
-                  ),
-                ],
-              ),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                decoration: BoxDecoration(
-                  color: AppColors.neonGreen.withOpacity(0.1),
-                  borderRadius: BorderRadius.circular(16),
-                  border: Border.all(
-                    color: AppColors.neonGreen.withOpacity(0.3),
-                    width: 1,
-                  ),
+                  ],
                 ),
-                child: Text(
-                  '$completedTests/$totalTests Complete',
-                  style: const TextStyle(
-                    fontSize: 12,
-                    color: AppColors.neonGreen,
-                    fontWeight: FontWeight.w600,
-                    letterSpacing: 0.5,
+              ),
+              Flexible( // Prevent overflow of completion badge
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4), // Reduced padding
+                  decoration: BoxDecoration(
+                    color: AppColors.neonGreen.withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(14),
+                    border: Border.all(
+                      color: AppColors.neonGreen.withOpacity(0.3),
+                      width: 1,
+                    ),
+                  ),
+                  child: Text(
+                    '$completedTests/$totalTests Complete',
+                    style: const TextStyle(
+                      fontSize: 11, // Reduced font size
+                      color: AppColors.neonGreen,
+                      fontWeight: FontWeight.w600,
+                      letterSpacing: 0.3,
+                    ),
                   ),
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 24),
+          const SizedBox(height: 16), // Reduced spacing
           // Premium progress bar
           Container(
             height: 12,

@@ -1,13 +1,32 @@
 import { query, mutation } from "./_generated/server";
 import { v } from "convex/values";
 
+export const getUsers = query({
+  args: {},
+  handler: async (ctx) => {
+    const users = await ctx.db
+      .query("users")
+      .collect();
+    return { users };
+  },
+});
+
+export const getUser = query({
+  args: { userId: v.id("users") },
+  handler: async (ctx, args) => {
+    const user = await ctx.db.get(args.userId);
+    if (!user) {
+      throw new Error("User not found");
+    }
+    return user;
+  },
+});
+
 export const getLeaderboard = query({
   args: {},
   handler: async (ctx) => {
     const leaderboard = await ctx.db
       .query("leaderboard")
-      .order("desc", "totalScore")
-      .take(10)
       .collect();
     return leaderboard;
   },
@@ -61,7 +80,7 @@ export const getUserTestResults = query({
     const results = await ctx.db
       .query("test_results")
       .withIndex("by_user", (q) => q.eq("userId", args.userId))
-      .order("desc", "completedAt")
+      .order("desc")
       .collect();
     return results;
   },
@@ -105,6 +124,7 @@ export const createUser = mutation({
       name: args.name,
       credits: 100, // Starting credits
       createdAt: Date.now(),
+      updatedAt: Date.now(),
       totalScore: 0,
     });
 
@@ -123,11 +143,13 @@ export const createUser = mutation({
 export const getMentors = query({
   args: { category: v.optional(v.string()) },
   handler: async (ctx, args) => {
-    let query = ctx.db.query("mentors");
+    let mentors = await ctx.db.query("mentors").collect();
     if (args.category) {
-      query = query.filter((q) => q.eq(q.field("categories"), args.category));
+      mentors = mentors.filter(mentor => 
+        mentor.categories.includes(args.category!)
+      );
     }
-    return await query.collect();
+    return mentors;
   },
 });
 
@@ -144,7 +166,7 @@ export const getUserMentorSessions = query({
     const sessions = await ctx.db
       .query("mentor_sessions")
       .withIndex("by_user", (q) => q.eq("userId", args.userId))
-      .order("desc", "scheduledAt")
+      .order("desc")
       .collect();
 
     // Enrich with mentor data
@@ -311,7 +333,13 @@ export const unlockAchievement = mutation({
 export const getAllAchievements = query({
   args: {},
   handler: async (ctx) => {
-    return await ctx.db.query("achievements").collect();
+    // Return hardcoded achievements for now since no achievements table exists
+    return [
+      { id: "first_test", name: "First Test", description: "Complete your first fitness test", icon: "🎯" },
+      { id: "score_100", name: "Century Club", description: "Score 100 points in a single test", icon: "💯" },
+      { id: "week_streak", name: "Weekly Warrior", description: "Complete tests for 7 consecutive days", icon: "🔥" },
+      { id: "perfect_form", name: "Perfect Form", description: "Achieve 100% form accuracy", icon: "⭐" },
+    ];
   },
 });
 
@@ -348,7 +376,7 @@ export const getUserBodyLogs = query({
     return await ctx.db
       .query("body_logs")
       .withIndex("by_user", (q) => q.eq("userId", args.userId))
-      .order("desc", "date")
+      .order("desc")
       .collect();
   },
 });

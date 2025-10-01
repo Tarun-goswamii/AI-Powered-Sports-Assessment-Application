@@ -22,17 +22,18 @@ class QuickAccessCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GlassCard(
-      padding: const EdgeInsets.all(20),
+      padding: const EdgeInsets.all(16), // Reduced padding to prevent overflow
       enableNeonGlow: true,
       neonGlowColor: color,
       onTap: onTap,
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
+        mainAxisSize: MainAxisSize.min, // Prevent overflow
         children: [
           // Premium icon with gradient background
           Container(
-            width: 48,
-            height: 48,
+            width: 40, // Reduced size to fit better
+            height: 40,
             decoration: BoxDecoration(
               gradient: LinearGradient(
                 colors: [
@@ -42,41 +43,50 @@ class QuickAccessCard extends StatelessWidget {
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
               ),
-              borderRadius: BorderRadius.circular(16),
+              borderRadius: BorderRadius.circular(12),
               boxShadow: [
                 BoxShadow(
                   color: color.withOpacity(0.3),
-                  blurRadius: 12,
-                  offset: const Offset(0, 4),
+                  blurRadius: 8,
+                  offset: const Offset(0, 2),
                 ),
               ],
             ),
             child: Icon(
               icon,
-              size: 24,
+              size: 20, // Reduced icon size
               color: Colors.white,
             ),
           ),
-          const SizedBox(height: 12),
-          Text(
-            title,
-            style: const TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.w600,
-              color: Colors.white,
-              letterSpacing: 0.1,
+          const SizedBox(height: 8), // Reduced spacing
+          Flexible( // Allow text to resize
+            child: Text(
+              title,
+              style: const TextStyle(
+                fontSize: 14, // Reduced font size
+                fontWeight: FontWeight.w600,
+                color: Colors.white,
+                letterSpacing: 0.1,
+              ),
+              textAlign: TextAlign.center,
+              maxLines: 2, // Limit lines
+              overflow: TextOverflow.ellipsis,
             ),
-            textAlign: TextAlign.center,
           ),
-          const SizedBox(height: 4),
-          Text(
-            subtitle,
-            style: TextStyle(
-              fontSize: 11,
-              color: AppColors.textSecondary.withOpacity(0.7),
-              fontWeight: FontWeight.w400,
+          const SizedBox(height: 2), // Reduced spacing
+          Flexible( // Allow subtitle to resize
+            child: Text(
+              subtitle,
+              style: TextStyle(
+                fontSize: 10, // Reduced font size
+                color: AppColors.textSecondary.withOpacity(0.7),
+                fontWeight: FontWeight.w400,
+                height: 1.2, // Better line height
+              ),
+              textAlign: TextAlign.center,
+              maxLines: 2, // Limit lines
+              overflow: TextOverflow.ellipsis,
             ),
-            textAlign: TextAlign.center,
           ),
         ],
       ),

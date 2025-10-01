@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/services/service_manager.dart';
 import '../../../../core/models/mentor_model.dart';
+import '../../../../core/models/mentor_session_model.dart';
 import '../../../../shared/presentation/widgets/glass_card.dart';
 import '../../../../shared/presentation/widgets/neon_button.dart';
 
@@ -251,7 +252,7 @@ class _MentorScreenState extends ConsumerState<MentorScreen>
                   mentor.specialty,
                   mentor.rating,
                   mentor.sessionsCount,
-                  mentor.price,
+                  '₹${mentor.price.toStringAsFixed(0)}/session',
                   _getMentorColor(mentor.categories.first),
                   mentor.isOnline,
                 ),
@@ -288,11 +289,11 @@ class _MentorScreenState extends ConsumerState<MentorScreen>
             ..._sessions.where((s) => s.status == 'upcoming').map((session) => Column(
               children: [
                 _buildSessionCard(
-                  session.mentorName,
+                  session.mentorName ?? 'Unknown Mentor',
                   session.topic,
-                  _formatSessionTime(session.scheduledTime),
-                  session.sessionType,
-                  _getMentorColor(session.category),
+                  _formatSessionTime(DateTime.fromMillisecondsSinceEpoch(session.scheduledAt)),
+                  session.type,
+                  _getMentorColor('general'),
                 ),
                 const SizedBox(height: 16),
               ],
@@ -316,11 +317,11 @@ class _MentorScreenState extends ConsumerState<MentorScreen>
             ..._sessions.where((s) => s.status == 'completed').map((session) => Column(
               children: [
                 _buildPastSessionCard(
-                  session.mentorName,
+                  session.mentorName ?? 'Unknown Mentor',
                   session.topic,
                   _formatCompletedTime(session.completedAt),
                   session.rating ?? 0.0,
-                  _getMentorColor(session.category),
+                  _getMentorColor('general'),
                 ),
                 const SizedBox(height: 12),
               ],
@@ -360,7 +361,7 @@ class _MentorScreenState extends ConsumerState<MentorScreen>
                   mentor.specialty,
                   mentor.rating,
                   mentor.sessionsCount,
-                  mentor.price,
+                  '₹${mentor.price.toStringAsFixed(0)}/session',
                   _getMentorColor(mentor.categories.first),
                   mentor.isOnline,
                 ),

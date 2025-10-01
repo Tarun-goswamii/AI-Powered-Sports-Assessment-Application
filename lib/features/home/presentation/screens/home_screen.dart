@@ -108,6 +108,36 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with TickerProviderStat
         'difficulty': 'Easy',
         'category': 'Strength',
       },
+      {
+        'id': '4',
+        'title': 'Endurance Run',
+        'description': 'Cardiovascular fitness test',
+        'icon': Icons.timer,
+        'status': TestStatus.notStarted,
+        'duration': 15,
+        'difficulty': 'Hard',
+        'category': 'Endurance',
+      },
+      {
+        'id': '5',
+        'title': 'Height Test',
+        'description': 'Physical measurements',
+        'icon': Icons.height,
+        'status': TestStatus.completed,
+        'duration': 2,
+        'difficulty': 'Easy',
+        'category': 'Physical',
+      },
+      {
+        'id': '6',
+        'title': 'Push-ups',
+        'description': 'Upper body strength test',
+        'icon': Icons.fitness_center,
+        'status': TestStatus.notStarted,
+        'duration': 5,
+        'difficulty': 'Medium',
+        'category': 'Strength',
+      },
     ];
 
     _userStats = {
@@ -115,6 +145,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with TickerProviderStat
       'averageScore': 8.4,
       'ranking': 'Top 25%',
       'badges': 5,
+      'completedTests': 2,
+      'totalAvailableTests': 6,
     };
   }
 
@@ -188,8 +220,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with TickerProviderStat
                       _buildHeader(),
                       SizedBox(height: AppLayout.homeScreenSpacing),
                       ProgressCard(
-                        completedTests: _userStats['completedTests'] ?? 0,
-                        totalTests: _userStats['totalAvailableTests'] ?? 6,
+                        completedTests: _getCompletedTestsCount(),
+                        totalTests: _getTotalTestsCount(),
                       ),
                       SizedBox(height: AppLayout.homeScreenSpacing),
                       _buildQuickAccessCards(),
@@ -213,9 +245,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with TickerProviderStat
     final user = authService.currentUser;
 
     return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         Expanded(
+          flex: 3, // Give more space to the text
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -224,49 +256,118 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with TickerProviderStat
                 style: AppTypography.h2.copyWith(
                   color: AppColors.foreground,
                   fontWeight: FontWeight.w600,
+                  fontSize: 20, // Reduced font size to prevent overflow
                 ),
+                overflow: TextOverflow.ellipsis,
+                maxLines: 1,
               ),
-              const SizedBox(height: 4),
+              const SizedBox(height: 2),
               Text(
                 'Ready to assess your performance?',
                 style: AppTypography.bodyMedium.copyWith(
                   color: AppColors.textSecondary,
+                  fontSize: 13, // Reduced font size
                 ),
+                overflow: TextOverflow.ellipsis,
+                maxLines: 1,
               ),
             ],
           ),
         ),
-        // Daily bonus button
-        GestureDetector(
-          onTap: _showDailyLoginBonus,
-          child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-            decoration: BoxDecoration(
-              color: AppColors.neonGreen.withOpacity(0.1),
-              border: Border.all(
-                color: AppColors.neonGreen.withOpacity(0.3),
-                width: 1,
-              ),
-              borderRadius: BorderRadius.circular(20),
-            ),
-            child: Row(
-              children: [
-                Icon(
-                  Icons.celebration,
-                  color: AppColors.neonGreen,
-                  size: 16,
-                ),
-                const SizedBox(width: 6),
-                Text(
-                  'Daily Bonus',
-                  style: TextStyle(
-                    color: AppColors.neonGreen,
-                    fontSize: 12,
-                    fontWeight: FontWeight.w600,
+        // Demo and Daily bonus buttons
+        Flexible(
+          flex: 2, // Constrain button area
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              // Judge Demo Button
+              Flexible(
+                child: GestureDetector(
+                  onTap: () => context.push('/demo'),
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6), // Reduced padding
+                    decoration: BoxDecoration(
+                      color: AppColors.royalPurple.withOpacity(0.1),
+                      border: Border.all(
+                        color: AppColors.royalPurple.withOpacity(0.3),
+                        width: 1,
+                      ),
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(
+                          Icons.play_circle_outline,
+                          color: AppColors.royalPurple,
+                          size: 14, // Reduced icon size
+                        ),
+                        const SizedBox(width: 3),
+                        Flexible(
+                          child: Text(
+                            'Demo',
+                            style: TextStyle(
+                              color: AppColors.royalPurple,
+                              fontSize: 10, // Reduced font size
+                              fontWeight: FontWeight.w600,
+                            ),
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
-              ],
-            ),
+              ),
+              const SizedBox(width: 6), // Reduced spacing
+              // Daily bonus button
+              Flexible(
+                child: GestureDetector(
+                  onTap: _showDailyLoginBonus,
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6), // Reduced padding
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        colors: [
+                          AppColors.neonGreen.withOpacity(0.8),
+                          AppColors.neonGreen.withOpacity(0.6),
+                        ],
+                      ),
+                      borderRadius: BorderRadius.circular(16),
+                      boxShadow: [
+                        BoxShadow(
+                          color: AppColors.neonGreen.withOpacity(0.3),
+                          blurRadius: 8,
+                          offset: const Offset(0, 2),
+                        ),
+                      ],
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(
+                          Icons.card_giftcard,
+                          color: Colors.white,
+                          size: 14, // Reduced icon size
+                        ),
+                        const SizedBox(width: 3),
+                        Flexible(
+                          child: Text(
+                            'Bonus',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 10, // Reduced font size
+                              fontWeight: FontWeight.w600,
+                            ),
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ],
           ),
         ),
       ],
@@ -275,7 +376,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with TickerProviderStat
 
   Widget _buildQuickAccessCards() {
     return SizedBox(
-      height: AppLayout.quickAccessHeight,
+      height: 130, // Reduced height to prevent overflow
       child: ListView.builder(
         scrollDirection: Axis.horizontal,
         padding: EdgeInsets.zero,
@@ -283,10 +384,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with TickerProviderStat
         itemBuilder: (context, index) {
           final cardData = _getQuickAccessCardData(index);
           return Container(
-            width: AppLayout.quickAccessCardWidth,
+            width: 110, // Reduced width for better fit
             margin: EdgeInsets.only(
               right: index < AppLayout.quickAccessCardCount - 1
-                  ? AppLayout.testGridCrossAxisSpacing
+                  ? 12 // Consistent spacing
                   : 0,
             ),
             child: QuickAccessCard(
@@ -316,15 +417,19 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with TickerProviderStat
         GridView.builder(
           shrinkWrap: true,
           physics: const NeverScrollableScrollPhysics(),
-          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: AppLayout.testGridCrossAxisCount,
-            crossAxisSpacing: AppLayout.testGridCrossAxisSpacing,
-            mainAxisSpacing: AppLayout.testGridMainAxisSpacing,
-            childAspectRatio: AppLayout.testGridChildAspectRatio,
+          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: 2, // Fixed to 2 columns
+            crossAxisSpacing: 12.0, // Consistent spacing
+            mainAxisSpacing: 12.0,
+            childAspectRatio: 0.9, // Adjusted aspect ratio to prevent overflow
           ),
-          itemCount: AppLayout.testGridItemCount,
+          itemCount: _availableTests.isNotEmpty ? _availableTests.length.clamp(0, 6) : 6, // Use actual data or fallback
           itemBuilder: (context, index) {
-            final testData = _getTestData(index);
+            // Use available tests data if loaded, otherwise use mock data
+            final testData = _availableTests.isNotEmpty && index < _availableTests.length
+                ? _availableTests[index]
+                : _getTestData(index);
+            
             return TestCard(
               title: testData['title'] as String,
               description: testData['description'] as String,
@@ -461,6 +566,29 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with TickerProviderStat
       },
     ];
     return tests[index];
+  }
+
+  int _getCompletedTestsCount() {
+    if (_availableTests.isNotEmpty) {
+      return _availableTests.where((test) => test['status'] == TestStatus.completed).length;
+    }
+    // Fallback to mock data count
+    final mockTests = [
+      {'status': TestStatus.notStarted},
+      {'status': TestStatus.inProgress},
+      {'status': TestStatus.completed},
+      {'status': TestStatus.notStarted},
+      {'status': TestStatus.completed},
+      {'status': TestStatus.notStarted},
+    ];
+    return mockTests.where((test) => test['status'] == TestStatus.completed).length;
+  }
+
+  int _getTotalTestsCount() {
+    if (_availableTests.isNotEmpty) {
+      return _availableTests.length;
+    }
+    return 6; // Default number of available tests
   }
 
   Future<void> _handleRefresh() async {

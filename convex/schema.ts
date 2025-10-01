@@ -1,8 +1,7 @@
-import { defineSchema, defineTable } from "convex/server";
+﻿import { defineSchema, defineTable } from "convex/server";
 import { v } from "convex/values";
 
 export default defineSchema({
-  // Existing tables (assuming from original functions)
   users: defineTable({
     email: v.string(),
     name: v.string(),
@@ -10,6 +9,8 @@ export default defineSchema({
     totalScore: v.number(),
     updatedAt: v.number(),
     createdAt: v.number(),
+    bio: v.optional(v.string()),
+    level: v.optional(v.string()),
   })
     .index("by_email", ["email"])
     .index("by_totalScore", ["totalScore"]),
@@ -26,12 +27,75 @@ export default defineSchema({
     userId: v.id("users"),
     testId: v.string(),
     score: v.number(),
+    mlAnalysis: v.optional(v.object({
+      cheatDetected: v.boolean(),
+      poseAccuracy: v.number(),
+      repetitions: v.number(),
+      formScore: v.number(),
+      violations: v.array(v.string()),
+      keyPoints: v.any(),
+      confidenceScore: v.number(),
+      recommendations: v.array(v.string()),
+    })),
+    videoUrl: v.optional(v.string()),
     completedAt: v.number(),
+    metadata: v.optional(v.object({
+      cheatDetected: v.boolean(),
+      poseAccuracy: v.number(),
+      repetitions: v.number(),
+      formScore: v.number(),
+    })),
   })
     .index("by_user", ["userId"])
-    .index("by_score", ["score"]),
+    .index("by_score", ["score"])
+    .index("by_completedAt", ["completedAt"]),
 
-  // New tables for mentors
+  community_posts: defineTable({
+    userId: v.id("users"),
+    content: v.string(),
+    type: v.string(),
+    imageUrl: v.optional(v.string()),
+    likes: v.number(),
+    comments: v.number(),
+    createdAt: v.number(),
+  })
+    .index("by_user", ["userId"])
+    .index("by_type", ["type"])
+    .index("by_createdAt", ["createdAt"]),
+
+  challenges: defineTable({
+    title: v.string(),
+    description: v.string(),
+    reward: v.number(),
+    startDate: v.number(),
+    endDate: v.number(),
+    isActive: v.boolean(),
+    participants: v.number(),
+    createdAt: v.number(),
+  })
+    .index("by_active", ["isActive"])
+    .index("by_endDate", ["endDate"]),
+
+  community_groups: defineTable({
+    name: v.string(),
+    description: v.string(),
+    category: v.string(),
+    memberCount: v.number(),
+    isPublic: v.boolean(),
+    createdAt: v.number(),
+  })
+    .index("by_category", ["category"])
+    .index("by_public", ["isPublic"]),
+
+  group_members: defineTable({
+    userId: v.id("users"),
+    groupId: v.id("community_groups"),
+    joinedAt: v.number(),
+  })
+    .index("by_user", ["userId"])
+    .index("by_group", ["groupId"])
+    .index("by_user_group", ["userId", "groupId"]),
+
   mentors: defineTable({
     name: v.string(),
     subtitle: v.string(),
@@ -49,44 +113,6 @@ export default defineSchema({
     .index("by_category", ["categories"])
     .index("by_rating", ["rating"]),
 
-  mentor_sessions: defineTable({
-    mentorId: v.id("mentors"),
-    userId: v.id("users"),
-    topic: v.string(),
-    scheduledAt: v.number(),
-    status: v.string(), // upcoming, completed, cancelled
-    type: v.string(), // video_call, chat_session
-    rating: v.optional(v.number()),
-    review: v.optional(v.string()),
-    createdAt: v.number(),
-    updatedAt: v.number(),
-  })
-    .index("by_user", ["userId"])
-    .index("by_mentor", ["mentorId"])
-    .index("by_scheduledAt", ["scheduledAt"]),
-
-  mentor_favorites: defineTable({
-    userId: v.id("users"),
-    mentorId: v.id("mentors"),
-    createdAt: v.number(),
-  })
-    .index("by_user", ["userId"])
-    .index("by_mentor", ["mentorId"])
-    .index("by_user_mentor", ["userId", "mentorId"]),
-
-  // Achievements
-  achievements: defineTable({
-    id: v.string(),
-    name: v.string(),
-    description: v.string(),
-    icon: v.string(),
-    category: v.string(),
-    requiredScore: v.number(),
-    isActive: v.boolean(),
-    createdAt: v.number(),
-  })
-    .index("by_category", ["category"]),
-
   user_achievements: defineTable({
     userId: v.id("users"),
     achievementId: v.string(),
@@ -96,7 +122,6 @@ export default defineSchema({
     .index("by_achievement", ["achievementId"])
     .index("by_user_achievement", ["userId", "achievementId"]),
 
-  // Body logs
   body_logs: defineTable({
     userId: v.id("users"),
     date: v.number(),
@@ -110,4 +135,54 @@ export default defineSchema({
   })
     .index("by_user", ["userId"])
     .index("by_date", ["date"]),
+
+  products: defineTable({
+    name: v.string(),
+    description: v.string(),
+    price: v.number(),
+    category: v.string(),
+    imageUrl: v.optional(v.string()),
+    isActive: v.boolean(),
+    createdAt: v.number(),
+  })
+    .index("by_category", ["category"])
+    .index("by_active", ["isActive"]),
+
+  purchases: defineTable({
+    userId: v.id("users"),
+    productId: v.id("products"),
+    quantity: v.number(),
+    totalCost: v.number(),
+    status: v.string(),
+    createdAt: v.number(),
+  })
+    .index("by_user", ["userId"])
+    .index("by_product", ["productId"]),
+
+  mentor_sessions: defineTable({
+    mentorId: v.id("mentors"),
+    userId: v.id("users"),
+    topic: v.string(),
+    scheduledAt: v.number(),
+    status: v.string(), // 'upcoming', 'completed', 'cancelled'
+    type: v.string(), // 'video_call', 'chat_session'
+    rating: v.optional(v.number()),
+    review: v.optional(v.string()),
+    completedAt: v.optional(v.number()),
+    createdAt: v.number(),
+    updatedAt: v.number(),
+  })
+    .index("by_user", ["userId"])
+    .index("by_mentor", ["mentorId"])
+    .index("by_status", ["status"])
+    .index("by_scheduledAt", ["scheduledAt"]),
+
+  mentor_favorites: defineTable({
+    userId: v.id("users"),
+    mentorId: v.id("mentors"),
+    createdAt: v.number(),
+  })
+    .index("by_user", ["userId"])
+    .index("by_mentor", ["mentorId"])
+    .index("by_user_mentor", ["userId", "mentorId"]),
 });

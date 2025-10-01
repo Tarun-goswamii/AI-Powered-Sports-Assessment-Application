@@ -17,111 +17,93 @@ class QuickStatsSection extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Padding(
-          padding: const EdgeInsets.only(bottom: 20),
+          padding: const EdgeInsets.only(bottom: 16),
           child: Text(
             'Your Performance',
             style: const TextStyle(
-              fontSize: 18,
+              fontSize: 16,
               fontWeight: FontWeight.w600,
               color: Colors.white,
               letterSpacing: 0.1,
             ),
           ),
         ),
-        LayoutBuilder(
-          builder: (context, constraints) {
-            // Calculate available width per stat item
-            final availableWidth = constraints.maxWidth;
-            final spacing = 16.0 * (stats.length - 1); // Total spacing between items
-            final itemWidth = (availableWidth - spacing) / stats.length;
-
-            return Row(
-              children: List.generate(stats.length, (index) {
-                final stat = stats[index];
-                return Container(
-                  width: itemWidth,
-                  margin: EdgeInsets.only(
-                    right: index < stats.length - 1 ? 16 : 0,
+        Row(
+          children: List.generate(stats.length, (index) {
+            final stat = stats[index];
+            return Expanded(
+              child: Container(
+                margin: EdgeInsets.only(
+                  right: index < stats.length - 1 ? 8 : 0,
+                ),
+                child: GlassCard(
+                  padding: const EdgeInsets.all(10),
+                  enableNeonGlow: true,
+                  neonGlowColor: stat.color,
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Container(
+                        width: 24,
+                        height: 24,
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            colors: [
+                              stat.color.withOpacity(0.8),
+                              stat.color.withOpacity(0.6),
+                            ],
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
+                          ),
+                          borderRadius: BorderRadius.circular(6),
+                        ),
+                        child: Icon(
+                          stat.icon,
+                          color: Colors.white,
+                          size: 12,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        stat.value,
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: stat.color,
+                          fontWeight: FontWeight.w700,
+                        ),
+                        textAlign: TextAlign.center,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      const SizedBox(height: 1),
+                      Text(
+                        stat.label,
+                        style: const TextStyle(
+                          fontSize: 8,
+                          fontWeight: FontWeight.w500,
+                          color: Colors.white,
+                        ),
+                        textAlign: TextAlign.center,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      Text(
+                        stat.subtitle,
+                        style: TextStyle(
+                          fontSize: 7,
+                          color: AppColors.textSecondary.withOpacity(0.6),
+                          fontWeight: FontWeight.w400,
+                        ),
+                        textAlign: TextAlign.center,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ],
                   ),
-                  child: GlassCard(
-                    padding: const EdgeInsets.all(16), // Reduced padding
-                    enableNeonGlow: true,
-                    neonGlowColor: stat.color,
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        // Icon with gradient background
-                        Container(
-                          width: 32, // Smaller icon
-                          height: 32,
-                          decoration: BoxDecoration(
-                            gradient: LinearGradient(
-                              colors: [
-                                stat.color.withOpacity(0.8),
-                                stat.color.withOpacity(0.6),
-                              ],
-                              begin: Alignment.topLeft,
-                              end: Alignment.bottomRight,
-                            ),
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                          child: Icon(
-                            stat.icon,
-                            color: Colors.white,
-                            size: 16, // Smaller icon
-                          ),
-                        ),
-                        const SizedBox(height: 8), // Reduced spacing
-                        Flexible(
-                          child: Text(
-                            stat.value,
-                            style: TextStyle(
-                              fontSize: 16, // Smaller font
-                              color: stat.color,
-                              fontWeight: FontWeight.w700,
-                              letterSpacing: -0.5,
-                            ),
-                            textAlign: TextAlign.center,
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                        ),
-                        const SizedBox(height: 2),
-                        Flexible(
-                          child: Text(
-                            stat.label,
-                            style: const TextStyle(
-                              fontSize: 10, // Smaller font
-                              fontWeight: FontWeight.w500,
-                              color: Colors.white,
-                              letterSpacing: 0.1,
-                            ),
-                            textAlign: TextAlign.center,
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                        ),
-                        const SizedBox(height: 2),
-                        Flexible(
-                          child: Text(
-                            stat.subtitle,
-                            style: TextStyle(
-                              fontSize: 8, // Smaller font
-                              color: AppColors.textSecondary.withOpacity(0.6),
-                              fontWeight: FontWeight.w400,
-                            ),
-                            textAlign: TextAlign.center,
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                );
-              }),
+                ),
+              ),
             );
-          },
+          }),
         ),
       ],
     );

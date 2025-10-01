@@ -4,13 +4,12 @@ import 'package:go_router/go_router.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/services/service_manager.dart';
 import '../../../../shared/presentation/widgets/glass_card.dart';
-import '../../../../shared/presentation/widgets/neon_button.dart';
 
 class CombinedResultsScreen extends ConsumerStatefulWidget {
   const CombinedResultsScreen({super.key});
 
   @override
-  State<CombinedResultsScreen> createState() => _CombinedResultsScreenState();
+  ConsumerState<CombinedResultsScreen> createState() => _CombinedResultsScreenState();
 }
 
 class _CombinedResultsScreenState extends ConsumerState<CombinedResultsScreen>
@@ -38,12 +37,12 @@ class _CombinedResultsScreenState extends ConsumerState<CombinedResultsScreen>
         // Load user stats
         final stats = await convexService.getUserStats(userId);
         // Load test results
-        final results = await convexService.getUserTestResults(userId);
+        final results = await convexService.getTestResults(userId);
 
         if (mounted) {
           setState(() {
             _userStats = stats;
-            _testResults = results.map((r) => r as Map<String, dynamic>).toList();
+            _testResults = results;
             _isLoading = false;
           });
         }
@@ -204,7 +203,7 @@ class _CombinedResultsScreenState extends ConsumerState<CombinedResultsScreen>
                 result['testId'] ?? 'Unknown Test',
                 '${result['score'] ?? 0}',
                 _formatDate(result['completedAt']),
-                _getScoreColor(result['score'] ?? 0),
+                _getScoreColor((result['score'] ?? 0).round()),
               ),
               const SizedBox(height: 12),
             ],
@@ -238,9 +237,9 @@ class _CombinedResultsScreenState extends ConsumerState<CombinedResultsScreen>
               _buildTestHistoryItem(
                 result['testId'] ?? 'Unknown Test',
                 '${result['score'] ?? 0}',
-                _getRatingText(result['score'] ?? 0),
+                _getRatingText((result['score'] ?? 0).round()),
                 _formatDate(result['completedAt']),
-                _getScoreColor(result['score'] ?? 0),
+                _getScoreColor((result['score'] ?? 0).round()),
               ),
               const SizedBox(height: 12),
             ],

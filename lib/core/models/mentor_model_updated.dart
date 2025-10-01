@@ -152,20 +152,22 @@ class MentorSessionModel extends Equatable {
 
   factory MentorSessionModel.fromJson(Map<String, dynamic> json) {
     return MentorSessionModel(
-      id: json['id'] as String,
+      id: json['_id'] as String? ?? json['id'] as String,
       mentorId: json['mentorId'] as String,
       userId: json['userId'] as String,
       topic: json['topic'] as String,
-      scheduledAt: DateTime.parse(json['scheduledAt'] as String),
+      scheduledAt: DateTime.fromMillisecondsSinceEpoch((json['scheduledAt'] as num).toInt()),
       status: json['status'] as String,
       type: json['type'] as String,
       rating: json['rating'] != null ? (json['rating'] as num).toDouble() : null,
       review: json['review'] as String?,
-      completedAt: json['completedAt'] != null ? DateTime.parse(json['completedAt'] as String) : null,
-      mentorName: json['mentorName'] as String? ?? 'Unknown Mentor',
+      completedAt: json['completedAt'] != null 
+        ? DateTime.fromMillisecondsSinceEpoch((json['completedAt'] as num).toInt())
+        : null,
+      mentorName: json['mentor']?['name'] as String? ?? json['mentorName'] as String? ?? 'Unknown Mentor',
       category: json['category'] as String? ?? 'General',
-      createdAt: DateTime.parse(json['createdAt'] as String),
-      updatedAt: DateTime.parse(json['updatedAt'] as String),
+      createdAt: DateTime.fromMillisecondsSinceEpoch((json['createdAt'] as num).toInt()),
+      updatedAt: DateTime.fromMillisecondsSinceEpoch((json['updatedAt'] as num).toInt()),
     );
   }
 

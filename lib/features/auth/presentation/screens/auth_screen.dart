@@ -52,87 +52,143 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
                 const SizedBox(height: 40),
                 // Logo
                 Container(
-                  width: 100,
-                  height: 100,
+                  width: 120,
+                  height: 120,
                   decoration: BoxDecoration(
                     gradient: LinearGradient(
-                      colors: [AppColors.royalPurple, AppColors.electricBlue],
+                      colors: [
+                        AppColors.royalPurple,
+                        AppColors.electricBlue,
+                        AppColors.neonGreen.withOpacity(0.8),
+                      ],
                       begin: Alignment.topLeft,
                       end: Alignment.bottomRight,
+                      stops: const [0.0, 0.5, 1.0],
                     ),
-                    borderRadius: BorderRadius.circular(25),
+                    borderRadius: BorderRadius.circular(30),
                     boxShadow: [
                       BoxShadow(
                         color: AppColors.royalPurple.withOpacity(0.4),
-                        blurRadius: 20,
-                        spreadRadius: 5,
+                        blurRadius: 25,
+                        spreadRadius: 8,
+                        offset: const Offset(0, 5),
+                      ),
+                      BoxShadow(
+                        color: AppColors.electricBlue.withOpacity(0.3),
+                        blurRadius: 15,
+                        spreadRadius: 3,
+                        offset: const Offset(0, -2),
                       ),
                     ],
                   ),
                   child: const Icon(
                     Icons.sports_soccer,
                     color: Colors.white,
-                    size: 50,
+                    size: 60,
                   ),
                 ),
                 const SizedBox(height: 32),
                 // Title
-                Text(
-                  'Welcome to Sports Assessment',
-                  style: const TextStyle(
-                    fontSize: 24,
-                    fontWeight: FontWeight.w700,
-                    color: Colors.white,
-                    letterSpacing: -0.5,
+                ShaderMask(
+                  shaderCallback: (bounds) => LinearGradient(
+                    colors: [
+                      AppColors.neonGreen,
+                      AppColors.electricBlue,
+                      AppColors.royalPurple,
+                    ],
+                    begin: Alignment.centerLeft,
+                    end: Alignment.centerRight,
+                  ).createShader(bounds),
+                  child: Text(
+                    'Welcome to Sports Assessment',
+                    style: const TextStyle(
+                      fontSize: 26,
+                      fontWeight: FontWeight.w800,
+                      color: Colors.white,
+                      letterSpacing: -0.5,
+                      height: 1.2,
+                    ),
+                    textAlign: TextAlign.center,
                   ),
-                  textAlign: TextAlign.center,
                 ),
-                const SizedBox(height: 8),
+                const SizedBox(height: 12),
                 Text(
                   'Your journey to athletic excellence starts here',
                   style: TextStyle(
                     fontSize: 16,
-                    color: AppColors.textSecondary.withOpacity(0.8),
-                    fontWeight: FontWeight.w400,
+                    color: AppColors.mutedForeground.withOpacity(0.9),
+                    fontWeight: FontWeight.w500,
+                    height: 1.4,
                   ),
                   textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: 40),
                 // Auth Form
                 Container(
-                  margin: const EdgeInsets.symmetric(horizontal: 16),
+                  margin: const EdgeInsets.symmetric(horizontal: 8),
                   decoration: AppColors.glassmorphismDecoration(
-                    borderRadius: BorderRadius.circular(20),
+                    borderRadius: BorderRadius.circular(25),
                     enableNeonGlow: true,
                     neonGlowColor: AppColors.royalPurple,
+                  ).copyWith(
+                    boxShadow: [
+                      BoxShadow(
+                        color: AppColors.royalPurple.withOpacity(0.2),
+                        blurRadius: 30,
+                        spreadRadius: 5,
+                        offset: const Offset(0, 10),
+                      ),
+                      BoxShadow(
+                        color: AppColors.electricBlue.withOpacity(0.1),
+                        blurRadius: 20,
+                        spreadRadius: 2,
+                        offset: const Offset(0, -5),
+                      ),
+                    ],
                   ),
                   child: Padding(
-                    padding: const EdgeInsets.all(24),
+                    padding: const EdgeInsets.all(28),
                     child: Column(
                       children: [
                         // Tab Bar
                         Container(
                           decoration: BoxDecoration(
-                            color: AppColors.glassmorphismBackground.withOpacity(0.3),
-                            borderRadius: BorderRadius.circular(12),
+                            color: AppColors.glassmorphismBackground.withOpacity(0.4),
+                            borderRadius: BorderRadius.circular(15),
                             border: Border.all(
-                              color: AppColors.glassmorphismBorder.withOpacity(0.5),
-                              width: 1,
+                              color: AppColors.glassmorphismBorder.withOpacity(0.6),
+                              width: 1.5,
                             ),
+                            boxShadow: [
+                              BoxShadow(
+                                color: AppColors.royalPurple.withOpacity(0.1),
+                                blurRadius: 10,
+                                spreadRadius: 1,
+                              ),
+                            ],
                           ),
                           child: TabBar(
                             controller: _tabController,
                             indicator: BoxDecoration(
                               gradient: LinearGradient(
                                 colors: [AppColors.royalPurple, AppColors.electricBlue],
+                                begin: Alignment.centerLeft,
+                                end: Alignment.centerRight,
                               ),
-                              borderRadius: BorderRadius.circular(8),
+                              borderRadius: BorderRadius.circular(12),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: AppColors.royalPurple.withOpacity(0.4),
+                                  blurRadius: 8,
+                                  spreadRadius: 1,
+                                ),
+                              ],
                             ),
                             indicatorSize: TabBarIndicatorSize.tab,
                             labelColor: Colors.white,
-                            unselectedLabelColor: AppColors.textSecondary,
+                            unselectedLabelColor: AppColors.mutedForeground,
                             labelStyle: const TextStyle(
-                              fontWeight: FontWeight.w600,
+                              fontWeight: FontWeight.w700,
                               fontSize: 16,
                             ),
                             unselectedLabelStyle: const TextStyle(
@@ -140,8 +196,18 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
                               fontSize: 16,
                             ),
                             tabs: const [
-                              Tab(text: 'Login'),
-                              Tab(text: 'Sign Up'),
+                              Tab(
+                                child: Padding(
+                                  padding: EdgeInsets.symmetric(vertical: 8),
+                                  child: Text('Login'),
+                                ),
+                              ),
+                              Tab(
+                                child: Padding(
+                                  padding: EdgeInsets.symmetric(vertical: 8),
+                                  child: Text('Sign Up'),
+                                ),
+                              ),
                             ],
                           ),
                         ),
@@ -213,39 +279,67 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
         ),
         const SizedBox(height: 16),
         // Password Field
-        TextField(
-          controller: _passwordController,
-          style: const TextStyle(color: Colors.white),
-          obscureText: _obscurePassword,
-          decoration: InputDecoration(
-            labelText: 'Password',
-            labelStyle: TextStyle(color: AppColors.textSecondary),
-            prefixIcon: Icon(Icons.lock, color: AppColors.textSecondary),
-            suffixIcon: IconButton(
-              icon: Icon(
-                _obscurePassword ? Icons.visibility : Icons.visibility_off,
-                color: AppColors.textSecondary,
+        Container(
+          decoration: AppColors.glassmorphismDecoration(
+            borderRadius: BorderRadius.circular(15),
+            enableNeonGlow: false,
+          ),
+          child: TextField(
+            controller: _passwordController,
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: 16,
+              fontWeight: FontWeight.w500,
+            ),
+            obscureText: _obscurePassword,
+            decoration: InputDecoration(
+              labelText: 'Password',
+              labelStyle: TextStyle(
+                color: AppColors.mutedForeground,
+                fontWeight: FontWeight.w500,
               ),
-              onPressed: () {
-                setState(() {
-                  _obscurePassword = !_obscurePassword;
-                });
-              },
+              prefixIcon: Icon(
+                Icons.lock_outline,
+                color: AppColors.mutedForeground,
+                size: 22,
+              ),
+              suffixIcon: IconButton(
+                icon: Icon(
+                  _obscurePassword ? Icons.visibility_outlined : Icons.visibility_off_outlined,
+                  color: AppColors.mutedForeground,
+                  size: 22,
+                ),
+                onPressed: () {
+                  setState(() {
+                    _obscurePassword = !_obscurePassword;
+                  });
+                },
+              ),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(15),
+                borderSide: BorderSide.none,
+              ),
+              enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(15),
+                borderSide: BorderSide(
+                  color: AppColors.glassmorphismBorder.withOpacity(0.3),
+                  width: 1,
+                ),
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(15),
+                borderSide: const BorderSide(
+                  color: AppColors.neonGreen,
+                  width: 2,
+                ),
+              ),
+              filled: true,
+              fillColor: Colors.transparent,
+              contentPadding: const EdgeInsets.symmetric(
+                horizontal: 20,
+                vertical: 16,
+              ),
             ),
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
-              borderSide: BorderSide(color: AppColors.border),
-            ),
-            enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
-              borderSide: BorderSide(color: AppColors.border),
-            ),
-            focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
-              borderSide: const BorderSide(color: AppColors.royalPurple, width: 2),
-            ),
-            filled: true,
-            fillColor: AppColors.muted,
           ),
         ),
         const SizedBox(height: 8),
@@ -298,27 +392,54 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
     return Column(
       children: [
         // Name Field
-        TextField(
-          controller: _nameController,
-          style: const TextStyle(color: Colors.white),
-          decoration: InputDecoration(
-            labelText: 'Full Name',
-            labelStyle: TextStyle(color: AppColors.textSecondary),
-            prefixIcon: Icon(Icons.person, color: AppColors.textSecondary),
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
-              borderSide: BorderSide(color: AppColors.border),
+        Container(
+          decoration: AppColors.glassmorphismDecoration(
+            borderRadius: BorderRadius.circular(15),
+            enableNeonGlow: false,
+          ),
+          child: TextField(
+            controller: _nameController,
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: 16,
+              fontWeight: FontWeight.w500,
             ),
-            enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
-              borderSide: BorderSide(color: AppColors.border),
+            decoration: InputDecoration(
+              labelText: 'Full Name',
+              labelStyle: TextStyle(
+                color: AppColors.mutedForeground,
+                fontWeight: FontWeight.w500,
+              ),
+              prefixIcon: Icon(
+                Icons.person_outline,
+                color: AppColors.mutedForeground,
+                size: 22,
+              ),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(15),
+                borderSide: BorderSide.none,
+              ),
+              enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(15),
+                borderSide: BorderSide(
+                  color: AppColors.glassmorphismBorder.withOpacity(0.3),
+                  width: 1,
+                ),
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(15),
+                borderSide: const BorderSide(
+                  color: AppColors.neonGreen,
+                  width: 2,
+                ),
+              ),
+              filled: true,
+              fillColor: Colors.transparent,
+              contentPadding: const EdgeInsets.symmetric(
+                horizontal: 20,
+                vertical: 16,
+              ),
             ),
-            focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
-              borderSide: const BorderSide(color: AppColors.royalPurple, width: 2),
-            ),
-            filled: true,
-            fillColor: AppColors.muted,
           ),
         ),
         const SizedBox(height: 16),
@@ -508,24 +629,36 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
   }) {
     return InkWell(
       onTap: onPressed,
-      borderRadius: BorderRadius.circular(12),
+      borderRadius: BorderRadius.circular(15),
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-        decoration: BoxDecoration(
-          color: AppColors.card,
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: AppColors.border),
+        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+        decoration: AppColors.glassmorphismDecoration(
+          borderRadius: BorderRadius.circular(15),
+          enableNeonGlow: true,
+          neonGlowColor: AppColors.electricBlue,
         ),
         child: Row(
+          mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(icon, color: AppColors.textSecondary, size: 20),
-            const SizedBox(width: 8),
+            Container(
+              padding: const EdgeInsets.all(6),
+              decoration: BoxDecoration(
+                color: AppColors.glassmorphismBackground.withOpacity(0.5),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Icon(
+                icon,
+                color: AppColors.mutedForeground,
+                size: 20,
+              ),
+            ),
+            const SizedBox(width: 12),
             Text(
               label,
               style: TextStyle(
-                color: AppColors.textSecondary,
-                fontSize: 14,
-                fontWeight: FontWeight.w500,
+                color: AppColors.mutedForeground,
+                fontSize: 15,
+                fontWeight: FontWeight.w600,
               ),
             ),
           ],
