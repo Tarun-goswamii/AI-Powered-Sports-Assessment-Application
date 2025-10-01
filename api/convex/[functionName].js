@@ -1,3 +1,4 @@
+// @vercel/node@3.0.7
 // Vercel API endpoint to proxy Convex requests
 // This helps avoid CORS issues and provides a unified API
 
