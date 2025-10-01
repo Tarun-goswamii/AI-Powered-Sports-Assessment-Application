@@ -4,7 +4,7 @@
   "description": "Backend for AI Sports Talent Assessment App",
   "main": "index.js",
   "scripts": {
-    "build": "flutter build web --release",
+    "build": "echo 'Static site - no build needed'",
     "deploy": "convex deploy",
     "dev": "convex dev",
     "deploy-and-run": "npm run deploy && flutter run",
@@ -12,7 +12,7 @@
     "start-complete": "start-complete.bat",
     "start-with-ml": "start-complete.bat",
     "start-global": "start-with-ngrok.bat",
-    "setup": "convex deploy && flutter pub get",
+    "setup": "convex deploy",
     "setup-ml": "pip install -r requirements.txt && npm run setup",
     "ml-server": "python python_ml_server.py",
     "seed-data": "npx convex run seed_data:seedAllData",

@@ -1,5 +1,6 @@
 {
   "version": 2,
+  "installCommand": "echo 'No dependencies needed for static site'",
   "buildCommand": "echo 'No build needed - deploying static site'",
   "outputDirectory": "submission",
   "cleanUrls": true,
