@@ -59,7 +59,6 @@ class TestDetailScreen extends StatelessWidget {
                       GlassCard(
                         padding: const EdgeInsets.all(24),
                         enableNeonGlow: true,
-                        neonGlowColor: AppColors.royalPurple,
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [

@@ -6,7 +6,7 @@ import '../../../../shared/presentation/widgets/neon_button.dart';
 
 enum TestStatus { notStarted, inProgress, completed }
 
-class TestCard extends StatelessWidget {
+class TestCard extends StatefulWidget {
   final String title;
   final String description;
   final IconData icon;
@@ -27,15 +27,58 @@ class TestCard extends StatelessWidget {
   });
 
   @override
+  State<TestCard> createState() => _TestCardState();
+}
+
+class _TestCardState extends State<TestCard> with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+  late Animation<double> _scaleAnimation;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      duration: const Duration(milliseconds: 100),
+      vsync: this,
+    );
+    _scaleAnimation = Tween<double>(begin: 1.0, end: 0.95).animate(
+      CurvedAnimation(parent: _controller, curve: Curves.easeOut),
+    );
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  void _handleTapDown(TapDownDetails details) {
+    _controller.forward();
+  }
+
+  void _handleTapUp(TapUpDetails details) {
+    _controller.reverse();
+  }
+
+  void _handleTapCancel() {
+    _controller.reverse();
+  }
+
+  @override
   Widget build(BuildContext context) {
     final statusConfig = _getStatusConfig();
 
-    return GlassCard(
-      padding: const EdgeInsets.all(20),
-      enableNeonGlow: status == TestStatus.completed,
-      neonGlowColor: _getStatusColor(),
-      onTap: onStartTest,
-      child: Column(
+    return ScaleTransition(
+      scale: _scaleAnimation,
+      child: GestureDetector(
+        onTapDown: _handleTapDown,
+        onTapUp: _handleTapUp,
+        onTapCancel: _handleTapCancel,
+        onTap: widget.onStartTest,
+        child: GlassCard(
+          padding: const EdgeInsets.all(20),
+          enableNeonGlow: widget.status == TestStatus.completed,
+          child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           // Icon with gradient background
@@ -64,12 +107,12 @@ class TestCard extends StatelessWidget {
                   ],
                 ),
                 child: Icon(
-                  icon,
+                  widget.icon,
                   color: Colors.white,
                   size: 28,
                 ),
               ),
-              if (status == TestStatus.completed)
+              if (widget.status == TestStatus.completed)
                 Positioned(
                   top: 0,
                   right: 0,
@@ -95,7 +138,7 @@ class TestCard extends StatelessWidget {
           ),
           const SizedBox(height: 16),
           Text(
-            title,
+            widget.title,
             style: const TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.w600,
@@ -106,7 +149,7 @@ class TestCard extends StatelessWidget {
           ),
           const SizedBox(height: 8),
           Text(
-            description,
+            widget.description,
             style: TextStyle(
               fontSize: 12,
               color: AppColors.textSecondary.withOpacity(0.8),
@@ -114,12 +157,12 @@ class TestCard extends StatelessWidget {
             ),
             textAlign: TextAlign.center,
           ),
-          if (duration != null || difficulty != null) ...[
+          if (widget.duration != null || widget.difficulty != null) ...[
             const SizedBox(height: 12),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                if (duration != null) ...[
+                if (widget.duration != null) ...[
                   Icon(
                     Icons.timer,
                     size: 14,
@@ -127,7 +170,7 @@ class TestCard extends StatelessWidget {
                   ),
                   const SizedBox(width: 4),
                   Text(
-                    '${duration}min',
+                    '${widget.duration}min',
                     style: TextStyle(
                       fontSize: 11,
                       color: AppColors.textSecondary.withOpacity(0.6),
@@ -135,8 +178,8 @@ class TestCard extends StatelessWidget {
                     ),
                   ),
                 ],
-                if (difficulty != null) ...[
-                  if (duration != null) const SizedBox(width: 8),
+                if (widget.difficulty != null) ...[
+                  if (widget.duration != null) const SizedBox(width: 8),
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                     decoration: BoxDecoration(
@@ -148,7 +191,7 @@ class TestCard extends StatelessWidget {
                       ),
                     ),
                     child: Text(
-                      difficulty!,
+                      widget.difficulty!,
                       style: TextStyle(
                         fontSize: 10,
                         color: _getDifficultyColor(),
@@ -164,15 +207,17 @@ class TestCard extends StatelessWidget {
           NeonButton(
             text: statusConfig['buttonText'] as String,
             size: NeonButtonSize.small,
-            onPressed: onStartTest,
+            onPressed: widget.onStartTest,
           ),
         ],
+          ),
+        ),
       ),
     );
   }
 
   Map<String, dynamic> _getStatusConfig() {
-    switch (status) {
+    switch (widget.status) {
       case TestStatus.notStarted:
         return {
           'badge': 'Not Started',
@@ -198,7 +243,7 @@ class TestCard extends StatelessWidget {
   }
 
   Color _getStatusColor() {
-    switch (status) {
+    switch (widget.status) {
       case TestStatus.notStarted:
         return AppColors.textSecondary;
       case TestStatus.inProgress:
@@ -209,9 +254,9 @@ class TestCard extends StatelessWidget {
   }
 
   Color _getDifficultyColor() {
-    if (difficulty == null) return AppColors.textSecondary;
+    if (widget.difficulty == null) return AppColors.textSecondary;
 
-    switch (difficulty!.toLowerCase()) {
+    switch (widget.difficulty!.toLowerCase()) {
       case 'easy':
         return AppColors.neonGreen;
       case 'medium':

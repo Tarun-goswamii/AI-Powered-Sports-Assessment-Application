@@ -379,17 +379,32 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with TickerProviderStat
       height: 130, // Reduced height to prevent overflow
       child: ListView.builder(
         scrollDirection: Axis.horizontal,
-        padding: EdgeInsets.zero,
+        padding: const EdgeInsets.symmetric(horizontal: 4), // Add padding at edges
         itemCount: AppLayout.quickAccessCardCount,
         itemBuilder: (context, index) {
           final cardData = _getQuickAccessCardData(index);
-          return Container(
-            width: 110, // Reduced width for better fit
-            margin: EdgeInsets.only(
-              right: index < AppLayout.quickAccessCardCount - 1
-                  ? 12 // Consistent spacing
-                  : 0,
-            ),
+          
+          return TweenAnimationBuilder<double>(
+            duration: const Duration(milliseconds: 500),
+            tween: Tween(begin: 0.0, end: 1.0),
+            curve: Curves.easeOutCubic,
+            builder: (context, value, child) {
+              return Opacity(
+                opacity: value,
+                child: Transform.translate(
+                  offset: Offset(0, 20 * (1 - value)),
+                  child: Container(
+                    width: 110, // Reduced width for better fit
+                    margin: EdgeInsets.only(
+                      right: index < AppLayout.quickAccessCardCount - 1
+                          ? 12 // Consistent spacing
+                          : 0,
+                    ),
+                    child: child,
+                  ),
+                ),
+              );
+            },
             child: QuickAccessCard(
               title: cardData['title'] as String,
               subtitle: cardData['subtitle'] as String,
@@ -459,7 +474,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with TickerProviderStat
           value: _userStats['ranking'] ?? 'Not ranked',
           label: 'Ranking',
           subtitle: 'National',
-          color: AppColors.electricBlue,
+          color: const Color(0xFF9333EA), // Purple variant instead of blue
           icon: Icons.leaderboard,
         ),
         StatItem(

@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../shared/presentation/widgets/glass_card.dart';
-import '../../../../shared/presentation/widgets/neon_button.dart';
+import '../../../../shared/presentation/widgets/enhanced_neon_button.dart';
 
 class CommunityScreen extends StatefulWidget {
   const CommunityScreen({super.key});
@@ -120,7 +120,7 @@ class _CommunityScreenState extends State<CommunityScreen>
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // Create Post Button
-          NeonButton(
+          EnhancedNeonButton(
             text: '+ Share Your Achievement',
             onPressed: () {},
             size: NeonButtonSize.medium,
@@ -433,7 +433,7 @@ class _CommunityScreenState extends State<CommunityScreen>
             ],
           ),
           const SizedBox(height: 16),
-          NeonButton(
+          EnhancedNeonButton(
             text: 'Join Challenge',
             onPressed: () {},
             size: NeonButtonSize.small,
@@ -540,11 +540,11 @@ class _CommunityScreenState extends State<CommunityScreen>
               ],
             ),
           ),
-          NeonButton(
+          EnhancedNeonButton(
             text: isJoined ? 'Joined' : 'Join',
             onPressed: () {},
             size: NeonButtonSize.small,
-            variant: isJoined ? NeonButtonVariant.outline : NeonButtonVariant.primary,
+            variant: isJoined ? NeonButtonVariant.outlined : NeonButtonVariant.filled,
           ),
         ],
       ),

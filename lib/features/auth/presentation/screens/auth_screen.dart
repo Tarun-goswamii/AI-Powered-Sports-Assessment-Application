@@ -1,10 +1,10 @@
-// lib/features/auth/presentation/screens/auth_screen_simple.dart
+// lib/features/auth/presentation/screens/auth_screen.dart
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../core/theme/app_colors.dart';
-import '../../../../core/services/auth_service.dart';
 import '../../../../core/services/service_manager.dart';
+import '../../../../core/providers/auth_state_provider.dart';
 import '../../../../shared/presentation/widgets/neon_button.dart';
 
 class AuthScreen extends ConsumerStatefulWidget {
@@ -17,6 +17,12 @@ class AuthScreen extends ConsumerStatefulWidget {
 class _AuthScreenState extends ConsumerState<AuthScreen>
     with TickerProviderStateMixin {
   late TabController _tabController;
+  late AnimationController _logoController;
+  late AnimationController _fadeController;
+  late Animation<double> _logoRotation;
+  late Animation<double> _logoScale;
+  late Animation<double> _fadeAnimation;
+  
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   final _confirmPasswordController = TextEditingController();
@@ -31,6 +37,58 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
   void initState() {
     super.initState();
     _tabController = TabController(length: 2, vsync: this);
+    
+    // Initialize animations
+    _logoController = AnimationController(
+      duration: const Duration(seconds: 2),
+      vsync: this,
+    );
+    
+    _fadeController = AnimationController(
+      duration: const Duration(milliseconds: 1500),
+      vsync: this,
+    );
+    
+    _logoRotation = Tween<double>(
+      begin: 0.0,
+      end: 0.1,
+    ).animate(CurvedAnimation(
+      parent: _logoController,
+      curve: Curves.easeInOut,
+    ));
+    
+    _logoScale = Tween<double>(
+      begin: 0.8,
+      end: 1.0,
+    ).animate(CurvedAnimation(
+      parent: _logoController,
+      curve: Curves.elasticOut,
+    ));
+    
+    _fadeAnimation = Tween<double>(
+      begin: 0.0,
+      end: 1.0,
+    ).animate(CurvedAnimation(
+      parent: _fadeController,
+      curve: Curves.easeOut,
+    ));
+    
+    // Start animations
+    _logoController.forward();
+    _fadeController.forward();
+    _logoController.repeat(reverse: true);
+  }
+
+  @override
+  void dispose() {
+    _logoController.dispose();
+    _fadeController.dispose();
+    _tabController.dispose();
+    _emailController.dispose();
+    _passwordController.dispose();
+    _confirmPasswordController.dispose();
+    _nameController.dispose();
+    super.dispose();
   }
 
   @override
@@ -50,41 +108,60 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 const SizedBox(height: 40),
-                // Logo
-                Container(
-                  width: 120,
-                  height: 120,
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      colors: [
-                        AppColors.royalPurple,
-                        AppColors.electricBlue,
-                        AppColors.neonGreen.withOpacity(0.8),
-                      ],
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                      stops: const [0.0, 0.5, 1.0],
-                    ),
-                    borderRadius: BorderRadius.circular(30),
-                    boxShadow: [
-                      BoxShadow(
-                        color: AppColors.royalPurple.withOpacity(0.4),
-                        blurRadius: 25,
-                        spreadRadius: 8,
-                        offset: const Offset(0, 5),
-                      ),
-                      BoxShadow(
-                        color: AppColors.electricBlue.withOpacity(0.3),
-                        blurRadius: 15,
-                        spreadRadius: 3,
-                        offset: const Offset(0, -2),
-                      ),
-                    ],
-                  ),
-                  child: const Icon(
-                    Icons.sports_soccer,
-                    color: Colors.white,
-                    size: 60,
+                // Enhanced Animated Logo
+                FadeTransition(
+                  opacity: _fadeAnimation,
+                  child: AnimatedBuilder(
+                    animation: Listenable.merge([_logoController, _fadeController]),
+                    builder: (context, child) {
+                      return Transform.scale(
+                        scale: _logoScale.value,
+                        child: Transform.rotate(
+                          angle: _logoRotation.value,
+                          child: Container(
+                            width: 140,
+                            height: 140,
+                            decoration: BoxDecoration(
+                              gradient: LinearGradient(
+                                colors: [
+                                  AppColors.royalPurple,
+                                  AppColors.electricBlue,
+                                  AppColors.neonGreen.withOpacity(0.9),
+                                ],
+                                begin: Alignment.topLeft,
+                                end: Alignment.bottomRight,
+                                stops: const [0.0, 0.5, 1.0],
+                              ),
+                              borderRadius: BorderRadius.circular(35),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: AppColors.royalPurple.withOpacity(0.6),
+                                  blurRadius: 30,
+                                  spreadRadius: 10,
+                                  offset: const Offset(0, 8),
+                                ),
+                                BoxShadow(
+                                  color: AppColors.electricBlue.withOpacity(0.4),
+                                  blurRadius: 20,
+                                  spreadRadius: 5,
+                                  offset: const Offset(0, -3),
+                                ),
+                                BoxShadow(
+                                  color: AppColors.neonGreen.withOpacity(0.3),
+                                  blurRadius: 40,
+                                  spreadRadius: 15,
+                                ),
+                              ],
+                            ),
+                            child: const Icon(
+                              Icons.sports_soccer,
+                              color: Colors.white,
+                              size: 70,
+                            ),
+                          ),
+                        ),
+                      );
+                    },
                   ),
                 ),
                 const SizedBox(height: 32),
@@ -100,7 +177,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
                     end: Alignment.centerRight,
                   ).createShader(bounds),
                   child: Text(
-                    'Welcome to Sports Assessment',
+                    'Welcome to Vita Sports',
                     style: const TextStyle(
                       fontSize: 26,
                       fontWeight: FontWeight.w800,
@@ -681,10 +758,30 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
     });
 
     try {
+      // First authenticate with the auth service
       final authService = ref.read(authServiceProvider);
-      await authService.signInWithEmailPassword(
+      final userCredential = await authService.signInWithEmailPassword(
         _emailController.text.trim(),
         _passwordController.text,
+      );
+      
+      // Extract user data for persistence
+      final userData = {
+        'uid': userCredential.user?.uid ?? '',
+        'email': userCredential.user?.email ?? '',
+        'displayName': userCredential.user?.displayName ?? '',
+        'photoURL': userCredential.user?.photoURL,
+        'emailVerified': userCredential.user?.emailVerified ?? false,
+      };
+      
+      // Get auth token if available
+      final authToken = await userCredential.user?.getIdToken();
+      
+      // Use the auth state provider to persist the session
+      final authNotifier = ref.read(authStateProvider.notifier);
+      await authNotifier.login(
+        userData: userData,
+        authToken: authToken,
       );
 
       if (mounted) {
@@ -732,11 +829,31 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
     });
 
     try {
+      // First create account with the auth service
       final authService = ref.read(authServiceProvider);
-      await authService.signUpWithEmailPassword(
+      final userCredential = await authService.signUpWithEmailPassword(
         _emailController.text.trim(),
         _passwordController.text,
         _nameController.text.trim(),
+      );
+      
+      // Extract user data for persistence
+      final userData = {
+        'uid': userCredential.user?.uid ?? '',
+        'email': userCredential.user?.email ?? '',
+        'displayName': _nameController.text.trim(),
+        'photoURL': userCredential.user?.photoURL,
+        'emailVerified': userCredential.user?.emailVerified ?? false,
+      };
+      
+      // Get auth token if available
+      final authToken = await userCredential.user?.getIdToken();
+      
+      // Use the auth state provider to persist the session
+      final authNotifier = ref.read(authStateProvider.notifier);
+      await authNotifier.login(
+        userData: userData,
+        authToken: authToken,
       );
 
       if (mounted) {
@@ -763,15 +880,5 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
 
   void _signInWithFacebook() {
     // TODO: Implement Facebook sign in
-  }
-
-  @override
-  void dispose() {
-    _tabController.dispose();
-    _emailController.dispose();
-    _passwordController.dispose();
-    _confirmPasswordController.dispose();
-    _nameController.dispose();
-    super.dispose();
   }
 }

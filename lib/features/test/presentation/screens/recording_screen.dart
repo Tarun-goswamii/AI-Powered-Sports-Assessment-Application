@@ -332,7 +332,6 @@ class _RecordingScreenState extends State<RecordingScreen>
                     child: GlassCard(
                       padding: const EdgeInsets.all(40),
                       enableNeonGlow: true,
-                      neonGlowColor: AppColors.electricBlue,
                       child: Text(
                         _countdownValue.toString(),
                         style: TextStyle(

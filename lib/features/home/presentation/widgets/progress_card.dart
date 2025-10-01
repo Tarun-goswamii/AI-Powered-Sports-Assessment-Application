@@ -23,7 +23,6 @@ class ProgressCard extends StatelessWidget {
     return GlassCard(
       padding: const EdgeInsets.all(20), // Reduced padding
       enableNeonGlow: true,
-      neonGlowColor: AppColors.royalPurple,
       onTap: onTap,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,

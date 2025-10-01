@@ -76,7 +76,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
                 const SizedBox(height: 32),
                 // Title
                 Text(
-                  'Welcome to Sports Assessment',
+                  'Welcome to Vita Sports',
                   style: const TextStyle(
                     fontSize: 24,
                     fontWeight: FontWeight.w700,

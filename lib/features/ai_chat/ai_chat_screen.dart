@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:speech_to_text/speech_to_text.dart' as stt;
 import '../../core/services/vapi_ai_service.dart';
 import '../../core/theme/app_colors.dart';
 
@@ -15,12 +16,18 @@ class _AIChatScreenState extends State<AIChatScreen> {
   final ScrollController _scrollController = ScrollController();
   final List<ChatMessage> _messages = [];
   final VapiAiService _vapiService = VapiAiService.instance;
+  late stt.SpeechToText _speechToText;
+  
   bool _isLoading = false;
   bool _isVoiceModeActive = false;
+  bool _isListening = false;
+  bool _speechAvailable = false;
 
   @override
   void initState() {
     super.initState();
+    _speechToText = stt.SpeechToText();
+    _initSpeech();
     _addMessage(
       'Hello! I\'m your AI Sports Coach. I can help you with workout plans, nutrition advice, and performance tips. How can I assist you today?',
       false,
@@ -32,6 +39,55 @@ class _AIChatScreenState extends State<AIChatScreen> {
     _messageController.dispose();
     _scrollController.dispose();
     super.dispose();
+  }
+
+  Future<void> _initSpeech() async {
+    try {
+      _speechAvailable = await _speechToText.initialize(
+        onStatus: (status) {
+          if (status == 'done' || status == 'notListening') {
+            setState(() => _isListening = false);
+          }
+        },
+        onError: (error) {
+          print('Speech recognition error: $error');
+          setState(() => _isListening = false);
+        },
+      );
+      setState(() {});
+    } catch (e) {
+      print('Failed to initialize speech recognition: $e');
+      _speechAvailable = false;
+    }
+  }
+
+  Future<void> _toggleListening() async {
+    if (_isListening) {
+      await _speechToText.stop();
+      setState(() => _isListening = false);
+    } else {
+      if (_speechAvailable) {
+        setState(() => _isListening = true);
+        await _speechToText.listen(
+          onResult: (result) {
+            setState(() {
+              _messageController.text = result.recognizedWords;
+            });
+          },
+          listenFor: const Duration(seconds: 30),
+          pauseFor: const Duration(seconds: 3),
+          partialResults: true,
+          cancelOnError: true,
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Speech recognition is not available'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
   }
 
   void _addMessage(String text, bool isUser) {
@@ -396,6 +452,35 @@ class _AIChatScreenState extends State<AIChatScreen> {
                   ),
                 ),
                 const SizedBox(width: 12),
+                // Microphone button
+                Container(
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      colors: _isListening 
+                          ? [Colors.red, Colors.redAccent]
+                          : [AppColors.warmOrange, AppColors.neonGreen],
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                    ),
+                    shape: BoxShape.circle,
+                    boxShadow: [
+                      BoxShadow(
+                        color: (_isListening ? Colors.red : AppColors.warmOrange).withOpacity(0.4),
+                        blurRadius: 8,
+                        spreadRadius: 1,
+                      ),
+                    ],
+                  ),
+                  child: IconButton(
+                    icon: Icon(
+                      _isListening ? Icons.mic : Icons.mic_none,
+                      color: Colors.white,
+                    ),
+                    onPressed: _isLoading ? null : _toggleListening,
+                  ),
+                ),
+                const SizedBox(width: 8),
+                // Send button
                 Container(
                   decoration: BoxDecoration(
                     gradient: LinearGradient(

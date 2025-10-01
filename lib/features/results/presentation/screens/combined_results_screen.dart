@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/services/service_manager.dart';
 import '../../../../shared/presentation/widgets/glass_card.dart';
+import '../widgets/analytics_charts.dart';
 
 class CombinedResultsScreen extends ConsumerStatefulWidget {
   const CombinedResultsScreen({super.key});
@@ -265,10 +266,11 @@ class _CombinedResultsScreenState extends ConsumerState<CombinedResultsScreen>
           ),
           const SizedBox(height: 16),
 
-          // Progress Chart Placeholder
+          // Progress Over Time Line Chart
           GlassCard(
             padding: const EdgeInsets.all(24),
             child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 const Text(
                   'Progress Over Time',
@@ -279,23 +281,65 @@ class _CombinedResultsScreenState extends ConsumerState<CombinedResultsScreen>
                   ),
                 ),
                 const SizedBox(height: 20),
-                Container(
-                  height: 200,
-                  decoration: BoxDecoration(
-                    color: AppColors.card,
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: const Center(
-                    child: Text(
-                      'Chart Placeholder\n(Performance trends)',
-                      style: TextStyle(
-                        color: AppColors.textSecondary,
-                        fontSize: 16,
-                      ),
-                      textAlign: TextAlign.center,
-                    ),
+                PerformanceLineChart(testResults: _testResults),
+              ],
+            ),
+          ),
+          const SizedBox(height: 24),
+
+          // Performance by Sport - Pie Chart
+          GlassCard(
+            padding: const EdgeInsets.all(24),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text(
+                  'Performance Distribution',
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.w600,
+                    color: Colors.white,
                   ),
                 ),
+                const SizedBox(height: 8),
+                Text(
+                  'Score distribution across sports',
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: AppColors.textSecondary,
+                  ),
+                ),
+                const SizedBox(height: 20),
+                PerformancePieChart(testResults: _testResults),
+              ],
+            ),
+          ),
+          const SizedBox(height: 24),
+
+          // Average Scores by Sport - Bar Chart
+          GlassCard(
+            padding: const EdgeInsets.all(24),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text(
+                  'Average Scores by Sport',
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.w600,
+                    color: Colors.white,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  'Compare your performance across different sports',
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: AppColors.textSecondary,
+                  ),
+                ),
+                const SizedBox(height: 20),
+                SportPerformanceBar(testResults: _testResults),
               ],
             ),
           ),

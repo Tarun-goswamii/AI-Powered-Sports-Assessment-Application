@@ -272,10 +272,41 @@ class _MentorScreenState extends ConsumerState<MentorScreen>
           if (_isLoadingMentors)
             const Center(child: CircularProgressIndicator())
           else if (_mentors.isEmpty)
-            const Center(
-              child: Text(
-                'No mentors available',
-                style: TextStyle(color: Colors.white),
+            Center(
+              child: GlassCard(
+                padding: const EdgeInsets.all(24),
+                child: Column(
+                  children: [
+                    Icon(
+                      Icons.person_search,
+                      size: 64,
+                      color: AppColors.royalPurple.withOpacity(0.5),
+                    ),
+                    const SizedBox(height: 16),
+                    const Text(
+                      'No Mentors Found',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      'Unable to load mentors from the server.\nPlease check your connection and try again.',
+                      style: TextStyle(
+                        color: AppColors.textSecondary,
+                        fontSize: 14,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                    const SizedBox(height: 16),
+                    NeonButton(
+                      onPressed: _loadMentors,
+                      text: 'Retry',
+                    ),
+                  ],
+                ),
               ),
             )
           else
@@ -583,7 +614,17 @@ class _MentorScreenState extends ConsumerState<MentorScreen>
               ),
               NeonButton(
                 text: 'Book Session',
-                onPressed: () {},
+                onPressed: () {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: const Text(
+                        'Mentor booking coming soon!',
+                        style: TextStyle(color: Colors.white),
+                      ),
+                      backgroundColor: AppColors.primary,
+                    ),
+                  );
+                },
                 size: NeonButtonSize.small,
               ),
             ],
@@ -651,7 +692,17 @@ class _MentorScreenState extends ConsumerState<MentorScreen>
               const SizedBox(height: 8),
               NeonButton(
                 text: 'Join',
-                onPressed: () {},
+                onPressed: () {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: const Text(
+                        'Live sessions coming soon!',
+                        style: TextStyle(color: Colors.white),
+                      ),
+                      backgroundColor: AppColors.primary,
+                    ),
+                  );
+                },
                 size: NeonButtonSize.small,
               ),
             ],

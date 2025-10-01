@@ -11,6 +11,7 @@ import 'core/theme/app_colors.dart';
 import 'core/utils/error_handler.dart';
 import 'core/services/service_manager.dart';
 import 'core/services/vapi_ai_service.dart';
+import 'core/services/auth_persistence_service.dart';
 
 void main() async {
   // Ensure Flutter framework is initialized
@@ -36,6 +37,9 @@ void main() async {
 
   // Initialize Hive for local storage
   await Hive.initFlutter();
+
+  // Initialize authentication persistence service
+  await AuthPersistenceService.init();
 
   // Skip service initialization during startup to prevent delays
   // Services will be initialized on-demand when needed

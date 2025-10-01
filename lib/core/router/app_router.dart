@@ -34,6 +34,21 @@ import '../../core/services/video_analysis_service.dart';
 class AppRouter {
   static final GoRouter router = GoRouter(
     initialLocation: '/splash',
+    redirect: (context, state) {
+      // If we're on splash, always allow it to handle its own logic
+      if (state.matchedLocation == '/splash') {
+        return null;
+      }
+      
+      // If we're on auth or onboarding routes, allow them
+      if (state.matchedLocation == '/auth' || state.matchedLocation == '/onboarding') {
+        return null;
+      }
+      
+      // For all other routes, we'll let the splash screen handle authentication checks
+      // The splash screen will redirect to auth if needed, or to home if authenticated
+      return null;
+    },
     routes: [
       GoRoute(
         path: '/splash',
@@ -128,6 +143,10 @@ class AppRouter {
           ),
           GoRoute(
             path: '/history',
+            builder: (context, state) => const CombinedResultsScreen(),
+          ),
+          GoRoute(
+            path: '/results',
             builder: (context, state) => const CombinedResultsScreen(),
           ),
           GoRoute(

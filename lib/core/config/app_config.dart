@@ -55,7 +55,7 @@ class AppConfig {
   static const String resendApiKey = 're_gUTc5fg4_WoqiCG2N7BvgaUyhyUKW7gLU';
   static const bool enableResendEmails = true;
 
-  // VAPI AI Configuration
+  // VAPI AI Configuration (Currently using fallback mode)
   static const String vapiApiKey = 'fe20c242-7427-4e70-832e-cc576834fae2'; // Your actual VAPI public key
   static const String vapiBaseUrl = 'https://api.vapi.ai';
   static const String vapiAssistantId = 'sports_coach_assistant';
@@ -74,7 +74,7 @@ class AppConfig {
 
   // Feature flags
   static const bool enableAIChat = true;
-  static const bool enableVapiChat = true;
+  static const bool enableVapiChat = false; // Disabled - using fallback responses
   static const bool enableCameraTests = true;
   static const bool enableOfflineMode = true;
   static const bool enablePushNotifications = true;

@@ -7,12 +7,11 @@ import '../../../core/providers/dynamic_data_providers.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_typography.dart';
 import '../../../core/theme/app_spacing.dart';
-import '../../../shared/widgets/glass_card.dart';
-import '../../../shared/widgets/neon_button.dart';
-import '../../../shared/widgets/quick_access_card.dart';
-import '../../../shared/widgets/progress_card.dart';
-import '../../../shared/widgets/test_card.dart';
-import '../../../shared/widgets/daily_login_bonus.dart';
+import '../../../shared/presentation/widgets/glass_card.dart';
+import '../../../shared/presentation/widgets/neon_button.dart';
+import '../../../shared/presentation/widgets/enhanced_neon_button.dart';
+import '../../../shared/presentation/widgets/animated_progress_card.dart';
+import '../../../shared/presentation/widgets/floating_action_menu.dart';
 
 class DynamicHomeScreen extends ConsumerStatefulWidget {
   const DynamicHomeScreen({Key? key}) : super(key: key);
@@ -24,9 +23,14 @@ class DynamicHomeScreen extends ConsumerStatefulWidget {
 class _DynamicHomeScreenState extends ConsumerState<DynamicHomeScreen>
     with TickerProviderStateMixin {
   late AnimationController _fadeController;
+  late AnimationController _slideController;
+  late AnimationController _pulseController;
   late Animation<double> _fadeAnimation;
+  late Animation<Offset> _slideAnimation;
+  late Animation<double> _pulseAnimation;
   Timer? _refreshTimer;
   bool _showDailyBonus = false;
+  final ScrollController _scrollController = ScrollController();
 
   @override
   void initState() {
@@ -38,7 +42,17 @@ class _DynamicHomeScreenState extends ConsumerState<DynamicHomeScreen>
 
   void _initializeAnimations() {
     _fadeController = AnimationController(
-      duration: const Duration(milliseconds: 1000),
+      duration: const Duration(milliseconds: 1200),
+      vsync: this,
+    );
+    
+    _slideController = AnimationController(
+      duration: const Duration(milliseconds: 800),
+      vsync: this,
+    );
+
+    _pulseController = AnimationController(
+      duration: const Duration(seconds: 3),
       vsync: this,
     );
     
@@ -47,7 +61,50 @@ class _DynamicHomeScreenState extends ConsumerState<DynamicHomeScreen>
       end: 1.0,
     ).animate(CurvedAnimation(
       parent: _fadeController,
+      curve: Curves.easeOutCubic,
+    ));
+
+    _slideAnimation = Tween<Offset>(
+      begin: const Offset(0, 0.3),
+      end: Offset.zero,
+    ).animate(CurvedAnimation(
+      parent: _slideController,
+      curve: Curves.easeOutCubic,
+    ));
+
+    _pulseAnimation = Tween<double>(
+      begin: 1.0,
+      end: 1.05,
+    ).animate(CurvedAnimation(
+      parent: _pulseController,
       curve: Curves.easeInOut,
+    ));
+    
+    _fadeController.forward();
+    _slideController.forward();
+    _pulseController.repeat(reverse: true);
+  }
+
+  @override
+  void dispose() {
+    _fadeController.dispose();
+    _slideController.dispose();
+    _pulseController.dispose();
+    _refreshTimer?.cancel();
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  void _checkDailyBonus() {
+    // Check if user should see daily bonus
+    // Implementation depends on your data provider
+  }
+
+  void _startAutoRefresh() {
+    _refreshTimer = Timer.periodic(const Duration(minutes: 5), (timer) {
+      // Auto refresh data every 5 minutes
+    });
+  }
     ));
     
     _fadeController.forward();

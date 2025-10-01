@@ -529,7 +529,7 @@ class _TestResultsScreenState extends State<TestResultsScreen> {
                     const SizedBox(width: 16),
                     Expanded(
                       child: ElevatedButton(
-                        onPressed: () => context.go('/tests'),
+                        onPressed: () => context.go('/home'),
                         style: ElevatedButton.styleFrom(
                           backgroundColor: AppColors.primary,
                           foregroundColor: Colors.white,
@@ -539,7 +539,7 @@ class _TestResultsScreenState extends State<TestResultsScreen> {
                           ),
                         ),
                         child: const Text(
-                          'Try Another Test',
+                          'Take Another Test',
                           style: TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.w600,

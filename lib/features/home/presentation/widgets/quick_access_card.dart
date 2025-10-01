@@ -24,7 +24,6 @@ class QuickAccessCard extends StatelessWidget {
     return GlassCard(
       padding: const EdgeInsets.all(16), // Reduced padding to prevent overflow
       enableNeonGlow: true,
-      neonGlowColor: color,
       onTap: onTap,
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,

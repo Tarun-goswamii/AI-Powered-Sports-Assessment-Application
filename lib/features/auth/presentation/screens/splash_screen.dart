@@ -1,16 +1,19 @@
 // lib/features/auth/presentation/screens/splash_screen.dart
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../../../../core/theme/app_colors.dart';
+import '../../../../core/services/auth_persistence_service.dart';
 
-class SplashScreen extends StatefulWidget {
+class SplashScreen extends ConsumerStatefulWidget {
   const SplashScreen({super.key});
 
   @override
-  State<SplashScreen> createState() => _SplashScreenState();
+  ConsumerState<SplashScreen> createState() => _SplashScreenState();
 }
 
-class _SplashScreenState extends State<SplashScreen>
+class _SplashScreenState extends ConsumerState<SplashScreen>
     with TickerProviderStateMixin {
   late AnimationController _logoAnimationController;
   late Animation<double> _logoScaleAnimation;
@@ -79,16 +82,32 @@ class _SplashScreenState extends State<SplashScreen>
   }
 
   void _navigateToNextScreen() async {
+    // Wait for animations to complete
     await Future.delayed(const Duration(seconds: 3));
-    if (mounted) {
-      // Check if user has seen onboarding
-      final hasSeenOnboarding = false; // TODO: Get from shared preferences
-
-      if (hasSeenOnboarding) {
-        context.go('/auth');
+    
+    if (!mounted) return;
+    
+    try {
+      // Check authentication status using our persistence service
+      final isLoggedIn = await AuthPersistenceService.isLoggedIn();
+      
+      if (isLoggedIn) {
+        // User is logged in, go to home
+        context.go('/home');
       } else {
-        context.go('/onboarding');
+        // Check if user has seen onboarding using SharedPreferences directly
+        final prefs = await SharedPreferences.getInstance();
+        final hasSeenOnboarding = prefs.getBool('has_seen_onboarding') ?? false;
+        
+        if (hasSeenOnboarding) {
+          context.go('/auth');
+        } else {
+          context.go('/onboarding');
+        }
       }
+    } catch (e) {
+      // On error, go to auth screen
+      context.go('/auth');
     }
   }
 

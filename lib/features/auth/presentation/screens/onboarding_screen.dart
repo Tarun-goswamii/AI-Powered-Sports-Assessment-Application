@@ -1,6 +1,7 @@
 // lib/features/auth/presentation/screens/onboarding_screen.dart
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../shared/presentation/widgets/neon_button.dart';
 
@@ -230,10 +231,9 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   }
 
   void _completeOnboarding() async {
-    // TODO: Save onboarding completion to shared preferences
-    // await SharedPreferences.getInstance().then((prefs) {
-    //   prefs.setBool('has_seen_onboarding', true);
-    // });
+    // Save onboarding completion to shared preferences
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('has_seen_onboarding', true);
 
     if (mounted) {
       context.go('/auth');
@@ -241,10 +241,9 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   }
 
   void _skipOnboarding() async {
-    // TODO: Save onboarding completion to shared preferences
-    // await SharedPreferences.getInstance().then((prefs) {
-    //   prefs.setBool('has_seen_onboarding', true);
-    // });
+    // Save onboarding completion to shared preferences
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('has_seen_onboarding', true);
 
     if (mounted) {
       context.go('/auth');

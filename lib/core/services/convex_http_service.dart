@@ -236,13 +236,19 @@ class ConvexHttpService {
     try {
       final response = await _dio.get('/getMentors');
 
-      if (response.statusCode == 200) {
-        final List<dynamic> mentors = response.data;
-        return mentors.map((json) => MentorModel.fromJson(json)).toList();
+      if (response.statusCode == 200 && response.data != null) {
+        // Handle both array response and object with mentors key
+        final List<dynamic> mentorsData = response.data is List 
+          ? response.data 
+          : (response.data['mentors'] as List? ?? []);
+        
+        print('✅ Loaded ${mentorsData.length} mentors from Convex');
+        return mentorsData.map((json) => MentorModel.fromJson(json)).toList();
       }
+      print('⚠️ No mentors found or invalid response');
       return [];
     } catch (e) {
-      print('Error getting mentors: $e');
+      print('❌ Error getting mentors: $e');
       return [];
     }
   }

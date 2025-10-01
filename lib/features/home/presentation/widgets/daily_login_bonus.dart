@@ -67,7 +67,6 @@ class _DailyLoginBonusState extends State<DailyLoginBonus>
               child: GlassCard(
                 padding: const EdgeInsets.all(32),
                 enableNeonGlow: true,
-                neonGlowColor: AppColors.neonGreen,
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [

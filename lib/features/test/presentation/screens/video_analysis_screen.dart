@@ -210,8 +210,8 @@ class _VideoAnalysisScreenState extends State<VideoAnalysisScreen>
   }
 
   void _retakeTest() {
-    context.pop();
-    context.pop();
+    // Navigate back to home to select another test
+    context.go('/home');
   }
 
   Widget _buildMetricCard(String title, double value, String unit, IconData icon) {

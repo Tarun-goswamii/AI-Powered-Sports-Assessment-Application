@@ -21,7 +21,7 @@ class AppLayout {
   static const List<String> quickAccessLabels = ['Mentors', 'Community', 'Nutrition', 'Recovery', 'Body Logs'];
   static const List<Color> quickAccessColors = [
     AppColors.royalPurple,  // Mentors - purple
-    AppColors.electricBlue, // Community - blue
+    Color(0xFF9333EA),      // Community - purple variant (darker)
     AppColors.warmOrange,   // Nutrition - orange
     Color(0xFFEC4899),      // Recovery - pink
     Color(0xFF9CA3AF),      // Body Logs - gray

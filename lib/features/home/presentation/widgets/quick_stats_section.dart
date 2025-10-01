@@ -39,7 +39,6 @@ class QuickStatsSection extends StatelessWidget {
                 child: GlassCard(
                   padding: const EdgeInsets.all(10),
                   enableNeonGlow: true,
-                  neonGlowColor: stat.color,
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
