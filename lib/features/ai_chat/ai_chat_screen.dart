@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:speech_to_text/speech_to_text.dart' as stt;
+import 'package:flutter_tts/flutter_tts.dart';
 import '../../core/services/vapi_ai_service.dart';
 import '../../core/theme/app_colors.dart';
 
@@ -17,17 +18,21 @@ class _AIChatScreenState extends State<AIChatScreen> {
   final List<ChatMessage> _messages = [];
   final VapiAiService _vapiService = VapiAiService.instance;
   late stt.SpeechToText _speechToText;
+  late FlutterTts _flutterTts;
   
   bool _isLoading = false;
   bool _isVoiceModeActive = false;
   bool _isListening = false;
   bool _speechAvailable = false;
+  bool _isSpeaking = false;
 
   @override
   void initState() {
     super.initState();
     _speechToText = stt.SpeechToText();
+    _flutterTts = FlutterTts();
     _initSpeech();
+    _initTts();
     _addMessage(
       'Hello! I\'m your AI Sports Coach. I can help you with workout plans, nutrition advice, and performance tips. How can I assist you today?',
       false,
@@ -38,6 +43,7 @@ class _AIChatScreenState extends State<AIChatScreen> {
   void dispose() {
     _messageController.dispose();
     _scrollController.dispose();
+    _flutterTts.stop();
     super.dispose();
   }
 
@@ -58,6 +64,34 @@ class _AIChatScreenState extends State<AIChatScreen> {
     } catch (e) {
       print('Failed to initialize speech recognition: $e');
       _speechAvailable = false;
+    }
+  }
+
+  Future<void> _initTts() async {
+    try {
+      await _flutterTts.setLanguage("en-US");
+      await _flutterTts.setSpeechRate(0.5); // Moderate speed
+      await _flutterTts.setVolume(1.0); // Max volume
+      await _flutterTts.setPitch(1.0); // Normal pitch
+      
+      // Set completion handler
+      _flutterTts.setCompletionHandler(() {
+        if (mounted) {
+          setState(() => _isSpeaking = false);
+        }
+      });
+      
+      // Set error handler
+      _flutterTts.setErrorHandler((msg) {
+        print('TTS Error: $msg');
+        if (mounted) {
+          setState(() => _isSpeaking = false);
+        }
+      });
+      
+      print('✅ Text-to-Speech initialized successfully');
+    } catch (e) {
+      print('Failed to initialize TTS: $e');
     }
   }
 
@@ -125,7 +159,14 @@ class _AIChatScreenState extends State<AIChatScreen> {
         message: message,
         userId: 'demo_user_${DateTime.now().millisecondsSinceEpoch}',
       );
-      _addMessage(response.message, false);
+      
+      final responseText = response.message;
+      _addMessage(responseText, false);
+      
+      // If voice mode is active, speak the response
+      if (_isVoiceModeActive && responseText.isNotEmpty) {
+        _speakResponse(responseText);
+      }
     } catch (e) {
       _addMessage('Sorry, I\'m having trouble connecting right now. Please try again.', false);
     } finally {
@@ -134,39 +175,76 @@ class _AIChatScreenState extends State<AIChatScreen> {
       });
     }
   }
+  
+  Future<void> _speakResponse(String text) async {
+    try {
+      // Stop any ongoing speech
+      if (_isSpeaking) {
+        await _flutterTts.stop();
+      }
+      
+      setState(() => _isSpeaking = true);
+      
+      // Clean up text for better speech (remove emojis)
+      final cleanText = text.replaceAll(RegExp(r'[🎤💡📝🏃⚽🏀🎾🏋️🧘🏊🚴🤸💪🔥⭐🎯📊]'), '');
+      
+      print('🔊 Speaking: $cleanText');
+      
+      // Speak the text
+      await _flutterTts.speak(cleanText);
+      
+      // Show visual indicator
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Row(
+              children: [
+                const Icon(Icons.volume_up, color: AppColors.neonGreen),
+                const SizedBox(width: 8),
+                const Expanded(
+                  child: Text(
+                    '🔊 Voice response playing...',
+                    style: TextStyle(color: Colors.white),
+                  ),
+                ),
+              ],
+            ),
+            backgroundColor: AppColors.cardBackground,
+            duration: const Duration(seconds: 3),
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+      }
+    } catch (e) {
+      print('Error speaking response: $e');
+      setState(() => _isSpeaking = false);
+    }
+  }
 
   Future<void> _toggleVoiceMode() async {
     if (_isVoiceModeActive) {
       setState(() {
         _isVoiceModeActive = false;
       });
-      _addMessage('Voice mode disabled. You can continue typing your questions.', false);
+      _addMessage('🎤 Voice mode disabled. You can continue typing your questions.', false);
     } else {
       setState(() {
         _isVoiceModeActive = true;
       });
-      _addMessage('Voice mode activated! Speak your question and I\'ll respond with voice and text.', false);
       
-      try {
-        final response = await _vapiService.startVoiceCall(
-          userId: 'demo_user_${DateTime.now().millisecondsSinceEpoch}',
-        );
-        if (response.isSuccess) {
-          _addMessage('Voice session started successfully!', false);
-        } else {
-          _addMessage('Voice mode is temporarily unavailable. You can still chat via text!', false);
-          setState(() {
-            _isVoiceModeActive = false;
-          });
+      _addMessage('🎤 Voice mode activated! I can hear you - just tap the microphone at the bottom and speak your question. I\'ll respond with voice!', false);
+      
+      // Show a helpful tip
+      Future.delayed(const Duration(seconds: 1), () {
+        if (mounted && _isVoiceModeActive) {
+          _addMessage('� Tip: The microphone button at the bottom (with the gradient) will listen to your voice. Speak naturally and I\'ll understand!', false);
         }
-      } catch (e) {
-        _addMessage('Voice mode setup failed. Continuing with text mode.', false);
-        setState(() {
-          _isVoiceModeActive = false;
-        });
-      }
+      });
     }
   }
+
+  // Voice mode using speech recognition
+  // The device listens via _toggleListening() and speaks responses
 
   void _sendSuggestedMessage(String message) {
     _messageController.text = message;

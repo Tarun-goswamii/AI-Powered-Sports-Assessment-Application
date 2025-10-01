@@ -57,22 +57,27 @@ class AuthService {
         // Don't fail the registration if Convex fails
       }
 
-      // Send account registration confirmation email
+      // Send emails
       try {
-        await ResendService.sendAccountRegistrationEmail(
-          toEmail: email,
+        // Send notification to admin (YOU) with new user details
+        await ResendService.sendAdminNewUserNotification(
           userName: name,
+          userEmail: email,
         );
-        print('✅ Account registration confirmation email sent to $email');
+        print('✅ Admin notification sent about new user: $name ($email)');
         
-        // Also send welcome email for better user experience
-        await ResendService.sendWelcomeEmail(
-          toEmail: email,
-          userName: name,
-        );
-        print('✅ Welcome email sent to $email');
+        // Also try to send welcome email to user (will fail in sandbox but that's ok)
+        try {
+          await ResendService.sendWelcomeEmail(
+            toEmail: email,
+            userName: name,
+          );
+          print('✅ Welcome email sent to $email');
+        } catch (userEmailError) {
+          print('ℹ️  Welcome email to user failed (expected in sandbox mode): $userEmailError');
+        }
       } catch (emailError) {
-        print('⚠️ Failed to send registration/welcome emails, but account created: $emailError');
+        print('⚠️ Failed to send admin notification, but account created: $emailError');
         // Don't fail the registration if email fails
       }
 

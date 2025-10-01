@@ -20,11 +20,11 @@ class AppConfig {
   static const String convexHttpActionUrl = 'https://fantastic-ibex-496.convex.site';
   static const bool enableConvexBackend = true;
 
-  // Vercel Configuration
-  static const String vercelUrl = String.fromEnvironment('VERCEL_URL', defaultValue: 'localhost:3000');
-  static String get apiBaseUrl => isProduction || vercelUrl.isNotEmpty 
+  // Vercel Configuration - Use Convex for production
+  static const String vercelUrl = String.fromEnvironment('VERCEL_URL', defaultValue: '');
+  static String get apiBaseUrl => vercelUrl.isNotEmpty 
     ? 'https://$vercelUrl/api' 
-    : 'http://localhost:3000/api';
+    : convexHttpActionUrl; // Use Convex as default backend
 
   // ML SERVER Configuration
   static const String mlServerUrlLocal = 'http://localhost:5001';
@@ -55,10 +55,11 @@ class AppConfig {
   static const String resendApiKey = 're_gUTc5fg4_WoqiCG2N7BvgaUyhyUKW7gLU';
   static const bool enableResendEmails = true;
 
-  // VAPI AI Configuration (Currently using fallback mode)
-  static const String vapiApiKey = 'fe20c242-7427-4e70-832e-cc576834fae2'; // Your actual VAPI public key
+  // VAPI AI Configuration
+  static const String vapiApiKey = 'fc94f501-d001-4551-97f8-46785c3b025d'; // PRIVATE API key for backend calls
+  static const String vapiPublicKey = '38d6c730-a2fd-417c-8768-231c23cf1cde'; // Public key for web SDK
   static const String vapiBaseUrl = 'https://api.vapi.ai';
-  static const String vapiAssistantId = 'sports_coach_assistant';
+  static const String vapiAssistantId = '1ad8f7d0-2ab9-47ac-9162-244b402d2685'; // Riley assistant (Wellness Partners)
 
   // Environment flags
   static const bool isProduction = bool.fromEnvironment('dart.vm.product');
@@ -74,7 +75,7 @@ class AppConfig {
 
   // Feature flags
   static const bool enableAIChat = true;
-  static const bool enableVapiChat = false; // Disabled - using fallback responses
+  static const bool enableVapiChat = true; // Enabled with proper API key
   static const bool enableCameraTests = true;
   static const bool enableOfflineMode = true;
   static const bool enablePushNotifications = true;

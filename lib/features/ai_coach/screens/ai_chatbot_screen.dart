@@ -112,40 +112,82 @@ class _AiChatbotScreenState extends State<AiChatbotScreen> with TickerProviderSt
     }
   }
 
-  Future<void> _startVoiceCall() async {
-    setState(() {
-      _isLoading = true;
-    });
+  // Voice call feature removed - use text chat instead
+  // For voice features, use the AI Chat screen with in-app voice mode
 
-    try {
-      final user = AuthService.instance.currentUser;
-      final userId = user?.uid ?? 'anonymous';
-
-      final response = await _vapiService.startVoiceCall(userId: userId);
-      
-      if (response.isSuccess) {
-        setState(() {
-          _isVoiceCallActive = true;
-          _activeCallId = response.callId;
-          _messages.add(ChatMessage(
-            message: "🎙️ Voice coaching session started! You can now speak with me directly.",
-            isUser: false,
-            timestamp: DateTime.now(),
-          ));
-        });
-        
-        // Show voice call dialog
-        _showVoiceCallDialog();
-      } else {
-        _showErrorSnackBar("Couldn't start voice call: ${response.error}");
-      }
-    } catch (e) {
-      _showErrorSnackBar("Voice call failed: $e");
-    } finally {
-      setState(() {
-        _isLoading = false;
-      });
-    }
+  Future<String?> _showPhoneNumberDialog() async {
+    final TextEditingController phoneController = TextEditingController();
+    
+    return showDialog<String>(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => AlertDialog(
+        backgroundColor: AppColors.cardBackground,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        title: const Row(
+          children: [
+            Icon(Icons.phone, color: AppColors.neonGreen),
+            SizedBox(width: 8),
+            Text('Voice Coaching', style: TextStyle(color: AppColors.textPrimary)),
+          ],
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text(
+              'Enter your phone number to receive a call from Riley, your AI sports coach.',
+              style: TextStyle(color: AppColors.textSecondary),
+            ),
+            const SizedBox(height: 16),
+            TextField(
+              controller: phoneController,
+              keyboardType: TextInputType.phone,
+              style: const TextStyle(color: AppColors.textPrimary),
+              decoration: InputDecoration(
+                labelText: 'Phone Number',
+                labelStyle: const TextStyle(color: AppColors.textSecondary),
+                hintText: '+1234567890',
+                hintStyle: TextStyle(color: AppColors.textSecondary.withOpacity(0.5)),
+                prefixIcon: const Icon(Icons.phone_android, color: AppColors.electricBlue),
+                filled: true,
+                fillColor: AppColors.background,
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: BorderSide.none,
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: const BorderSide(color: AppColors.neonGreen, width: 2),
+                ),
+              ),
+            ),
+            const SizedBox(height: 12),
+            const Text(
+              '💡 Tip: Include country code (e.g., +1 for US)',
+              style: TextStyle(color: AppColors.textSecondary, fontSize: 12),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, null),
+            child: const Text('Cancel', style: TextStyle(color: AppColors.textSecondary)),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              final phone = phoneController.text.trim();
+              Navigator.pop(context, phone);
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppColors.neonGreen,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            ),
+            child: const Text('Call Me', style: TextStyle(color: Colors.black)),
+          ),
+        ],
+      ),
+    );
   }
 
   void _showVoiceCallDialog() {

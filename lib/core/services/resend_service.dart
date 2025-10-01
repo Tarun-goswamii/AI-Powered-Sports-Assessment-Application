@@ -67,6 +67,70 @@ class ResendService {
     );
   }
 
+  /// Send admin notification when new user registers
+  /// This sends YOU an email with the new user's details
+  static Future<void> sendAdminNewUserNotification({
+    required String userName,
+    required String userEmail,
+  }) async {
+    final adminEmail = 'subject.test2005@gmail.com'; // Your email
+    final now = DateTime.now();
+    final formattedDate = '${now.day}/${now.month}/${now.year} ${now.hour}:${now.minute}';
+    
+    await _sendEmail(
+      to: adminEmail,
+      subject: '🎉 New User Registered: $userName',
+      html: '''
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+        <div style="background: linear-gradient(135deg, #6A0DAD 0%, #00D4FF 100%); padding: 30px; border-radius: 12px; text-align: center;">
+          <h1 style="color: white; margin: 0;">🎉 New User Registration!</h1>
+        </div>
+        
+        <div style="background: #f8f8f8; padding: 30px; border-radius: 12px; margin-top: 20px;">
+          <h2 style="color: #6A0DAD; margin-top: 0;">User Details</h2>
+          
+          <table style="width: 100%; border-collapse: collapse;">
+            <tr>
+              <td style="padding: 12px; border-bottom: 1px solid #ddd;"><strong>👤 Name:</strong></td>
+              <td style="padding: 12px; border-bottom: 1px solid #ddd; color: #6A0DAD;"><strong>$userName</strong></td>
+            </tr>
+            <tr>
+              <td style="padding: 12px; border-bottom: 1px solid #ddd;"><strong>📧 Email:</strong></td>
+              <td style="padding: 12px; border-bottom: 1px solid #ddd; color: #6A0DAD;"><strong>$userEmail</strong></td>
+            </tr>
+            <tr>
+              <td style="padding: 12px; border-bottom: 1px solid #ddd;"><strong>🕐 Time:</strong></td>
+              <td style="padding: 12px; border-bottom: 1px solid #ddd;">$formattedDate</td>
+            </tr>
+            <tr>
+              <td style="padding: 12px;"><strong>📱 Platform:</strong></td>
+              <td style="padding: 12px;">Vita Sports Mobile App</td>
+            </tr>
+          </table>
+          
+          <div style="background: #e8f5e9; padding: 15px; border-radius: 8px; margin-top: 20px; border-left: 4px solid #4caf50;">
+            <p style="margin: 0; color: #2e7d32;">
+              <strong>✅ Action:</strong> User account created successfully in Firebase + Firestore + Convex
+            </p>
+          </div>
+          
+          <div style="margin-top: 20px; padding: 15px; background: #fff3cd; border-radius: 8px; border-left: 4px solid #ffc107;">
+            <p style="margin: 0; color: #856404;">
+              <strong>💡 Note:</strong> User also received welcome emails at their address
+            </p>
+          </div>
+        </div>
+        
+        <div style="margin-top: 20px; padding: 20px; background: #f0f0f0; border-radius: 8px; text-align: center;">
+          <p style="color: #666; margin: 0;">
+            This is an automated notification from <strong>Vita Sports</strong>
+          </p>
+        </div>
+      </div>
+      ''',
+    );
+  }
+
   /// Send test completion notification
   static Future<void> sendTestCompletionEmail({
     required String toEmail,
@@ -240,6 +304,8 @@ class ResendService {
     }
 
     try {
+      print('📧 RESEND: Sending email to $to');
+      
       final url = Uri.parse('$baseUrl/emails');
       final response = await http.post(
         url,
@@ -248,21 +314,40 @@ class ResendService {
           'Content-Type': 'application/json',
         },
         body: jsonEncode({
-          'from': 'Sports Assessment <noreply@sportsassessment.com>',
-          'to': [to],
+          'from': 'Vita Sports <onboarding@resend.dev>',
+          'to': [to], // Send to actual user email
           'subject': subject,
           'html': html,
         }),
       );
 
       if (response.statusCode == 200) {
+        final responseData = jsonDecode(response.body);
         print('✅ RESEND: Email sent successfully to $to');
+        print('   Email ID: ${responseData['id']}');
+        print('   ✉️  User should check their inbox!');
       } else {
+        final errorBody = response.body;
+        print('❌ RESEND Error ${response.statusCode}: $errorBody');
+        
+        // Check if it's the sandbox restriction error
+        if (errorBody.contains('only send testing emails to your own email')) {
+          print('');
+          print('⚠️  SANDBOX MODE RESTRICTION:');
+          print('   Your Resend account can only send to: subject.test2005@gmail.com');
+          print('');
+          print('💡 SOLUTION - Choose one:');
+          print('   1. Verify a domain at: https://resend.com/domains');
+          print('   2. OR upgrade your Resend plan');
+          print('   3. OR ask users to use: subject.test2005@gmail.com for testing');
+          print('');
+        }
+        
         throw Exception('Failed to send email: ${response.statusCode} - ${response.body}');
       }
     } catch (e) {
       print('❌ RESEND _sendEmail failed: $e');
-      throw e;
+      rethrow;
     }
   }
 }

@@ -78,6 +78,9 @@ dependencies:
   # Convex HTTP client for backend integration
   web_socket_channel: ^2.4.0
   
+  # Text-to-Speech for voice responses
+  flutter_tts: ^4.0.2
+  
   # ML Model Integration
   tflite_flutter: ^0.10.4
   image: ^4.1.3
