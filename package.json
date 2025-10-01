@@ -28,8 +28,8 @@
     "deploy-render": "deploy-render.bat",
     "build-prod": "build-production.bat",
     "deploy-railway": "deploy-railway.bat",
-    "vercel-build": "flutter build web --release",
-    "vercel-dev": "flutter run -d web-server --web-port=3000",
+    "vercel-build": "echo 'Deploying static submission page - no build needed'",
+    "vercel-dev": "npx http-server submission -p 3000",
     "vercel-deploy": "vercel --prod",
     "vercel-preview": "vercel"
   },
