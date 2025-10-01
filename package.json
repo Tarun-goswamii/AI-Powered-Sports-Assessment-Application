@@ -4,6 +4,7 @@
   "description": "Backend for AI Sports Talent Assessment App",
   "main": "index.js",
   "scripts": {
+    "build": "flutter build web --release",
     "deploy": "convex deploy",
     "dev": "convex dev",
     "deploy-and-run": "npm run deploy && flutter run",
