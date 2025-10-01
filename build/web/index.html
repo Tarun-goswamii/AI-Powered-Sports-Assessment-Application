@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <!--
+    If you are serving your web app in a path other than the root, change the
+    href value below to reflect the base path you are serving from.
+
+    The path provided below has to start and end with a slash "/" in order for
+    it to work correctly.
+
+    For more details:
+    * https://developer.mozilla.org/en-US/docs/Web/HTML/Element/base
+
+    This is a placeholder for base href that will be replaced by the value of
+    the `--base-href` argument provided to `flutter build`.
+  -->
+  <base href="/">
+
+  <meta charset="UTF-8">
+  <meta content="IE=Edge" http-equiv="X-UA-Compatible">
+  <meta name="description" content="AI-Powered Sports Talent Assessment Platform - Discover your athletic potential with cutting-edge AI technology">
+  <meta name="keywords" content="sports, assessment, AI, fitness, talent, performance, training">
+  <meta name="author" content="Sports Assessment Team">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- Open Graph Meta Tags for Social Media -->
+  <meta property="og:title" content="Sports Assessment - AI-Powered Athletic Evaluation">
+  <meta property="og:description" content="Discover your athletic potential with our cutting-edge AI technology">
+  <meta property="og:type" content="website">
+  <meta property="og:image" content="icons/Icon-512.png">
+  
+  <!-- Twitter Card Meta Tags -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Sports Assessment - AI-Powered Athletic Evaluation">
+  <meta name="twitter:description" content="Discover your athletic potential with our cutting-edge AI technology">
+
+  <!-- iOS meta tags & icons -->
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <meta name="apple-mobile-web-app-title" content="Sports Assessment">
+  <link rel="apple-touch-icon" href="icons/Icon-192.png">
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" href="favicon.png"/>
+
+  <title>Sports Assessment - AI-Powered Athletic Evaluation</title>
+  <link rel="manifest" href="manifest.json">
+
+  <!-- Preload critical resources -->
+  <link rel="preload" href="main.dart.js" as="script">
+  <link rel="preload" href="flutter.js" as="script">
+
+  <!-- Firebase Configuration -->
+  <script type="module">
+    import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js';
+    import { getAuth } from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js';
+    import { getFirestore } from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js';
+    import { getStorage } from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-storage.js';
+    
+    const firebaseConfig = {
+      apiKey: "AIzaSyAPifHu945t_OZ9HkFkLW9hlHRyFRy8Kug",
+      authDomain: "ai-sport-assessment.firebaseapp.com",
+      projectId: "ai-sport-assessment",
+      storageBucket: "ai-sport-assessment.firebasestorage.app",
+      messagingSenderId: "353205052706",
+      appId: "1:353205052706:android:5815e7b99f14911b32317b"
+    };
+    
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+    const storage = getStorage(app);
+    
+    window.firebaseApp = app;
+    window.firebaseAuth = auth;
+    window.firebaseFirestore = db;
+    window.firebaseStorage = storage;
+  </script>
+</head>
+<body>
+  <script src="flutter_bootstrap.js" async></script>
+</body>
+</html>
