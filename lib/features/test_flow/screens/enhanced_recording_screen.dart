@@ -8,6 +8,7 @@ import 'package:go_router/go_router.dart';
 import '../../../core/providers/dynamic_data_providers.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_typography.dart';
+import '../../../core/utils/responsive_utils.dart';
 import '../../../shared/widgets/glass_card.dart';
 import '../../../shared/widgets/neon_button.dart';
 

@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import '../../../../core/services/video_analysis_service.dart';
 import '../../../../core/services/convex_http_service.dart';
 import '../../../../core/theme/app_colors.dart';
+import '../../../../core/utils/responsive_utils.dart';
 import '../../../../shared/presentation/widgets/glass_card.dart';
 
 
@@ -292,6 +293,8 @@ class _TestResultsScreenState extends State<TestResultsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final responsive = ResponsiveUtils(context);
+    
     return Scaffold(
       backgroundColor: AppColors.background,
       body: Container(
@@ -303,19 +306,19 @@ class _TestResultsScreenState extends State<TestResultsScreen> {
             children: [
               // Header
               Padding(
-                padding: const EdgeInsets.all(20),
+                padding: EdgeInsets.all(responsive.wp(5)),
                 child: Row(
                   children: [
                     IconButton(
                       onPressed: () => context.go('/home'),
                       icon: const Icon(Icons.close, color: Colors.white),
                     ),
-                    const SizedBox(width: 16),
+                    SizedBox(width: responsive.wp(4)),
                     Expanded(
                       child: Text(
                         'Test Results',
-                        style: const TextStyle(
-                          fontSize: 24,
+                        style: TextStyle(
+                          fontSize: responsive.sp(24),
                           fontWeight: FontWeight.w700,
                           color: Colors.white,
                         ),

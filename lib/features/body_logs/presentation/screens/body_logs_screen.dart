@@ -2,6 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../core/theme/app_colors.dart';
+import '../../../../core/utils/responsive_utils.dart';
 import '../../../../shared/presentation/widgets/glass_card.dart';
 import '../../../../shared/presentation/widgets/neon_button.dart';
 
@@ -30,6 +31,8 @@ class _BodyLogsScreenState extends State<BodyLogsScreen>
 
   @override
   Widget build(BuildContext context) {
+    final responsive = ResponsiveUtils(context);
+    
     return Container(
       decoration: BoxDecoration(
         gradient: AppColors.backgroundGradient,
@@ -39,15 +42,15 @@ class _BodyLogsScreenState extends State<BodyLogsScreen>
           children: [
             // Header
             Padding(
-              padding: const EdgeInsets.all(20),
+              padding: EdgeInsets.all(responsive.wp(5)),
               child: Row(
                 children: [
                   IconButton(
                     onPressed: () => context.go('/home'),
-                    icon: const Icon(Icons.arrow_back, color: Colors.white),
+                    icon: Icon(Icons.arrow_back, color: Colors.white, size: responsive.sp(24)),
                     style: IconButton.styleFrom(
                       backgroundColor: AppColors.card.withOpacity(0.5),
-                      padding: const EdgeInsets.all(12),
+                      padding: EdgeInsets.all(responsive.wp(3)),
                     ),
                   ),
                   const SizedBox(width: 16),

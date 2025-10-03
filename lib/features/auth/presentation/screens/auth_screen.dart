@@ -6,6 +6,7 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/services/service_manager.dart';
 import '../../../../core/providers/auth_state_provider.dart';
 import '../../../../shared/presentation/widgets/neon_button.dart';
+import '../../../../core/utils/responsive_utils.dart';
 
 class AuthScreen extends ConsumerStatefulWidget {
   const AuthScreen({super.key});
@@ -93,6 +94,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
 
   @override
   Widget build(BuildContext context) {
+    final responsive = ResponsiveUtils(context);
     return Container(
       width: double.infinity,
       height: double.infinity,
@@ -103,11 +105,11 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
         backgroundColor: Colors.transparent,
         body: SafeArea(
           child: SingleChildScrollView(
-            padding: const EdgeInsets.all(24),
+            padding: EdgeInsets.all(responsive.wp(6)),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                const SizedBox(height: 40),
+                SizedBox(height: responsive.hp(5)),
                 // Enhanced Animated Logo
                 FadeTransition(
                   opacity: _fadeAnimation,
@@ -119,8 +121,8 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
                         child: Transform.rotate(
                           angle: _logoRotation.value,
                           child: Container(
-                            width: 140,
-                            height: 140,
+                            width: responsive.wp(35),
+                            height: responsive.wp(35),
                             decoration: BoxDecoration(
                               gradient: LinearGradient(
                                 colors: [
@@ -132,7 +134,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
                                 end: Alignment.bottomRight,
                                 stops: const [0.0, 0.5, 1.0],
                               ),
-                              borderRadius: BorderRadius.circular(35),
+                              borderRadius: BorderRadius.circular(responsive.wp(9)),
                               boxShadow: [
                                 BoxShadow(
                                   color: AppColors.royalPurple.withOpacity(0.6),
@@ -153,10 +155,10 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
                                 ),
                               ],
                             ),
-                            child: const Icon(
+                            child: Icon(
                               Icons.sports_soccer,
                               color: Colors.white,
-                              size: 70,
+                              size: responsive.wp(18),
                             ),
                           ),
                         ),
@@ -164,7 +166,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
                     },
                   ),
                 ),
-                const SizedBox(height: 32),
+                SizedBox(height: responsive.hp(4)),
                 // Title
                 ShaderMask(
                   shaderCallback: (bounds) => LinearGradient(
@@ -178,8 +180,8 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
                   ).createShader(bounds),
                   child: Text(
                     'Welcome to Vita Sports',
-                    style: const TextStyle(
-                      fontSize: 26,
+                    style: TextStyle(
+                      fontSize: responsive.sp(26),
                       fontWeight: FontWeight.w800,
                       color: Colors.white,
                       letterSpacing: -0.5,
@@ -188,23 +190,23 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
                     textAlign: TextAlign.center,
                   ),
                 ),
-                const SizedBox(height: 12),
+                SizedBox(height: responsive.hp(1.5)),
                 Text(
                   'Your journey to athletic excellence starts here',
                   style: TextStyle(
-                    fontSize: 16,
+                    fontSize: responsive.sp(16),
                     color: AppColors.mutedForeground.withOpacity(0.9),
                     fontWeight: FontWeight.w500,
                     height: 1.4,
                   ),
                   textAlign: TextAlign.center,
                 ),
-                const SizedBox(height: 40),
+                SizedBox(height: responsive.hp(5)),
                 // Auth Form
                 Container(
-                  margin: const EdgeInsets.symmetric(horizontal: 8),
+                  margin: EdgeInsets.symmetric(horizontal: responsive.wp(2)),
                   decoration: AppColors.glassmorphismDecoration(
-                    borderRadius: BorderRadius.circular(25),
+                    borderRadius: BorderRadius.circular(responsive.wp(7)),
                     enableNeonGlow: true,
                     neonGlowColor: AppColors.royalPurple,
                   ).copyWith(
@@ -213,25 +215,25 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
                         color: AppColors.royalPurple.withOpacity(0.2),
                         blurRadius: 30,
                         spreadRadius: 5,
-                        offset: const Offset(0, 10),
+                        offset: Offset(0, responsive.hp(1.2)),
                       ),
                       BoxShadow(
                         color: AppColors.electricBlue.withOpacity(0.1),
                         blurRadius: 20,
                         spreadRadius: 2,
-                        offset: const Offset(0, -5),
+                        offset: Offset(0, -responsive.hp(0.6)),
                       ),
                     ],
                   ),
                   child: Padding(
-                    padding: const EdgeInsets.all(28),
+                    padding: EdgeInsets.all(responsive.wp(7)),
                     child: Column(
                       children: [
                         // Tab Bar
                         Container(
                           decoration: BoxDecoration(
                             color: AppColors.glassmorphismBackground.withOpacity(0.4),
-                            borderRadius: BorderRadius.circular(15),
+                            borderRadius: BorderRadius.circular(responsive.wp(4)),
                             border: Border.all(
                               color: AppColors.glassmorphismBorder.withOpacity(0.6),
                               width: 1.5,
@@ -252,7 +254,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
                                 begin: Alignment.centerLeft,
                                 end: Alignment.centerRight,
                               ),
-                              borderRadius: BorderRadius.circular(12),
+                              borderRadius: BorderRadius.circular(responsive.wp(3)),
                               boxShadow: [
                                 BoxShadow(
                                   color: AppColors.royalPurple.withOpacity(0.4),
@@ -288,10 +290,10 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
                             ],
                           ),
                         ),
-                        const SizedBox(height: 24),
+                        SizedBox(height: responsive.hp(3)),
                         // Tab Bar View
                         SizedBox(
-                          height: 400,
+                          height: responsive.hp(50),
                           child: TabBarView(
                             controller: _tabController,
                             children: [
@@ -304,15 +306,15 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
                     ),
                   ),
                 ),
-                const SizedBox(height: 24),
+                SizedBox(height: responsive.hp(3)),
                 // Social Auth
                 _buildSocialAuth(),
-                const SizedBox(height: 24),
+                SizedBox(height: responsive.hp(3)),
                 // Terms
                 Text(
                   'By continuing, you agree to our Terms of Service and Privacy Policy',
                   style: TextStyle(
-                    fontSize: 12,
+                    fontSize: responsive.sp(12),
                     color: AppColors.textSecondary.withOpacity(0.6),
                     height: 1.5,
                   ),

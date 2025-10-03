@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../../core/theme/app_colors.dart';
+import '../../../../core/utils/responsive_utils.dart';
 
 enum TestStatus { notStarted, inProgress, completed }
 
@@ -25,12 +26,14 @@ class TestCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final responsive = ResponsiveUtils(context);
+    
     return Container(
-      width: 160,
-      height: 150, // Reduced height to prevent overflow
+      width: responsive.wp(42).clamp(140.0, 180.0),
+      height: responsive.hp(20).clamp(140.0, 170.0),
       decoration: BoxDecoration(
         color: AppColors.card,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(responsive.wp(4)),
         border: Border.all(
           color: AppColors.border,
           width: 1,
@@ -38,8 +41,8 @@ class TestCard extends StatelessWidget {
         boxShadow: [
           BoxShadow(
             color: Colors.black.withOpacity(0.1),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
+            blurRadius: responsive.wp(2),
+            offset: Offset(0, responsive.hp(0.25)),
           ),
         ],
       ),
@@ -47,9 +50,9 @@ class TestCard extends StatelessWidget {
         color: Colors.transparent,
         child: InkWell(
           onTap: onStartTest,
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(responsive.wp(4)),
           child: Padding(
-            padding: const EdgeInsets.all(12), // Reduced padding
+            padding: EdgeInsets.all(responsive.wp(3)),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
@@ -58,11 +61,11 @@ class TestCard extends StatelessWidget {
                   alignment: Alignment.center,
                   children: [
                     Container(
-                      width: 40, // Reduced size
-                      height: 40,
+                      width: responsive.wp(10).clamp(35.0, 45.0),
+                      height: responsive.wp(10).clamp(35.0, 45.0),
                       decoration: BoxDecoration(
                         color: _getStatusColor().withOpacity(0.1),
-                        borderRadius: BorderRadius.circular(10),
+                        borderRadius: BorderRadius.circular(responsive.wp(2.5)),
                         border: Border.all(
                           color: _getStatusColor().withOpacity(0.3),
                           width: 1,
@@ -71,7 +74,7 @@ class TestCard extends StatelessWidget {
                       child: Icon(
                         icon,
                         color: _getStatusColor(),
-                        size: 20,
+                        size: responsive.sp(18).clamp(16.0, 22.0),
                       ),
                     ),
                     if (status == TestStatus.completed)
@@ -79,8 +82,8 @@ class TestCard extends StatelessWidget {
                         top: -2,
                         right: -2,
                         child: Container(
-                          width: 16,
-                          height: 16,
+                          width: responsive.wp(4).clamp(14.0, 18.0),
+                          height: responsive.wp(4).clamp(14.0, 18.0),
                           decoration: BoxDecoration(
                             color: AppColors.success,
                             shape: BoxShape.circle,
@@ -89,20 +92,20 @@ class TestCard extends StatelessWidget {
                               width: 2,
                             ),
                           ),
-                          child: const Icon(
+                          child: Icon(
                             Icons.check,
                             color: Colors.white,
-                            size: 8,
+                            size: responsive.sp(7).clamp(6.0, 10.0),
                           ),
                         ),
                       ),
                   ],
                 ),
-                const SizedBox(height: 8),
+                SizedBox(height: responsive.hp(1)),
                 Text(
                   title,
-                  style: const TextStyle(
-                    fontSize: 13,
+                  style: TextStyle(
+                    fontSize: responsive.sp(12).clamp(11.0, 14.0),
                     fontWeight: FontWeight.w600,
                     color: Colors.white,
                   ),
@@ -110,11 +113,11 @@ class TestCard extends StatelessWidget {
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
                 ),
-                const SizedBox(height: 4),
+                SizedBox(height: responsive.hp(0.5)),
                 Text(
                   description,
                   style: TextStyle(
-                    fontSize: 10,
+                    fontSize: responsive.sp(9).clamp(8.0, 11.0),
                     color: AppColors.textSecondary,
                     height: 1.2,
                   ),
@@ -123,38 +126,41 @@ class TestCard extends StatelessWidget {
                   overflow: TextOverflow.ellipsis,
                 ),
                 if (duration != null || difficulty != null) ...[
-                  const SizedBox(height: 6),
+                  SizedBox(height: responsive.hp(0.75)),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       if (duration != null) ...[
                         Icon(
                           Icons.timer,
-                          size: 10,
+                          size: responsive.sp(9).clamp(8.0, 11.0),
                           color: AppColors.textSecondary,
                         ),
-                        const SizedBox(width: 2),
+                        SizedBox(width: responsive.wp(0.5)),
                         Text(
                           '${duration}min',
                           style: TextStyle(
-                            fontSize: 9,
+                            fontSize: responsive.sp(8).clamp(7.0, 10.0),
                             color: AppColors.textSecondary,
                             fontWeight: FontWeight.w500,
                           ),
                         ),
                       ],
                       if (difficulty != null) ...[
-                        if (duration != null) const SizedBox(width: 4),
+                        if (duration != null) SizedBox(width: responsive.wp(1)),
                         Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 3, vertical: 1),
+                          padding: EdgeInsets.symmetric(
+                            horizontal: responsive.wp(0.75),
+                            vertical: responsive.hp(0.1),
+                          ),
                           decoration: BoxDecoration(
                             color: _getDifficultyColor().withOpacity(0.1),
-                            borderRadius: BorderRadius.circular(4),
+                            borderRadius: BorderRadius.circular(responsive.wp(1)),
                           ),
                           child: Text(
                             difficulty!,
                             style: TextStyle(
-                              fontSize: 8,
+                              fontSize: responsive.sp(7).clamp(6.0, 9.0),
                               color: _getDifficultyColor(),
                               fontWeight: FontWeight.w600,
                             ),
@@ -164,21 +170,21 @@ class TestCard extends StatelessWidget {
                     ],
                   ),
                 ],
-                const SizedBox(height: 8),
+                SizedBox(height: responsive.hp(1)),
                 SizedBox(
                   width: double.infinity,
-                  height: 28, // Reduced button height
+                  height: responsive.hp(3.5).clamp(26.0, 32.0),
                   child: ElevatedButton(
                     onPressed: onStartTest,
                     style: ElevatedButton.styleFrom(
                       backgroundColor: _getStatusColor(),
                       foregroundColor: Colors.white,
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(6),
+                        borderRadius: BorderRadius.circular(responsive.wp(1.5)),
                       ),
                       padding: EdgeInsets.zero,
-                      textStyle: const TextStyle(
-                        fontSize: 11,
+                      textStyle: TextStyle(
+                        fontSize: responsive.sp(10).clamp(9.0, 12.0),
                         fontWeight: FontWeight.w600,
                       ),
                     ),

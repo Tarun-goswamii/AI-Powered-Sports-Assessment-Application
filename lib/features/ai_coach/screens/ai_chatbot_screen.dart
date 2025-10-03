@@ -4,13 +4,9 @@ import 'package:flutter/services.dart';
 import '../../../core/services/vapi_ai_service.dart';
 import '../../../core/services/auth_service.dart';
 import '../../../core/theme/app_colors.dart';
-imp          child: Container(
-            padding: const EdgeInsets.all(12),
-            decoration: BoxDecoration(
-              color: AppColors.card,
-              borderRadius: BorderRadius.circular(16),
-              border: Border.all(color: AppColors.border),
-            ),/../../shared/presentation/widgets/neon_button.dart';
+import '../../../core/utils/responsive_utils.dart';
+import '../../../shared/presentation/widgets/glass_card.dart';
+import '../../../shared/presentation/widgets/neon_button.dart';
 
 class AiChatbotScreen extends StatefulWidget {
   const AiChatbotScreen({super.key});

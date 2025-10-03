@@ -4,6 +4,7 @@ import 'package:speech_to_text/speech_to_text.dart' as stt;
 import 'package:flutter_tts/flutter_tts.dart';
 import '../../core/services/vapi_ai_service.dart';
 import '../../core/theme/app_colors.dart';
+import '../../core/utils/responsive_utils.dart';
 
 class AIChatScreen extends StatefulWidget {
   const AIChatScreen({super.key});
@@ -253,6 +254,8 @@ class _AIChatScreenState extends State<AIChatScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final responsive = ResponsiveUtils(context);
+    
     return Container(
       decoration: BoxDecoration(
         gradient: AppColors.backgroundGradient,
@@ -262,10 +265,10 @@ class _AIChatScreenState extends State<AIChatScreen> {
         appBar: AppBar(
           title: Text(
             'AI Sports Coach',
-            style: const TextStyle(
+            style: TextStyle(
               fontWeight: FontWeight.bold,
               color: Colors.white,
-              fontSize: 20,
+              fontSize: responsive.sp(20),
             ),
           ),
           backgroundColor: Colors.transparent,

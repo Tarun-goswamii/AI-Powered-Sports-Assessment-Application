@@ -1,6 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
 import '../models/credit_points_model.dart';
+import '../services/service_manager.dart';
 
 class CreditPointsState {
   final int totalCredits;
@@ -31,22 +31,19 @@ class CreditPointsState {
 }
 
 class CreditPointsNotifier extends StateNotifier<CreditPointsState> {
-  final SupabaseClient _supabase;
+  final ConvexService _convexService;
 
-  CreditPointsNotifier(this._supabase)
+  CreditPointsNotifier(this._convexService)
       : super(const CreditPointsState(totalCredits: 0, transactions: []));
 
   Future<void> loadCreditPoints(String userId) async {
     state = state.copyWith(isLoading: true, errorMessage: null);
 
     try {
-      final response = await _supabase
-          .from('credit_transactions')
-          .select()
-          .eq('user_id', userId)
-          .order('created_at', ascending: false);
-
-      final transactions = response
+      // Fetch credit transactions from Convex
+      final response = await _convexService.query('creditPoints:getByUser', {'userId': userId});
+      
+      final transactions = (response['transactions'] as List? ?? [])
           .map((json) => CreditPointsModel.fromJson(json))
           .toList();
 
@@ -77,22 +74,14 @@ class CreditPointsNotifier extends StateNotifier<CreditPointsState> {
     String? referenceType,
   }) async {
     try {
-      final transaction = CreditPointsModel(
-        id: DateTime.now().millisecondsSinceEpoch.toString(),
-        userId: userId,
-        amount: amount,
-        type: type,
-        description: description,
-        referenceId: referenceId,
-        referenceType: referenceType,
-        createdAt: DateTime.now(),
-        expiresAt: DateTime.now().add(const Duration(days: 365)), // 1 year expiry
-      );
-
-      final transactionData = transaction.toJson();
-      transactionData.remove('id'); // Let Supabase generate the ID
-
-      await _supabase.from('credit_transactions').insert(transactionData);
+      await _convexService.mutation('creditPoints:addTransaction', {
+        'userId': userId,
+        'amount': amount,
+        'type': type.toString().split('.').last,
+        'description': description,
+        'referenceId': referenceId,
+        'referenceType': referenceType,
+      });
 
       // Reload credit points
       await loadCreditPoints(userId);
@@ -130,8 +119,8 @@ class CreditPointsNotifier extends StateNotifier<CreditPointsState> {
 
 final creditPointsProvider =
     StateNotifierProvider<CreditPointsNotifier, CreditPointsState>((ref) {
-  final supabase = Supabase.instance.client;
-  return CreditPointsNotifier(supabase);
+  final convexService = ServiceManager.instance.convexService;
+  return CreditPointsNotifier(convexService);
 });
 
 final totalCreditsProvider = Provider<int>((ref) {

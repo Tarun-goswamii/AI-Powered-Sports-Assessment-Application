@@ -6,6 +6,7 @@ import 'dart:async';
 import '../../../core/providers/dynamic_data_providers.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_typography.dart';
+import '../../../core/utils/responsive_utils.dart';
 import '../../../shared/presentation/widgets/glass_card.dart';
 import '../../../shared/presentation/widgets/animated_progress_card.dart';
 import '../../../shared/presentation/widgets/floating_action_menu.dart';

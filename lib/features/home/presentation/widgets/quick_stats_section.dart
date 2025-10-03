@@ -2,6 +2,7 @@
 import 'package:flutter/material.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../shared/presentation/widgets/glass_card.dart';
+import '../../../../core/utils/responsive_utils.dart';
 
 class QuickStatsSection extends StatelessWidget {
   final List<StatItem> stats;
@@ -13,15 +14,16 @@ class QuickStatsSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final responsive = ResponsiveUtils(context);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Padding(
-          padding: const EdgeInsets.only(bottom: 16),
+          padding: EdgeInsets.only(bottom: responsive.hp(2)),
           child: Text(
             'Your Performance',
-            style: const TextStyle(
-              fontSize: 16,
+            style: TextStyle(
+              fontSize: responsive.sp(16).clamp(14.0, 18.0),
               fontWeight: FontWeight.w600,
               color: Colors.white,
               letterSpacing: 0.1,
@@ -34,17 +36,17 @@ class QuickStatsSection extends StatelessWidget {
             return Expanded(
               child: Container(
                 margin: EdgeInsets.only(
-                  right: index < stats.length - 1 ? 8 : 0,
+                  right: index < stats.length - 1 ? responsive.wp(2) : 0,
                 ),
                 child: GlassCard(
-                  padding: const EdgeInsets.all(10),
+                  padding: EdgeInsets.all(responsive.wp(2.5).clamp(8.0, 12.0)),
                   enableNeonGlow: true,
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       Container(
-                        width: 24,
-                        height: 24,
+                        width: responsive.wp(6).clamp(20.0, 28.0),
+                        height: responsive.wp(6).clamp(20.0, 28.0),
                         decoration: BoxDecoration(
                           gradient: LinearGradient(
                             colors: [
@@ -54,19 +56,19 @@ class QuickStatsSection extends StatelessWidget {
                             begin: Alignment.topLeft,
                             end: Alignment.bottomRight,
                           ),
-                          borderRadius: BorderRadius.circular(6),
+                          borderRadius: BorderRadius.circular(responsive.wp(1.5).clamp(5.0, 8.0)),
                         ),
                         child: Icon(
                           stat.icon,
                           color: Colors.white,
-                          size: 12,
+                          size: responsive.sp(12).clamp(10.0, 14.0),
                         ),
                       ),
-                      const SizedBox(height: 4),
+                      SizedBox(height: responsive.hp(0.5)),
                       Text(
                         stat.value,
                         style: TextStyle(
-                          fontSize: 12,
+                          fontSize: responsive.sp(12).clamp(11.0, 14.0),
                           color: stat.color,
                           fontWeight: FontWeight.w700,
                         ),
@@ -74,11 +76,11 @@ class QuickStatsSection extends StatelessWidget {
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                       ),
-                      const SizedBox(height: 1),
+                      SizedBox(height: responsive.hp(0.1)),
                       Text(
                         stat.label,
-                        style: const TextStyle(
-                          fontSize: 8,
+                        style: TextStyle(
+                          fontSize: responsive.sp(8).clamp(7.0, 10.0),
                           fontWeight: FontWeight.w500,
                           color: Colors.white,
                         ),
@@ -89,7 +91,7 @@ class QuickStatsSection extends StatelessWidget {
                       Text(
                         stat.subtitle,
                         style: TextStyle(
-                          fontSize: 7,
+                          fontSize: responsive.sp(7).clamp(6.0, 9.0),
                           color: AppColors.textSecondary.withOpacity(0.6),
                           fontWeight: FontWeight.w400,
                         ),

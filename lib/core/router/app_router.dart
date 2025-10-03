@@ -146,10 +146,6 @@ class AppRouter {
             builder: (context, state) => const CombinedResultsScreen(),
           ),
           GoRoute(
-            path: '/results',
-            builder: (context, state) => const CombinedResultsScreen(),
-          ),
-          GoRoute(
             path: '/community',
             builder: (context, state) => const CommunityScreen(),
           ),

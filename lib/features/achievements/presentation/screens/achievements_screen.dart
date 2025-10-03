@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../shared/presentation/widgets/glass_card.dart';
 import '../../../../shared/presentation/widgets/neon_button.dart';
+import '../../../../core/utils/responsive_utils.dart';
 
 class AchievementsScreen extends StatefulWidget {
   const AchievementsScreen({super.key});
@@ -30,6 +31,7 @@ class _AchievementsScreenState extends State<AchievementsScreen>
 
   @override
   Widget build(BuildContext context) {
+    final responsive = ResponsiveUtils(context);
     return Container(
       decoration: BoxDecoration(
         gradient: AppColors.backgroundGradient,
@@ -39,7 +41,7 @@ class _AchievementsScreenState extends State<AchievementsScreen>
           children: [
             // Header
             Padding(
-              padding: const EdgeInsets.all(20),
+              padding: EdgeInsets.all(responsive.wp(5)),
               child: Row(
                 children: [
                   IconButton(
@@ -47,15 +49,15 @@ class _AchievementsScreenState extends State<AchievementsScreen>
                     icon: const Icon(Icons.arrow_back, color: Colors.white),
                     style: IconButton.styleFrom(
                       backgroundColor: AppColors.card.withOpacity(0.5),
-                      padding: const EdgeInsets.all(12),
+                      padding: EdgeInsets.all(responsive.wp(3)),
                     ),
                   ),
-                  const SizedBox(width: 16),
-                  const Expanded(
+                  SizedBox(width: responsive.wp(4)),
+                  Expanded(
                     child: Text(
                       'Achievements',
                       style: TextStyle(
-                        fontSize: 28,
+                        fontSize: responsive.sp(28),
                         fontWeight: FontWeight.w700,
                         color: Colors.white,
                       ),
@@ -71,31 +73,31 @@ class _AchievementsScreenState extends State<AchievementsScreen>
 
             // Stats Overview
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20),
+              padding: EdgeInsets.symmetric(horizontal: responsive.wp(5)),
               child: Row(
                 children: [
                   Expanded(
                     child: _buildStatCard('47', 'Unlocked', AppColors.neonGreen),
                   ),
-                  const SizedBox(width: 16),
+                  SizedBox(width: responsive.wp(4)),
                   Expanded(
                     child: _buildStatCard('23', 'In Progress', AppColors.warmOrange),
                   ),
-                  const SizedBox(width: 16),
+                  SizedBox(width: responsive.wp(4)),
                   Expanded(
                     child: _buildStatCard('18', 'Locked', AppColors.textSecondary),
                   ),
                 ],
               ),
             ),
-            const SizedBox(height: 24),
+            SizedBox(height: responsive.hp(3)),
 
             // Tab Bar
             Container(
-              margin: const EdgeInsets.symmetric(horizontal: 20),
+              margin: EdgeInsets.symmetric(horizontal: responsive.wp(5)),
               decoration: BoxDecoration(
                 color: AppColors.card.withOpacity(0.3),
-                borderRadius: BorderRadius.circular(12),
+                borderRadius: BorderRadius.circular(responsive.wp(3)),
               ),
               child: TabBar(
                 controller: _tabController,

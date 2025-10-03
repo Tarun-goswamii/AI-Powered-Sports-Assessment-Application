@@ -2,6 +2,7 @@
 import 'package:flutter/material.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../shared/presentation/widgets/glass_card.dart';
+import '../../../../core/utils/responsive_utils.dart';
 
 class QuickAccessCard extends StatelessWidget {
   final String title;
@@ -21,8 +22,9 @@ class QuickAccessCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final responsive = ResponsiveUtils(context);
     return GlassCard(
-      padding: const EdgeInsets.all(16), // Reduced padding to prevent overflow
+      padding: EdgeInsets.all(responsive.wp(4).clamp(14.0, 18.0)),
       enableNeonGlow: true,
       onTap: onTap,
       child: Column(
@@ -31,8 +33,8 @@ class QuickAccessCard extends StatelessWidget {
         children: [
           // Premium icon with gradient background
           Container(
-            width: 40, // Reduced size to fit better
-            height: 40,
+            width: responsive.wp(10).clamp(35.0, 45.0),
+            height: responsive.wp(10).clamp(35.0, 45.0),
             decoration: BoxDecoration(
               gradient: LinearGradient(
                 colors: [
@@ -42,7 +44,7 @@ class QuickAccessCard extends StatelessWidget {
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
               ),
-              borderRadius: BorderRadius.circular(12),
+              borderRadius: BorderRadius.circular(responsive.wp(3).clamp(10.0, 14.0)),
               boxShadow: [
                 BoxShadow(
                   color: color.withOpacity(0.3),
@@ -53,16 +55,16 @@ class QuickAccessCard extends StatelessWidget {
             ),
             child: Icon(
               icon,
-              size: 20, // Reduced icon size
+              size: responsive.sp(20).clamp(18.0, 24.0),
               color: Colors.white,
             ),
           ),
-          const SizedBox(height: 8), // Reduced spacing
+          SizedBox(height: responsive.hp(1)),
           Flexible( // Allow text to resize
             child: Text(
               title,
-              style: const TextStyle(
-                fontSize: 14, // Reduced font size
+              style: TextStyle(
+                fontSize: responsive.sp(14).clamp(12.0, 16.0),
                 fontWeight: FontWeight.w600,
                 color: Colors.white,
                 letterSpacing: 0.1,
@@ -72,12 +74,12 @@ class QuickAccessCard extends StatelessWidget {
               overflow: TextOverflow.ellipsis,
             ),
           ),
-          const SizedBox(height: 2), // Reduced spacing
+          SizedBox(height: responsive.hp(0.25)),
           Flexible( // Allow subtitle to resize
             child: Text(
               subtitle,
               style: TextStyle(
-                fontSize: 10, // Reduced font size
+                fontSize: responsive.sp(10).clamp(9.0, 12.0),
                 color: AppColors.textSecondary.withOpacity(0.7),
                 fontWeight: FontWeight.w400,
                 height: 1.2, // Better line height

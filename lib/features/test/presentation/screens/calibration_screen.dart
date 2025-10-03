@@ -5,6 +5,7 @@ import 'package:camera/camera.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../shared/presentation/widgets/glass_card.dart';
 import '../../../../shared/presentation/widgets/neon_button.dart';
+import '../../../../core/utils/responsive_utils.dart';
 
 class CalibrationScreen extends StatefulWidget {
   const CalibrationScreen({super.key});
@@ -62,6 +63,7 @@ class _CalibrationScreenState extends State<CalibrationScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final responsive = ResponsiveUtils(context);
     return Scaffold(
       backgroundColor: AppColors.background,
       body: Container(
@@ -73,18 +75,18 @@ class _CalibrationScreenState extends State<CalibrationScreen> {
             children: [
               // Header
               Padding(
-                padding: const EdgeInsets.all(20),
+                padding: EdgeInsets.all(responsive.wp(5)),
                 child: Row(
                   children: [
                     IconButton(
                       onPressed: () => context.go('/test-detail'),
                       icon: const Icon(Icons.arrow_back, color: Colors.white),
                     ),
-                    const SizedBox(width: 16),
-                    const Text(
+                    SizedBox(width: responsive.wp(4)),
+                    Text(
                       'Camera Calibration',
                       style: TextStyle(
-                        fontSize: 24,
+                        fontSize: responsive.sp(24).clamp(22.0, 28.0),
                         fontWeight: FontWeight.w700,
                         color: Colors.white,
                       ),
@@ -96,16 +98,16 @@ class _CalibrationScreenState extends State<CalibrationScreen> {
               // Camera Preview
               Expanded(
                 child: Container(
-                  margin: const EdgeInsets.symmetric(horizontal: 20),
+                  margin: EdgeInsets.symmetric(horizontal: responsive.wp(5)),
                   decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(24),
+                    borderRadius: BorderRadius.circular(responsive.wp(6)),
                     border: Border.all(
                       color: AppColors.royalPurple.withOpacity(0.3),
                       width: 2,
                     ),
                   ),
                   child: ClipRRect(
-                    borderRadius: BorderRadius.circular(22),
+                    borderRadius: BorderRadius.circular(responsive.wp(5.5)),
                     child: _isInitialized && _cameraController != null
                         ? CameraPreview(_cameraController!)
                         : Container(
@@ -122,54 +124,54 @@ class _CalibrationScreenState extends State<CalibrationScreen> {
 
               // Calibration Instructions
               Padding(
-                padding: const EdgeInsets.all(20),
+                padding: EdgeInsets.all(responsive.wp(5)),
                 child: GlassCard(
-                  padding: const EdgeInsets.all(24),
+                  padding: EdgeInsets.all(responsive.wp(6)),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text(
+                      Text(
                         'Calibration Instructions',
                         style: TextStyle(
-                          fontSize: 18,
+                          fontSize: responsive.sp(18).clamp(16.0, 20.0),
                           fontWeight: FontWeight.w600,
                           color: Colors.white,
                         ),
                       ),
-                      const SizedBox(height: 16),
+                      SizedBox(height: responsive.hp(2)),
                       _buildCalibrationStep(
                         '1',
                         'Position your phone 5-10 meters from the start line',
                         Icons.location_on,
                       ),
-                      const SizedBox(height: 12),
+                      SizedBox(height: responsive.hp(1.5)),
                       _buildCalibrationStep(
                         '2',
                         'Ensure the entire 40m track is visible in frame',
                         Icons.visibility,
                       ),
-                      const SizedBox(height: 12),
+                      SizedBox(height: responsive.hp(1.5)),
                       _buildCalibrationStep(
                         '3',
                         'Keep the camera steady and level',
                         Icons.straighten,
                       ),
-                      const SizedBox(height: 12),
+                      SizedBox(height: responsive.hp(1.5)),
                       _buildCalibrationStep(
                         '4',
                         'Test the view by standing at the start line',
                         Icons.accessibility,
                       ),
-                      const SizedBox(height: 24),
+                      SizedBox(height: responsive.hp(3)),
 
                       // Calibration Status
                       Container(
-                        padding: const EdgeInsets.all(16),
+                        padding: EdgeInsets.all(responsive.wp(4)),
                         decoration: BoxDecoration(
                           color: _isCalibrating
                               ? AppColors.neonGreen.withOpacity(0.1)
                               : AppColors.royalPurple.withOpacity(0.1),
-                          borderRadius: BorderRadius.circular(12),
+                          borderRadius: BorderRadius.circular(responsive.wp(3)),
                           border: Border.all(
                             color: _isCalibrating
                                 ? AppColors.neonGreen

@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/services/auth_persistence_service.dart';
+import '../../../../core/utils/responsive_utils.dart';
 
 class SplashScreen extends ConsumerStatefulWidget {
   const SplashScreen({super.key});
@@ -113,6 +114,7 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
 
   @override
   Widget build(BuildContext context) {
+    final responsive = ResponsiveUtils(context);
     return Scaffold(
       backgroundColor: AppColors.background,
       body: Container(
@@ -133,8 +135,8 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
                       child: Opacity(
                         opacity: _logoOpacityAnimation.value,
                         child: Container(
-                          width: 120,
-                          height: 120,
+                          width: responsive.wp(32).clamp(100.0, 140.0),
+                          height: responsive.wp(32).clamp(100.0, 140.0),
                           decoration: BoxDecoration(
                             gradient: LinearGradient(
                               colors: [
@@ -144,7 +146,7 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
                               begin: Alignment.topLeft,
                               end: Alignment.bottomRight,
                             ),
-                            borderRadius: BorderRadius.circular(30),
+                            borderRadius: BorderRadius.circular(responsive.wp(8)),
                             boxShadow: [
                               BoxShadow(
                                 color: AppColors.royalPurple.withOpacity(0.4),
@@ -158,17 +160,17 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
                               ),
                             ],
                           ),
-                          child: const Icon(
+                          child: Icon(
                             Icons.sports_soccer,
                             color: Colors.white,
-                            size: 60,
+                            size: responsive.sp(60).clamp(50.0, 70.0),
                           ),
                         ),
                       ),
                     );
                   },
                 ),
-                const SizedBox(height: 40),
+                SizedBox(height: responsive.hp(5)),
                 // Animated text
                 AnimatedBuilder(
                   animation: _textAnimationController,
@@ -181,19 +183,19 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
                           children: [
                             Text(
                               'Sports Assessment',
-                              style: const TextStyle(
-                                fontSize: 28,
+                              style: TextStyle(
+                                fontSize: responsive.sp(28).clamp(24.0, 32.0),
                                 fontWeight: FontWeight.w700,
                                 color: Colors.white,
                                 letterSpacing: -0.5,
                               ),
                               textAlign: TextAlign.center,
                             ),
-                            const SizedBox(height: 8),
+                            SizedBox(height: responsive.hp(1)),
                             Text(
                               'AI-Powered Talent Evaluation',
                               style: TextStyle(
-                                fontSize: 16,
+                                fontSize: responsive.sp(16).clamp(14.0, 18.0),
                                 color: AppColors.textSecondary.withOpacity(0.8),
                                 fontWeight: FontWeight.w400,
                                 letterSpacing: 0.2,

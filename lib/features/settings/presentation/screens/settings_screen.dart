@@ -5,6 +5,7 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/services/service_manager.dart';
 import '../../../../shared/presentation/widgets/glass_card.dart';
 import '../../../../shared/presentation/widgets/neon_button.dart';
+import '../../../../core/utils/responsive_utils.dart';
 
 class SettingsScreen extends ConsumerStatefulWidget {
   const SettingsScreen({super.key});
@@ -86,13 +87,14 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final responsive = ResponsiveUtils(context);
     return Container(
       decoration: BoxDecoration(
         gradient: AppColors.backgroundGradient,
       ),
       child: SafeArea(
         child: SingleChildScrollView(
-          padding: const EdgeInsets.all(20),
+          padding: EdgeInsets.all(responsive.wp(5)),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -102,31 +104,31 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                     onPressed: () => context.go('/profile'),
                     icon: const Icon(Icons.arrow_back, color: Colors.white),
                   ),
-                  const Expanded(
+                  Expanded(
                     child: Text(
                       'Settings',
                       style: TextStyle(
-                        fontSize: 28,
+                        fontSize: responsive.sp(28),
                         fontWeight: FontWeight.w700,
                         color: Colors.white,
                       ),
                       textAlign: TextAlign.center,
                     ),
                   ),
-                  const SizedBox(width: 48),
+                  SizedBox(width: responsive.wp(12)),
                 ],
               ),
-              const SizedBox(height: 32),
+              SizedBox(height: responsive.hp(4)),
 
-              const Text(
+              Text(
                 'Account Settings',
                 style: TextStyle(
-                  fontSize: 20,
+                  fontSize: responsive.sp(20),
                   fontWeight: FontWeight.w600,
                   color: Colors.white,
                 ),
               ),
-              const SizedBox(height: 16),
+              SizedBox(height: responsive.hp(2)),
               _buildSettingsItem(
                 Icons.person,
                 'Edit Profile',
@@ -146,7 +148,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                 () {},
               ),
 
-              const SizedBox(height: 40),
+              SizedBox(height: responsive.hp(5)),
 
               NeonButton(
                 text: 'Logout',
@@ -154,18 +156,18 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                 variant: NeonButtonVariant.outline,
                 size: NeonButtonSize.medium,
               ),
-              const SizedBox(height: 20),
+              SizedBox(height: responsive.hp(2)),
 
               Center(
                 child: Text(
                   'Version 1.0.0',
                   style: TextStyle(
-                    fontSize: 12,
+                    fontSize: responsive.sp(12),
                     color: AppColors.textSecondary,
                   ),
                 ),
               ),
-              const SizedBox(height: 40),
+              SizedBox(height: responsive.hp(5)),
             ],
           ),
         ),
@@ -180,28 +182,29 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     VoidCallback onTap, {
     bool isDestructive = false,
   }) {
+    final responsive = ResponsiveUtils(context);
     return Container(
-      margin: const EdgeInsets.only(bottom: 8),
+      margin: EdgeInsets.only(bottom: responsive.hp(2)),
       child: GlassCard(
-        padding: const EdgeInsets.all(16),
+        padding: EdgeInsets.all(responsive.wp(4)),
         onTap: onTap,
         child: Row(
           children: [
             Container(
-              padding: const EdgeInsets.all(8),
+              padding: EdgeInsets.all(responsive.wp(2)),
               decoration: BoxDecoration(
                 color: isDestructive
                     ? AppColors.brightRed.withOpacity(0.2)
                     : AppColors.card.withOpacity(0.5),
-                borderRadius: BorderRadius.circular(8),
+                borderRadius: BorderRadius.circular(responsive.wp(2)),
               ),
               child: Icon(
                 icon,
                 color: isDestructive ? AppColors.brightRed : AppColors.royalPurple,
-                size: 20,
+                size: responsive.sp(20),
               ),
             ),
-            const SizedBox(width: 16),
+            SizedBox(width: responsive.wp(4)),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -209,7 +212,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                   Text(
                     title,
                     style: TextStyle(
-                      fontSize: 16,
+                      fontSize: responsive.sp(16),
                       fontWeight: FontWeight.w600,
                       color: isDestructive ? AppColors.brightRed : Colors.white,
                     ),
@@ -217,7 +220,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                   Text(
                     subtitle,
                     style: TextStyle(
-                      fontSize: 12,
+                      fontSize: responsive.sp(12),
                       color: AppColors.textSecondary,
                     ),
                   ),
@@ -227,7 +230,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
             Icon(
               Icons.chevron_right,
               color: AppColors.textSecondary,
-              size: 20,
+              size: responsive.sp(20),
             ),
           ],
         ),

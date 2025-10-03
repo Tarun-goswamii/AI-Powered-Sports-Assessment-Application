@@ -1,7 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
 import '../models/test_model.dart';
 import '../models/test_result_model.dart';
+import '../services/service_manager.dart';
 
 class TestState {
   final List<TestModel> availableTests;
@@ -32,22 +32,19 @@ class TestState {
 }
 
 class TestNotifier extends StateNotifier<TestState> {
-  final SupabaseClient _supabase;
+  final ConvexService _convexService;
 
-  TestNotifier(this._supabase)
+  TestNotifier(this._convexService)
       : super(const TestState(availableTests: [], testResults: []));
 
   Future<void> loadAvailableTests() async {
     state = state.copyWith(isLoading: true, errorMessage: null);
 
     try {
-      final response = await _supabase
-          .from('tests')
-          .select()
-          .eq('is_active', true)
-          .order('created_at', ascending: false);
-
-      final tests = response
+      // Fetch available tests from Convex
+      final response = await _convexService.query('tests:list', {});
+      
+      final tests = (response as List)
           .map((json) => TestModel.fromJson(json))
           .toList();
 
@@ -67,14 +64,10 @@ class TestNotifier extends StateNotifier<TestState> {
     state = state.copyWith(isLoading: true, errorMessage: null);
 
     try {
-      final response = await _supabase
-          .from('test_results')
-          .select()
-          .eq('user_id', userId)
-          .order('completed_at', ascending: false);
-
-      final results = response
-          .map((json) => TestResultModel.fromJson(json))
+      final response = await _convexService.query('testResults:getByUser', {'userId': userId});
+      
+      final results = (response['results'] as List? ?? [])
+          .map((json) => TestResultModel.fromJson(json as Map<String, dynamic>))
           .toList();
 
       state = state.copyWith(
@@ -91,23 +84,14 @@ class TestNotifier extends StateNotifier<TestState> {
 
   Future<void> startTest(String userId, String testId) async {
     try {
-      final testResult = TestResultModel(
-        id: DateTime.now().millisecondsSinceEpoch.toString(),
-        userId: userId,
-        testId: testId,
-        status: TestResultStatus.pending,
-        rawData: {},
-        processedData: {},
-        recommendations: [],
-        startedAt: DateTime.now(),
-        createdAt: DateTime.now(),
-        updatedAt: DateTime.now(),
-      );
-
-      final resultData = testResult.toJson();
-      resultData.remove('id'); // Let Supabase generate the ID
-
-      await _supabase.from('test_results').insert(resultData);
+      await _convexService.mutation('testResults:create', {
+        'userId': userId,
+        'testId': testId,
+        'status': 'pending',
+        'rawData': {},
+        'processedData': {},
+        'recommendations': [],
+      });
 
       // Reload user test results
       await loadUserTestResults(userId);
@@ -118,6 +102,7 @@ class TestNotifier extends StateNotifier<TestState> {
 
   Future<void> completeTest({
     required String resultId,
+    required String userId,
     required Map<String, dynamic> rawData,
     required Map<String, dynamic> processedData,
     double? score,
@@ -127,29 +112,20 @@ class TestNotifier extends StateNotifier<TestState> {
     required List<String> recommendations,
   }) async {
     try {
-      final updateData = {
-        'status': TestResultStatus.completed.index,
-        'raw_data': rawData,
-        'processed_data': processedData,
+      await _convexService.mutation('testResults:complete', {
+        'resultId': resultId,
+        'status': 'completed',
+        'rawData': rawData,
+        'processedData': processedData,
         'score': score,
         'grade': grade,
         'percentile': percentile,
         'feedback': feedback,
         'recommendations': recommendations,
-        'completed_at': DateTime.now().toIso8601String(),
-        'updated_at': DateTime.now().toIso8601String(),
-      };
-
-      await _supabase
-          .from('test_results')
-          .update(updateData)
-          .eq('id', resultId);
+      });
 
       // Reload test results
-      final currentUserId = _supabase.auth.currentUser?.id;
-      if (currentUserId != null) {
-        await loadUserTestResults(currentUserId);
-      }
+      await loadUserTestResults(userId);
     } catch (e) {
       state = state.copyWith(errorMessage: 'Failed to complete test: $e');
     }
@@ -185,8 +161,8 @@ class TestNotifier extends StateNotifier<TestState> {
 }
 
 final testProvider = StateNotifierProvider<TestNotifier, TestState>((ref) {
-  final supabase = Supabase.instance.client;
-  return TestNotifier(supabase);
+  final convexService = ServiceManager.instance.convexService;
+  return TestNotifier(convexService);
 });
 
 final availableTestsProvider = Provider<List<TestModel>>((ref) {

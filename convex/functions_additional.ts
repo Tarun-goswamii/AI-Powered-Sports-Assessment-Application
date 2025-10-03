@@ -28,6 +28,7 @@ export const submitTestResultWithML = mutation({
       userId: args.userId,
       testId: args.testId,
       score: args.score,
+      status: 'completed',
       mlAnalysis: args.mlAnalysis,
       videoUrl: args.videoUrl,
       completedAt: args.completedAt,
@@ -807,6 +808,7 @@ export const seedComprehensiveDemoData = mutation({
           userId: user.id,
           testId: testType,
           score: Math.round(score),
+          status: 'completed',
           mlAnalysis: {
             cheatDetected: Math.random() < 0.1, // 10% chance of cheat detection
             poseAccuracy: 75 + Math.random() * 20,
@@ -1310,6 +1312,7 @@ export const quickSeedDemo = mutation({
           userId: user.id,
           testId: testType,
           score: Math.round(score),
+          status: 'completed',
           mlAnalysis: {
             cheatDetected: false,
             poseAccuracy: 80 + Math.random() * 15,

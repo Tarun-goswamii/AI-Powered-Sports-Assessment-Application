@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../core/theme/app_colors.dart';
+import '../../../../core/utils/responsive_utils.dart';
 import '../../../../core/services/service_manager.dart';
 import '../../../../core/models/mentor_model.dart';
 import '../../../../core/models/mentor_session_model.dart';
@@ -99,6 +100,7 @@ class _MentorScreenState extends ConsumerState<MentorScreen>
 
   @override
   Widget build(BuildContext context) {
+    final responsive = ResponsiveUtils(context);
     return Scaffold(
       backgroundColor: Colors.transparent,
       body: Container(

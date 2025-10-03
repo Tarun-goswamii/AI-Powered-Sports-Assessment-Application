@@ -2,6 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../core/theme/app_colors.dart';
+import '../../../../core/utils/responsive_utils.dart';
 import '../../../../shared/presentation/widgets/glass_card.dart';
 import '../../../../shared/presentation/widgets/neon_button.dart';
 
@@ -10,13 +11,15 @@ class CreditsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final responsive = ResponsiveUtils(context);
+    
     return Container(
       decoration: BoxDecoration(
         gradient: AppColors.backgroundGradient,
       ),
       child: SafeArea(
         child: SingleChildScrollView(
-          padding: const EdgeInsets.all(20),
+          padding: EdgeInsets.all(responsive.wp(5)),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -25,23 +28,23 @@ class CreditsScreen extends StatelessWidget {
                 children: [
                   IconButton(
                     onPressed: () => context.go('/settings'),
-                    icon: const Icon(Icons.arrow_back, color: Colors.white),
+                    icon: Icon(Icons.arrow_back, color: Colors.white, size: responsive.sp(24)),
                   ),
-                  const Expanded(
+                  Expanded(
                     child: Text(
                       'About & Credits',
                       style: TextStyle(
-                        fontSize: 28,
+                        fontSize: responsive.sp(28),
                         fontWeight: FontWeight.w700,
                         color: Colors.white,
                       ),
                       textAlign: TextAlign.center,
                     ),
                   ),
-                  const SizedBox(width: 48), // Balance the back button
+                  SizedBox(width: responsive.wp(12)), // Balance the back button
                 ],
               ),
-              const SizedBox(height: 24),
+              SizedBox(height: responsive.hp(3)),
 
               // App Logo and Info
               GlassCard(
@@ -153,7 +156,7 @@ class CreditsScreen extends StatelessWidget {
                     const SizedBox(height: 12),
                     _buildTechItem('Dart', 'Programming language', AppColors.royalPurple),
                     const SizedBox(height: 12),
-                    _buildTechItem('Supabase', 'Backend as a Service', AppColors.neonGreen),
+                    _buildTechItem('Convex', 'Backend as a Service', AppColors.neonGreen),
                     const SizedBox(height: 12),
                     _buildTechItem('TensorFlow Lite', 'AI/ML inference', AppColors.warmOrange),
                     const SizedBox(height: 12),
@@ -222,7 +225,7 @@ class CreditsScreen extends StatelessWidget {
                     ),
                     const SizedBox(height: 12),
                     Text(
-                      '• Indian Sports Federations for collaboration and validation\n• Beta testers and early adopters\n• Open source community for amazing tools\n• Flutter and Supabase teams for excellent frameworks',
+                      '• Indian Sports Federations for collaboration and validation\n• Beta testers and early adopters\n• Open source community for amazing tools\n• Flutter and Convex teams for excellent frameworks',
                       style: TextStyle(
                         fontSize: 14,
                         color: AppColors.textSecondary,

@@ -5,6 +5,7 @@ import 'package:camera/camera.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../core/services/video_analysis_service.dart';
 import '../../../../core/theme/app_colors.dart';
+import '../../../../core/utils/responsive_utils.dart';
 import '../../../../shared/presentation/widgets/glass_card.dart';
 
 class CameraCalibrationScreen extends StatefulWidget {

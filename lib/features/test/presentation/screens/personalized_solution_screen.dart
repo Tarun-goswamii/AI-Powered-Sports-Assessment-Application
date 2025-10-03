@@ -2,6 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../core/theme/app_colors.dart';
+import '../../../../core/utils/responsive_utils.dart';
 import '../../../../shared/presentation/widgets/glass_card.dart';
 import '../../../../shared/presentation/widgets/neon_button.dart';
 
@@ -38,6 +39,8 @@ class _PersonalizedSolutionScreenState extends State<PersonalizedSolutionScreen>
 
   @override
   Widget build(BuildContext context) {
+    final responsive = ResponsiveUtils(context);
+    
     return Scaffold(
       backgroundColor: AppColors.background,
       body: Container(
@@ -46,7 +49,7 @@ class _PersonalizedSolutionScreenState extends State<PersonalizedSolutionScreen>
         ),
         child: SafeArea(
           child: SingleChildScrollView(
-            padding: const EdgeInsets.all(20),
+            padding: EdgeInsets.all(responsive.wp(5)),
             child: FadeTransition(
               opacity: _fadeAnimation,
               child: Column(

@@ -6,6 +6,7 @@ import '../../../../core/theme/app_layout.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/services/auth_service.dart';
 import '../../../../core/services/service_manager.dart';
+import '../../../../core/utils/responsive_utils.dart';
 import '../../../../shared/presentation/widgets/glass_card.dart';
 import '../../../../shared/presentation/widgets/neon_button.dart';
 import '../widgets/test_card_new.dart';
@@ -198,6 +199,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with TickerProviderStat
 
   @override
   Widget build(BuildContext context) {
+    final responsive = ResponsiveUtils(context);
+    
     return Scaffold(
       backgroundColor: AppColors.background,
       body: Container(
@@ -207,32 +210,45 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with TickerProviderStat
         child: SafeArea(
           child: RefreshIndicator(
             onRefresh: _handleRefresh,
-            child: SingleChildScrollView(
-              physics: const AlwaysScrollableScrollPhysics(),
-              padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-              child: FadeTransition(
-                opacity: _fadeAnimation,
-                child: SlideTransition(
-                  position: _slideAnimation,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      _buildHeader(),
-                      SizedBox(height: AppLayout.homeScreenSpacing),
-                      ProgressCard(
-                        completedTests: _getCompletedTestsCount(),
-                        totalTests: _getTotalTestsCount(),
-                      ),
-                      SizedBox(height: AppLayout.homeScreenSpacing),
-                      _buildQuickAccessCards(),
-                      SizedBox(height: AppLayout.homeScreenSpacing),
-                      _buildTestGrid(),
-                      SizedBox(height: AppLayout.homeScreenSpacing),
-                      _buildQuickStats(),
-                    ],
+            child: LayoutBuilder(
+              builder: (context, constraints) {
+                return SingleChildScrollView(
+                  physics: const AlwaysScrollableScrollPhysics(),
+                  padding: EdgeInsets.symmetric(
+                    horizontal: responsive.wp(4),
+                    vertical: responsive.hp(1),
                   ),
-                ),
-              ),
+                  child: ConstrainedBox(
+                    constraints: BoxConstraints(
+                      minHeight: constraints.maxHeight,
+                    ),
+                    child: FadeTransition(
+                      opacity: _fadeAnimation,
+                      child: SlideTransition(
+                        position: _slideAnimation,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            _buildHeader(responsive),
+                            SizedBox(height: responsive.hp(2)),
+                            ProgressCard(
+                              completedTests: _getCompletedTestsCount(),
+                              totalTests: _getTotalTestsCount(),
+                            ),
+                            SizedBox(height: responsive.hp(2)),
+                            _buildQuickAccessCards(responsive),
+                            SizedBox(height: responsive.hp(2)),
+                            _buildTestGrid(responsive),
+                            SizedBox(height: responsive.hp(2)),
+                            _buildQuickStats(),
+                            SizedBox(height: responsive.hp(10)), // Extra bottom padding for scrolling
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                );
+              },
             ),
           ),
         ),
@@ -240,7 +256,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with TickerProviderStat
     );
   }
 
-  Widget _buildHeader() {
+  Widget _buildHeader(ResponsiveUtils responsive) {
     final authService = ref.watch(authServiceProvider);
     final user = authService.currentUser;
 
@@ -256,17 +272,17 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with TickerProviderStat
                 style: AppTypography.h2.copyWith(
                   color: AppColors.foreground,
                   fontWeight: FontWeight.w600,
-                  fontSize: 20, // Reduced font size to prevent overflow
+                  fontSize: responsive.sp(18).clamp(16.0, 22.0),
                 ),
                 overflow: TextOverflow.ellipsis,
                 maxLines: 1,
               ),
-              const SizedBox(height: 2),
+              SizedBox(height: responsive.hp(0.5)),
               Text(
                 'Ready to assess your performance?',
                 style: AppTypography.bodyMedium.copyWith(
                   color: AppColors.textSecondary,
-                  fontSize: 13, // Reduced font size
+                  fontSize: responsive.sp(12).clamp(11.0, 14.0),
                 ),
                 overflow: TextOverflow.ellipsis,
                 maxLines: 1,
@@ -285,14 +301,17 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with TickerProviderStat
                 child: GestureDetector(
                   onTap: () => context.push('/demo'),
                   child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6), // Reduced padding
+                    padding: EdgeInsets.symmetric(
+                      horizontal: responsive.wp(2),
+                      vertical: responsive.hp(0.7),
+                    ),
                     decoration: BoxDecoration(
                       color: AppColors.royalPurple.withOpacity(0.1),
                       border: Border.all(
                         color: AppColors.royalPurple.withOpacity(0.3),
                         width: 1,
                       ),
-                      borderRadius: BorderRadius.circular(16),
+                      borderRadius: BorderRadius.circular(responsive.wp(4)),
                     ),
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
@@ -300,15 +319,15 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with TickerProviderStat
                         Icon(
                           Icons.play_circle_outline,
                           color: AppColors.royalPurple,
-                          size: 14, // Reduced icon size
+                          size: responsive.sp(12).clamp(12.0, 16.0),
                         ),
-                        const SizedBox(width: 3),
+                        SizedBox(width: responsive.wp(1)),
                         Flexible(
                           child: Text(
                             'Demo',
                             style: TextStyle(
                               color: AppColors.royalPurple,
-                              fontSize: 10, // Reduced font size
+                              fontSize: responsive.sp(9).clamp(9.0, 12.0),
                               fontWeight: FontWeight.w600,
                             ),
                             overflow: TextOverflow.ellipsis,
@@ -319,13 +338,16 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with TickerProviderStat
                   ),
                 ),
               ),
-              const SizedBox(width: 6), // Reduced spacing
+              SizedBox(width: responsive.wp(1.5)),
               // Daily bonus button
               Flexible(
                 child: GestureDetector(
                   onTap: _showDailyLoginBonus,
                   child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6), // Reduced padding
+                    padding: EdgeInsets.symmetric(
+                      horizontal: responsive.wp(2),
+                      vertical: responsive.hp(0.7),
+                    ),
                     decoration: BoxDecoration(
                       gradient: LinearGradient(
                         colors: [
@@ -333,12 +355,12 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with TickerProviderStat
                           AppColors.neonGreen.withOpacity(0.6),
                         ],
                       ),
-                      borderRadius: BorderRadius.circular(16),
+                      borderRadius: BorderRadius.circular(responsive.wp(4)),
                       boxShadow: [
                         BoxShadow(
                           color: AppColors.neonGreen.withOpacity(0.3),
-                          blurRadius: 8,
-                          offset: const Offset(0, 2),
+                          blurRadius: responsive.wp(2),
+                          offset: Offset(0, responsive.hp(0.25)),
                         ),
                       ],
                     ),
@@ -348,15 +370,15 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with TickerProviderStat
                         Icon(
                           Icons.card_giftcard,
                           color: Colors.white,
-                          size: 14, // Reduced icon size
+                          size: responsive.sp(12).clamp(12.0, 16.0),
                         ),
-                        const SizedBox(width: 3),
+                        SizedBox(width: responsive.wp(1)),
                         Flexible(
                           child: Text(
                             'Bonus',
                             style: TextStyle(
                               color: Colors.white,
-                              fontSize: 10, // Reduced font size
+                              fontSize: responsive.sp(9).clamp(9.0, 12.0),
                               fontWeight: FontWeight.w600,
                             ),
                             overflow: TextOverflow.ellipsis,
@@ -374,12 +396,12 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with TickerProviderStat
     );
   }
 
-  Widget _buildQuickAccessCards() {
+  Widget _buildQuickAccessCards(ResponsiveUtils responsive) {
     return SizedBox(
-      height: 130, // Reduced height to prevent overflow
+      height: responsive.hp(16).clamp(120.0, 150.0),
       child: ListView.builder(
         scrollDirection: Axis.horizontal,
-        padding: const EdgeInsets.symmetric(horizontal: 4), // Add padding at edges
+        padding: EdgeInsets.symmetric(horizontal: responsive.wp(1)),
         itemCount: AppLayout.quickAccessCardCount,
         itemBuilder: (context, index) {
           final cardData = _getQuickAccessCardData(index);
@@ -392,12 +414,12 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with TickerProviderStat
               return Opacity(
                 opacity: value,
                 child: Transform.translate(
-                  offset: Offset(0, 20 * (1 - value)),
+                  offset: Offset(0, responsive.hp(2.5) * (1 - value)),
                   child: Container(
-                    width: 110, // Reduced width for better fit
+                    width: responsive.wp(29).clamp(100.0, 130.0),
                     margin: EdgeInsets.only(
                       right: index < AppLayout.quickAccessCardCount - 1
-                          ? 12 // Consistent spacing
+                          ? responsive.wp(3)
                           : 0,
                     ),
                     child: child,
@@ -418,7 +440,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with TickerProviderStat
     );
   }
 
-  Widget _buildTestGrid() {
+  Widget _buildTestGrid(ResponsiveUtils responsive) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -426,19 +448,20 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with TickerProviderStat
           'Available Tests',
           style: AppTypography.h3.copyWith(
             color: AppColors.foreground,
+            fontSize: responsive.sp(18).clamp(16.0, 22.0),
           ),
         ),
-        const SizedBox(height: 16),
+        SizedBox(height: responsive.hp(2)),
         GridView.builder(
           shrinkWrap: true,
           physics: const NeverScrollableScrollPhysics(),
-          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: 2, // Fixed to 2 columns
-            crossAxisSpacing: 12.0, // Consistent spacing
-            mainAxisSpacing: 12.0,
-            childAspectRatio: 0.9, // Adjusted aspect ratio to prevent overflow
+          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: 2,
+            crossAxisSpacing: responsive.wp(3),
+            mainAxisSpacing: responsive.hp(1.5),
+            childAspectRatio: 0.85,
           ),
-          itemCount: _availableTests.isNotEmpty ? _availableTests.length.clamp(0, 6) : 6, // Use actual data or fallback
+          itemCount: _availableTests.isNotEmpty ? _availableTests.length.clamp(0, 6) : 6,
           itemBuilder: (context, index) {
             // Use available tests data if loaded, otherwise use mock data
             final testData = _availableTests.isNotEmpty && index < _availableTests.length

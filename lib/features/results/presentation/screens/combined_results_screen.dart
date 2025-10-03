@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../core/theme/app_colors.dart';
+import '../../../../core/utils/responsive_utils.dart';
 import '../../../../core/services/service_manager.dart';
 import '../../../../shared/presentation/widgets/glass_card.dart';
 import '../widgets/analytics_charts.dart';
@@ -68,6 +69,8 @@ class _CombinedResultsScreenState extends ConsumerState<CombinedResultsScreen>
 
   @override
   Widget build(BuildContext context) {
+    final responsive = ResponsiveUtils(context);
+    
     return Container(
       decoration: BoxDecoration(
         gradient: AppColors.backgroundGradient,
@@ -77,23 +80,23 @@ class _CombinedResultsScreenState extends ConsumerState<CombinedResultsScreen>
           children: [
             // Header
             Padding(
-              padding: const EdgeInsets.all(20),
+              padding: EdgeInsets.all(responsive.wp(5)),
               child: Row(
                 children: [
                   IconButton(
                     onPressed: () => context.go('/home'),
-                    icon: const Icon(Icons.arrow_back, color: Colors.white),
+                    icon: Icon(Icons.arrow_back, color: Colors.white, size: responsive.sp(24)),
                     style: IconButton.styleFrom(
                       backgroundColor: AppColors.card.withOpacity(0.5),
-                      padding: const EdgeInsets.all(12),
+                      padding: EdgeInsets.all(responsive.wp(3)),
                     ),
                   ),
-                  const SizedBox(width: 16),
-                  const Expanded(
+                  SizedBox(width: responsive.wp(4)),
+                  Expanded(
                     child: Text(
                       'My Results',
                       style: TextStyle(
-                        fontSize: 28,
+                        fontSize: responsive.sp(28),
                         fontWeight: FontWeight.w700,
                         color: Colors.white,
                       ),

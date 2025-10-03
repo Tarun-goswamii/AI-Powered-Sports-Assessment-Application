@@ -5,6 +5,7 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/services/video_analysis_service.dart';
 import '../../../../shared/presentation/widgets/glass_card.dart';
 import '../../../../shared/presentation/widgets/neon_button.dart';
+import '../../../../core/utils/responsive_utils.dart';
 
 class TestDetailScreen extends StatelessWidget {
   final ExerciseType exerciseType;
@@ -16,6 +17,7 @@ class TestDetailScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final responsive = ResponsiveUtils(context);
     return Scaffold(
       backgroundColor: AppColors.background,
       body: Container(
@@ -27,19 +29,19 @@ class TestDetailScreen extends StatelessWidget {
             children: [
               // Header
               Padding(
-                padding: const EdgeInsets.all(20),
+                padding: EdgeInsets.all(responsive.wp(5)),
                 child: Row(
                   children: [
                     IconButton(
                       onPressed: () => context.go('/home'),
                       icon: const Icon(Icons.arrow_back, color: Colors.white),
                     ),
-                    const SizedBox(width: 16),
-                    const Expanded(
+                    SizedBox(width: responsive.wp(4)),
+                    Expanded(
                       child: Text(
                         '40m Sprint Test',
                         style: TextStyle(
-                          fontSize: 24,
+                          fontSize: responsive.sp(24).clamp(22.0, 28.0),
                           fontWeight: FontWeight.w700,
                           color: Colors.white,
                         ),
@@ -51,13 +53,13 @@ class TestDetailScreen extends StatelessWidget {
               // Content
               Expanded(
                 child: SingleChildScrollView(
-                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  padding: EdgeInsets.symmetric(horizontal: responsive.wp(5)),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       // Test Overview Card
                       GlassCard(
-                        padding: const EdgeInsets.all(24),
+                        padding: EdgeInsets.all(responsive.wp(6)),
                         enableNeonGlow: true,
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -65,40 +67,40 @@ class TestDetailScreen extends StatelessWidget {
                             Row(
                               children: [
                                 Container(
-                                  width: 60,
-                                  height: 60,
+                                  width: responsive.wp(16).clamp(50.0, 70.0),
+                                  height: responsive.wp(16).clamp(50.0, 70.0),
                                   decoration: BoxDecoration(
                                     gradient: LinearGradient(
                                       colors: [AppColors.royalPurple, AppColors.electricBlue],
                                       begin: Alignment.topLeft,
                                       end: Alignment.bottomRight,
                                     ),
-                                    borderRadius: BorderRadius.circular(16),
+                                    borderRadius: BorderRadius.circular(responsive.wp(4)),
                                   ),
                                   child: Icon(
                                     _getExerciseIcon(exerciseType),
                                     color: Colors.white,
-                                    size: 30,
+                                    size: responsive.sp(30).clamp(26.0, 34.0),
                                   ),
                                 ),
-                                const SizedBox(width: 16),
+                                SizedBox(width: responsive.wp(4)),
                                 Expanded(
                                   child: Column(
                                     crossAxisAlignment: CrossAxisAlignment.start,
                                     children: [
                                       Text(
                                         VideoAnalysisService.getExerciseName(exerciseType),
-                                        style: const TextStyle(
-                                          fontSize: 20,
+                                        style: TextStyle(
+                                          fontSize: responsive.sp(20).clamp(18.0, 24.0),
                                           fontWeight: FontWeight.w700,
                                           color: Colors.white,
                                         ),
                                       ),
-                                      const SizedBox(height: 4),
+                                      SizedBox(height: responsive.hp(0.5)),
                                       Text(
                                         _getExerciseDescription(exerciseType),
-                                        style: const TextStyle(
-                                          fontSize: 14,
+                                        style: TextStyle(
+                                          fontSize: responsive.sp(14).clamp(12.0, 16.0),
                                           color: AppColors.textSecondary,
                                         ),
                                       ),
@@ -107,40 +109,40 @@ class TestDetailScreen extends StatelessWidget {
                                 ),
                               ],
                             ),
-                            const SizedBox(height: 24),
+                            SizedBox(height: responsive.hp(3)),
                             Row(
                               children: [
                                 _buildStatItem('Duration', '30 sec', Icons.timer),
-                                const SizedBox(width: 24),
+                                SizedBox(width: responsive.wp(6)),
                                 _buildStatItem('Credits', '+50', Icons.stars),
-                                const SizedBox(width: 24),
+                                SizedBox(width: responsive.wp(6)),
                                 _buildStatItem('Difficulty', 'Medium', Icons.trending_up),
                               ],
                             ),
                           ],
                         ),
                       ),
-                      const SizedBox(height: 24),
+                      SizedBox(height: responsive.hp(3)),
 
                       // Test Description
                       GlassCard(
-                        padding: const EdgeInsets.all(24),
+                        padding: EdgeInsets.all(responsive.wp(6)),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            const Text(
+                            Text(
                               'Test Description',
                               style: TextStyle(
-                                fontSize: 18,
+                                fontSize: responsive.sp(18).clamp(16.0, 20.0),
                                 fontWeight: FontWeight.w600,
                                 color: Colors.white,
                               ),
                             ),
-                            const SizedBox(height: 16),
+                            SizedBox(height: responsive.hp(2)),
                             Text(
                               'The 40m sprint test measures your acceleration and maximum speed capabilities. This test is crucial for athletes in sports requiring quick bursts of speed like football, basketball, and track events.',
                               style: TextStyle(
-                                fontSize: 16,
+                                fontSize: responsive.sp(16).clamp(14.0, 18.0),
                                 color: AppColors.textSecondary.withOpacity(0.9),
                                 height: 1.6,
                               ),
@@ -270,101 +272,116 @@ class TestDetailScreen extends StatelessWidget {
 
   Widget _buildStatItem(String label, String value, IconData icon) {
     return Expanded(
-      child: Column(
-        children: [
-          Icon(
-            icon,
-            color: AppColors.royalPurple,
-            size: 24,
-          ),
-          const SizedBox(height: 8),
-          Text(
-            value,
-            style: const TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.w700,
-              color: Colors.white,
-            ),
-          ),
-          const SizedBox(height: 4),
-          Text(
-            label,
-            style: TextStyle(
-              fontSize: 12,
+      child: Builder(
+        builder: (context) {
+          final responsive = ResponsiveUtils(context);
+          return Column(
+            children: [
+              Icon(
+                icon,
+                color: AppColors.royalPurple,
+                size: responsive.sp(24).clamp(20.0, 28.0),
+              ),
+              SizedBox(height: responsive.hp(1)),
+              Text(
+                value,
+                style: TextStyle(
+                  fontSize: responsive.sp(16).clamp(14.0, 18.0),
+                  fontWeight: FontWeight.w700,
+                  color: Colors.white,
+                ),
+              ),
+              SizedBox(height: responsive.hp(0.5)),
+              Text(
+                label,
+                style: TextStyle(
+                  fontSize: responsive.sp(12).clamp(10.0, 14.0),
               color: AppColors.textSecondary,
             ),
             textAlign: TextAlign.center,
-          ),
-        ],
+              ),
+            ],
+          );
+        },
       ),
     );
   }
 
   Widget _buildRequirementItem(IconData icon, String text) {
-    return Row(
-      children: [
-        Container(
-          width: 32,
-          height: 32,
-          decoration: BoxDecoration(
-            color: AppColors.royalPurple.withOpacity(0.1),
-            borderRadius: BorderRadius.circular(8),
-          ),
-          child: Icon(
-            icon,
-            color: AppColors.royalPurple,
-            size: 16,
-          ),
-        ),
-        const SizedBox(width: 12),
-        Expanded(
-          child: Text(
-            text,
-            style: const TextStyle(
-              fontSize: 14,
-              color: Colors.white,
-              height: 1.4,
+    return Builder(
+      builder: (context) {
+        final responsive = ResponsiveUtils(context);
+        return Row(
+          children: [
+            Container(
+              width: responsive.wp(8).clamp(28.0, 36.0),
+              height: responsive.wp(8).clamp(28.0, 36.0),
+              decoration: BoxDecoration(
+                color: AppColors.royalPurple.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(responsive.wp(2)),
+              ),
+              child: Icon(
+                icon,
+                color: AppColors.royalPurple,
+                size: responsive.sp(16).clamp(14.0, 18.0),
+              ),
             ),
-          ),
-        ),
-      ],
+            SizedBox(width: responsive.wp(3)),
+            Expanded(
+              child: Text(
+                text,
+                style: TextStyle(
+                  fontSize: responsive.sp(14).clamp(12.0, 16.0),
+                  color: Colors.white,
+                  height: 1.4,
+                ),
+              ),
+            ),
+          ],
+        );
+      },
     );
   }
 
   Widget _buildInstructionStep(String step, String text) {
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Container(
-          width: 24,
-          height: 24,
-          decoration: BoxDecoration(
-            color: AppColors.electricBlue,
-            borderRadius: BorderRadius.circular(12),
-          ),
-          child: Center(
-            child: Text(
-              step,
-              style: const TextStyle(
-                fontSize: 12,
-                fontWeight: FontWeight.w700,
-                color: Colors.white,
+    return Builder(
+      builder: (context) {
+        final responsive = ResponsiveUtils(context);
+        return Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Container(
+              width: responsive.wp(6).clamp(20.0, 28.0),
+              height: responsive.wp(6).clamp(20.0, 28.0),
+              decoration: BoxDecoration(
+                color: AppColors.electricBlue,
+                borderRadius: BorderRadius.circular(responsive.wp(3)),
+              ),
+              child: Center(
+                child: Text(
+                  step,
+                  style: TextStyle(
+                    fontSize: responsive.sp(12).clamp(10.0, 14.0),
+                    fontWeight: FontWeight.w700,
+                    color: Colors.white,
+                  ),
+                ),
               ),
             ),
-          ),
-        ),
-        const SizedBox(width: 12),
-        Expanded(
-          child: Text(
-            text,
-            style: TextStyle(
-              fontSize: 14,
-              color: AppColors.textSecondary.withOpacity(0.9),
-              height: 1.4,
+            SizedBox(width: responsive.wp(3)),
+            Expanded(
+              child: Text(
+                text,
+                style: TextStyle(
+                  fontSize: responsive.sp(14).clamp(12.0, 16.0),
+                  color: AppColors.textSecondary.withOpacity(0.9),
+                  height: 1.4,
+                ),
+              ),
             ),
-          ),
-        ),
-      ],
+          ],
+        );
+      },
     );
   }
 

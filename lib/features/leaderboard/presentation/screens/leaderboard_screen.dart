@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/services/service_manager.dart';
+import '../../../../core/utils/responsive_utils.dart';
 import '../../../../shared/presentation/widgets/glass_card.dart';
 import '../../../../shared/presentation/widgets/neon_button.dart';
 
@@ -39,6 +40,8 @@ class _LeaderboardScreenState extends ConsumerState<LeaderboardScreen>
 
   @override
   Widget build(BuildContext context) {
+    final responsive = ResponsiveUtils(context);
+    
     return Container(
       decoration: BoxDecoration(
         gradient: AppColors.backgroundGradient,
@@ -48,7 +51,7 @@ class _LeaderboardScreenState extends ConsumerState<LeaderboardScreen>
           children: [
             // Header
             Padding(
-              padding: const EdgeInsets.all(20),
+              padding: EdgeInsets.all(responsive.wp(5)),
               child: Row(
                 children: [
                   IconButton(
@@ -56,25 +59,28 @@ class _LeaderboardScreenState extends ConsumerState<LeaderboardScreen>
                     icon: const Icon(Icons.arrow_back, color: Colors.white),
                     style: IconButton.styleFrom(
                       backgroundColor: AppColors.card.withOpacity(0.5),
-                      padding: const EdgeInsets.all(12),
+                      padding: EdgeInsets.all(responsive.wp(3)),
                     ),
                   ),
-                  const SizedBox(width: 16),
-                  const Expanded(
+                  SizedBox(width: responsive.wp(4)),
+                  Expanded(
                     child: Text(
                       'Leaderboard',
                       style: TextStyle(
-                        fontSize: 28,
+                        fontSize: responsive.sp(28),
                         fontWeight: FontWeight.w700,
                         color: Colors.white,
                       ),
                     ),
                   ),
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                    padding: EdgeInsets.symmetric(
+                      horizontal: responsive.wp(3),
+                      vertical: responsive.hp(0.8),
+                    ),
                     decoration: BoxDecoration(
                       color: AppColors.card.withOpacity(0.3),
-                      borderRadius: BorderRadius.circular(20),
+                      borderRadius: BorderRadius.circular(responsive.wp(5)),
                     ),
                     child: DropdownButton<String>(
                       value: _selectedFilter,
@@ -107,10 +113,10 @@ class _LeaderboardScreenState extends ConsumerState<LeaderboardScreen>
 
             // Tab Bar
             Container(
-              margin: const EdgeInsets.symmetric(horizontal: 20),
+              margin: EdgeInsets.symmetric(horizontal: responsive.wp(5)),
               decoration: BoxDecoration(
                 color: AppColors.card.withOpacity(0.3),
-                borderRadius: BorderRadius.circular(12),
+                borderRadius: BorderRadius.circular(responsive.wp(3)),
               ),
               child: TabBar(
                 controller: _tabController,

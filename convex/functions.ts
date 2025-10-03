@@ -44,6 +44,7 @@ export const saveTestResult = mutation({
       userId: args.userId,
       testId: args.testId,
       score: args.score,
+      status: 'completed',
       completedAt: Date.now(),
     });
 

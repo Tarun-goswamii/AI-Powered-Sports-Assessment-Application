@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../shared/presentation/widgets/glass_card.dart';
 import '../../../../shared/presentation/widgets/neon_button.dart';
+import '../../../../core/utils/responsive_utils.dart';
 
 class DailyLoginBonus extends StatefulWidget {
   final VoidCallback? onClaimBonus;
@@ -55,6 +56,7 @@ class _DailyLoginBonusState extends State<DailyLoginBonus>
 
   @override
   Widget build(BuildContext context) {
+    final responsive = ResponsiveUtils(context);
     return AnimatedBuilder(
       animation: _animationController,
       builder: (context, child) {
@@ -65,15 +67,15 @@ class _DailyLoginBonusState extends State<DailyLoginBonus>
             child: Dialog(
               backgroundColor: Colors.transparent,
               child: GlassCard(
-                padding: const EdgeInsets.all(32),
+                padding: EdgeInsets.all(responsive.wp(8).clamp(24.0, 36.0)),
                 enableNeonGlow: true,
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     // Celebration icon with glow
                     Container(
-                      width: 80,
-                      height: 80,
+                      width: responsive.wp(20).clamp(70.0, 90.0),
+                      height: responsive.wp(20).clamp(70.0, 90.0),
                       decoration: BoxDecoration(
                         gradient: LinearGradient(
                           colors: [
@@ -92,55 +94,58 @@ class _DailyLoginBonusState extends State<DailyLoginBonus>
                           ),
                         ],
                       ),
-                      child: const Icon(
+                      child: Icon(
                         Icons.celebration,
                         color: Colors.white,
-                        size: 40,
+                        size: responsive.sp(40).clamp(36.0, 48.0),
                       ),
                     ),
-                    const SizedBox(height: 24),
-                    const Text(
+                    SizedBox(height: responsive.hp(3)),
+                    Text(
                       'Daily Bonus!',
                       style: TextStyle(
-                        fontSize: 24,
+                        fontSize: responsive.sp(24).clamp(22.0, 28.0),
                         fontWeight: FontWeight.w700,
                         color: Colors.white,
                         letterSpacing: -0.5,
                       ),
                       textAlign: TextAlign.center,
                     ),
-                    const SizedBox(height: 12),
+                    SizedBox(height: responsive.hp(1.5)),
                     Text(
                       'Welcome back! Claim your daily login bonus of 10 credits.',
                       style: TextStyle(
-                        fontSize: 16,
+                        fontSize: responsive.sp(16).clamp(14.0, 18.0),
                         color: AppColors.textSecondary.withOpacity(0.9),
                         height: 1.5,
                       ),
                       textAlign: TextAlign.center,
                     ),
-                    const SizedBox(height: 8),
+                    SizedBox(height: responsive.hp(1)),
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                      padding: EdgeInsets.symmetric(
+                        horizontal: responsive.wp(4).clamp(12.0, 18.0),
+                        vertical: responsive.hp(1).clamp(6.0, 10.0),
+                      ),
                       decoration: BoxDecoration(
                         color: AppColors.neonGreen.withOpacity(0.1),
-                        borderRadius: BorderRadius.circular(20),
+                        borderRadius: BorderRadius.circular(responsive.wp(5).clamp(18.0, 24.0)),
                         border: Border.all(
                           color: AppColors.neonGreen.withOpacity(0.3),
                           width: 1,
                         ),
                       ),
-                      child: const Text(
+                      child: Text(
                         '+10 Credits',
                         style: TextStyle(
-                          fontSize: 14,
+                          fontSize: responsive.sp(14).clamp(12.0, 16.0),
                           color: AppColors.neonGreen,
                           fontWeight: FontWeight.w600,
                           letterSpacing: 0.5,
                         ),
                       ),
                     ),
-                    const SizedBox(height: 32),
+                    SizedBox(height: responsive.hp(4)),
                     NeonButton(
                       text: 'Claim Bonus',
                       onPressed: () {

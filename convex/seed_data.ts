@@ -144,7 +144,7 @@ export const seedAllData = mutation({
 
     // Insert all test results
     for (const result of testResults) {
-      await ctx.db.insert("test_results", result);
+      await ctx.db.insert("test_results", { ...result, status: 'completed' });
     }
 
     // Create leaderboard entries for all users

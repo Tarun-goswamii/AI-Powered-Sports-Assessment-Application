@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/services/service_manager.dart';
 import '../../../../shared/presentation/widgets/glass_card.dart';
+import '../../../../core/utils/responsive_utils.dart';
 
 class ProfileScreen extends ConsumerStatefulWidget {
   const ProfileScreen({super.key});
@@ -110,6 +111,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final responsive = ResponsiveUtils(context);
     final authService = ref.watch(authServiceProvider);
     final user = authService.currentUser;
 
@@ -119,18 +121,18 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
       ),
       child: SafeArea(
         child: SingleChildScrollView(
-          padding: const EdgeInsets.all(20),
+          padding: EdgeInsets.all(responsive.wp(5)),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               // Header
               Row(
                 children: [
-                  const Expanded(
+                  Expanded(
                     child: Text(
                       'My Profile',
                       style: TextStyle(
-                        fontSize: 28,
+                        fontSize: responsive.sp(28),
                         fontWeight: FontWeight.w700,
                         color: Colors.white,
                       ),
@@ -142,17 +144,17 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                   ),
                 ],
               ),
-              const SizedBox(height: 24),
+              SizedBox(height: responsive.hp(3)),
 
               // Profile Header
               GlassCard(
-                padding: const EdgeInsets.all(24),
+                padding: EdgeInsets.all(responsive.wp(6)),
                 child: Column(
                   children: [
                     Stack(
                       children: [
                         CircleAvatar(
-                          radius: 50,
+                          radius: responsive.wp(12.5),
                           backgroundColor: AppColors.royalPurple.withOpacity(0.2),
                           child: Text(
                             user?.displayName?.isNotEmpty == true
@@ -160,9 +162,9 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                                 : user?.email?.isNotEmpty == true
                                     ? user!.email![0].toUpperCase()
                                     : 'A',
-                            style: const TextStyle(
+                            style: TextStyle(
                               color: AppColors.royalPurple,
-                              fontSize: 36,
+                              fontSize: responsive.sp(36),
                               fontWeight: FontWeight.w600,
                             ),
                           ),
@@ -171,31 +173,31 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                           right: 0,
                           bottom: 0,
                           child: Container(
-                            padding: const EdgeInsets.all(8),
+                            padding: EdgeInsets.all(responsive.wp(2)),
                             decoration: BoxDecoration(
                               color: AppColors.neonGreen,
-                              borderRadius: BorderRadius.circular(20),
+                              borderRadius: BorderRadius.circular(responsive.wp(5)),
                               border: Border.all(color: AppColors.background, width: 3),
                             ),
-                            child: const Icon(
+                            child: Icon(
                               Icons.edit,
                               color: Colors.white,
-                              size: 16,
+                              size: responsive.sp(16),
                             ),
                           ),
                         ),
                       ],
                     ),
-                    const SizedBox(height: 16),
+                    SizedBox(height: responsive.hp(2)),
                     Text(
                       user?.displayName ?? 'Athlete',
-                      style: const TextStyle(
-                        fontSize: 24,
+                      style: TextStyle(
+                        fontSize: responsive.sp(24),
                         fontWeight: FontWeight.w700,
                         color: Colors.white,
                       ),
                     ),
-                    const SizedBox(height: 4),
+                    SizedBox(height: responsive.hp(0.5)),
                     Text(
                       user?.email ?? 'athlete@email.com',
                       style: TextStyle(

@@ -1,6 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
 import '../models/user_model.dart';
+import '../services/service_manager.dart';
 
 enum AuthStatus { initial, loading, authenticated, unauthenticated, error }
 
@@ -29,41 +29,38 @@ class AuthState {
 }
 
 class AuthNotifier extends StateNotifier<AuthState> {
-  final SupabaseClient _supabase;
-
-  AuthNotifier(this._supabase) : super(const AuthState(status: AuthStatus.initial)) {
+  AuthNotifier() : super(const AuthState(status: AuthStatus.initial)) {
     _initializeAuth();
   }
 
   void _initializeAuth() {
-    // Listen to auth state changes
-    _supabase.auth.onAuthStateChange.listen((event) {
-      final session = event.session;
-      if (session?.user != null) {
-        _loadUserProfile(session!.user.id);
-      } else {
-        state = const AuthState(status: AuthStatus.unauthenticated);
-      }
-    });
+    // Initialize with unauthenticated state
+    // Auth is now handled through ConvexService and AuthService
+    state = const AuthState(status: AuthStatus.unauthenticated);
+  }
 
-    // Check current session
-    final currentUser = _supabase.auth.currentUser;
-    if (currentUser != null) {
-      _loadUserProfile(currentUser.id);
-    } else {
-      state = const AuthState(status: AuthStatus.unauthenticated);
-    }
+  void setAuthenticated(UserModel user) {
+    state = AuthState(status: AuthStatus.authenticated, user: user);
+  }
+
+  void setUnauthenticated() {
+    state = const AuthState(status: AuthStatus.unauthenticated);
+  }
+
+  void setLoading() {
+    state = state.copyWith(status: AuthStatus.loading);
+  }
+
+  void setError(String message) {
+    state = state.copyWith(status: AuthStatus.error, errorMessage: message);
   }
 
   Future<void> _loadUserProfile(String userId) async {
     try {
-      final response = await _supabase
-          .from('profiles')
-          .select()
-          .eq('id', userId)
-          .single();
-
-      final user = UserModel.fromJson(response);
+      final convexService = ServiceManager.instance.convexService;
+      final response = await convexService.query('users:getById', {'userId': userId});
+      
+      final user = UserModel.fromJson(response as Map<String, dynamic>);
       state = AuthState(status: AuthStatus.authenticated, user: user);
     } catch (e) {
       state = AuthState(
@@ -77,19 +74,15 @@ class AuthNotifier extends StateNotifier<AuthState> {
     state = state.copyWith(status: AuthStatus.loading);
 
     try {
-      final response = await _supabase.auth.signInWithPassword(
-        email: email,
-        password: password,
-      );
+      final convexService = ServiceManager.instance.convexService;
+      final response = await convexService.mutation('auth:signIn', {
+        'email': email,
+        'password': password,
+      });
 
-      if (response.user != null) {
-        await _loadUserProfile(response.user!.id);
+      if (response != null && response['userId'] != null) {
+        await _loadUserProfile(response['userId'] as String);
       }
-    } on AuthException catch (e) {
-      state = AuthState(
-        status: AuthStatus.error,
-        errorMessage: e.message,
-      );
     } catch (e) {
       state = AuthState(
         status: AuthStatus.error,
@@ -106,22 +99,16 @@ class AuthNotifier extends StateNotifier<AuthState> {
     state = state.copyWith(status: AuthStatus.loading);
 
     try {
-      final response = await _supabase.auth.signUp(
-        email: email,
-        password: password,
-        data: {'name': name},
-      );
+      final convexService = ServiceManager.instance.convexService;
+      final response = await convexService.mutation('auth:signUp', {
+        'email': email,
+        'password': password,
+        'name': name,
+      });
 
-      if (response.user != null) {
-        // Create user profile
-        await _createUserProfile(response.user!.id, email, name);
-        await _loadUserProfile(response.user!.id);
+      if (response != null && response['userId'] != null) {
+        await _loadUserProfile(response['userId'] as String);
       }
-    } on AuthException catch (e) {
-      state = AuthState(
-        status: AuthStatus.error,
-        errorMessage: e.message,
-      );
     } catch (e) {
       state = AuthState(
         status: AuthStatus.error,
@@ -130,22 +117,8 @@ class AuthNotifier extends StateNotifier<AuthState> {
     }
   }
 
-  Future<void> _createUserProfile(String userId, String email, String name) async {
-    final profileData = {
-      'id': userId,
-      'email': email,
-      'name': name,
-      'credits': 100, // Starting credits
-      'created_at': DateTime.now().toIso8601String(),
-      'updated_at': DateTime.now().toIso8601String(),
-    };
-
-    await _supabase.from('profiles').insert(profileData);
-  }
-
   Future<void> signOut() async {
     try {
-      await _supabase.auth.signOut();
       state = const AuthState(status: AuthStatus.unauthenticated);
     } catch (e) {
       state = AuthState(
@@ -159,22 +132,18 @@ class AuthNotifier extends StateNotifier<AuthState> {
     if (state.user == null) return;
 
     try {
-      final updateData = {
+      final convexService = ServiceManager.instance.convexService;
+      await convexService.mutation('users:update', {
+        'userId': state.user!.id,
         'name': updatedUser.name,
         'phone': updatedUser.phone,
-        'date_of_birth': updatedUser.dateOfBirth?.toIso8601String(),
+        'dateOfBirth': updatedUser.dateOfBirth?.toIso8601String(),
         'gender': updatedUser.gender,
         'height': updatedUser.height,
         'weight': updatedUser.weight,
         'sport': updatedUser.sport,
         'level': updatedUser.level,
-        'updated_at': DateTime.now().toIso8601String(),
-      };
-
-      await _supabase
-          .from('profiles')
-          .update(updateData)
-          .eq('id', state.user!.id);
+      });
 
       state = state.copyWith(user: updatedUser);
     } catch (e) {
@@ -190,8 +159,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
 }
 
 final authProvider = StateNotifierProvider<AuthNotifier, AuthState>((ref) {
-  final supabase = Supabase.instance.client;
-  return AuthNotifier(supabase);
+  return AuthNotifier();
 });
 
 final currentUserProvider = Provider<UserModel?>((ref) {

@@ -27,6 +27,14 @@ export default defineSchema({
     userId: v.id("users"),
     testId: v.string(),
     score: v.number(),
+    status: v.string(), // 'pending', 'in_progress', 'completed'
+    rawData: v.optional(v.any()),
+    processedData: v.optional(v.any()),
+    recommendations: v.optional(v.array(v.string())),
+    grade: v.optional(v.string()),
+    percentile: v.optional(v.number()),
+    feedback: v.optional(v.string()),
+    startedAt: v.optional(v.number()),
     mlAnalysis: v.optional(v.object({
       cheatDetected: v.boolean(),
       poseAccuracy: v.number(),
@@ -48,7 +56,8 @@ export default defineSchema({
   })
     .index("by_user", ["userId"])
     .index("by_score", ["score"])
-    .index("by_completedAt", ["completedAt"]),
+    .index("by_completedAt", ["completedAt"])
+    .index("by_status", ["status"]),
 
   community_posts: defineTable({
     userId: v.id("users"),
@@ -185,4 +194,18 @@ export default defineSchema({
     .index("by_user", ["userId"])
     .index("by_mentor", ["mentorId"])
     .index("by_user_mentor", ["userId", "mentorId"]),
+
+  credit_transactions: defineTable({
+    userId: v.id("users"),
+    amount: v.number(),
+    type: v.string(), // 'earned', 'spent', 'bonus', 'reward'
+    description: v.string(),
+    referenceId: v.optional(v.string()),
+    referenceType: v.optional(v.string()), // 'test', 'achievement', 'purchase', 'daily_bonus'
+    createdAt: v.number(),
+    expiresAt: v.optional(v.number()),
+  })
+    .index("by_user", ["userId"])
+    .index("by_type", ["type"])
+    .index("by_createdAt", ["createdAt"]),
 });

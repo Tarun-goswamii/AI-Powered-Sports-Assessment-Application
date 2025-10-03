@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../shared/presentation/widgets/glass_card.dart';
 import '../../../../shared/presentation/widgets/neon_button.dart';
+import '../../../../core/utils/responsive_utils.dart';
 
 class HelpScreen extends StatefulWidget {
   const HelpScreen({super.key});
@@ -30,6 +31,7 @@ class _HelpScreenState extends State<HelpScreen>
 
   @override
   Widget build(BuildContext context) {
+    final responsive = ResponsiveUtils(context);
     return Container(
       decoration: BoxDecoration(
         gradient: AppColors.backgroundGradient,
@@ -39,35 +41,35 @@ class _HelpScreenState extends State<HelpScreen>
           children: [
             // Header
             Padding(
-              padding: const EdgeInsets.all(20),
+              padding: EdgeInsets.all(responsive.wp(5)),
               child: Row(
                 children: [
                   IconButton(
                     onPressed: () => context.go('/settings'),
                     icon: const Icon(Icons.arrow_back, color: Colors.white),
                   ),
-                  const Expanded(
+                  Expanded(
                     child: Text(
                       'Help & Support',
                       style: TextStyle(
-                        fontSize: 28,
+                        fontSize: responsive.sp(28),
                         fontWeight: FontWeight.w700,
                         color: Colors.white,
                       ),
                       textAlign: TextAlign.center,
                     ),
                   ),
-                  const SizedBox(width: 48), // Balance the back button
+                  SizedBox(width: responsive.wp(12)), // Balance the back button
                 ],
               ),
             ),
 
             // Tab Bar
             Container(
-              margin: const EdgeInsets.symmetric(horizontal: 20),
+              margin: EdgeInsets.symmetric(horizontal: responsive.wp(5)),
               decoration: BoxDecoration(
                 color: AppColors.card.withOpacity(0.3),
-                borderRadius: BorderRadius.circular(12),
+                borderRadius: BorderRadius.circular(responsive.wp(3)),
               ),
               child: TabBar(
                 controller: _tabController,
@@ -75,7 +77,7 @@ class _HelpScreenState extends State<HelpScreen>
                   gradient: LinearGradient(
                     colors: [AppColors.royalPurple, AppColors.electricBlue],
                   ),
-                  borderRadius: BorderRadius.circular(8),
+                  borderRadius: BorderRadius.circular(responsive.wp(2)),
                 ),
                 indicatorSize: TabBarIndicatorSize.tab,
                 dividerColor: Colors.transparent,
