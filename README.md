@@ -1,72 +1,64 @@
 # 🏆 AI Sports Talent Assessment Platform
 
-<div align="center">
-
-![Flutter](https://img.shields.io/badge/Flutter-3.32.2-02569B?style=for-the-badge&logo=flutter&logoColor=white)
-![Dart](https://img.shields.io/badge/Dart-3.5+-0175C2?style=for-the-badge&logo=dart&logoColor=white)
-![Firebase](https://img.shields.io/badge/Firebase-Latest-FFCA28?style=for-the-badge&logo=firebase&logoColor=black)
-![Convex](https://img.shields.io/badge/Convex-Deployed-FF6B6B?style=for-the-badge)
-![Resend](https://img.shields.io/badge/Resend-Active-00D9FF?style=for-the-badge)
-![VAPI](https://img.shields.io/badge/VAPI_AI-Voice_Enabled-6A0DAD?style=for-the-badge)
-![Build](https://img.shields.io/badge/Build-Passing-success?style=for-the-badge)
-![Status](https://img.shields.io/badge/Status-Production_Ready-brightgreen?style=for-the-badge)
-
-*🎯 Next-generation mobile application for AI-powered sports talent assessment with real-time backend, intelligent email notifications, and voice AI coaching*
-
-[📱 Features](#features) • [🚀 Getting Started](#getting-started---run-the-app-on-your-phone) • [🤝 Sponsors](#powered-by-amazing-sponsors) • [⚡ Quick Start](#quick-start) • [🏗️ Architecture](#architecture) • [🚀 Future Vision](#future-enhancements)
-
----
-
-## 🚀 Installation & Run Guide (Windows)
-
-This guide walks you from cloning the repo to running the app on an Android phone and on Windows (desktop). It includes required environment variables, Convex setup, Resend email notes, and the exact commands to run in PowerShell.
-
-### 1) Prerequisites
-
-- Git
-- Node.js (16+) and npm
-- Flutter (3.32.2) with Dart (add to PATH)
-- Android SDK + AVD or a physical Android device with USB debugging enabled
-- Convex CLI (install via npm: `npm install -g convex` or use `npx convex`)
-- Python 3 (optional, for ML server components)
-- (Optional) VS Code with Flutter & Dart extensions
-
 ### 2) Clone the repository
 
-Open PowerShell and run:
+Open PowerShell and run (one-line):
 
 ```powershell
-cd C:\path\to\workspace
-git clone https://github.com/Tarun-goswamii/AI-Powered-Sports-Assessment-Application.git
-cd "AI-Powered-Sports-Assessment-Application/src/FLUTTER KA CODEBASE/sports_assessment_app"
+git clone https://github.com/Tarun-goswamii/AI-Powered-Sports-Assessment-Application.git ; cd "AI-Powered-Sports-Assessment-Application/src/FLUTTER KA CODEBASE/sports_assessment_app"
 ```
 
-### 3) Environment variables (Convex & local)
+### 3) One-click installers (recommended)
 
-Important variables:
+To make demos and judging easy we provide three installer batch files in the project root. After cloning the repo, connect your target device (Android phone or Windows machine) and double-click the matching installer:
 
-- `RESEND_API_KEY` — Resend API key (starts with `re_...`).
-- `CONVEX_URL` — (optional) your deployed Convex project URL.
+- `Install (Android).bat` — Installs dependencies, prompts for `RESEND_API_KEY`, deploys Convex, and launches the app on a connected Android device or emulator.
+- `Install (Windows).bat` — Installs dependencies, prompts for `RESEND_API_KEY`, enables Windows desktop support, deploys Convex, and launches the Windows desktop build.
+- `Install (iOS).bat` — macOS helper that prints the exact iOS/macOS commands (iOS builds require macOS/Xcode). Run the printed commands on a macOS terminal.
 
-Set the Convex env var (recommended) via the Convex CLI (replace with your key):
+What the batch files do:
+
+- Install Node and Flutter dependencies (`npm install`, `flutter pub get`).
+- Prompt for your `RESEND_API_KEY` and call `npx convex env set` to save it to the deployed Convex environment.
+- Deploy the Convex backend (`npm run deploy`).
+- Run `flutter run` for the selected target.
+
+Notes & tips:
+
+- First run will take longer because `npm` and Flutter will download packages and set up build artifacts.
+- If `npx convex env set` fails because you're not logged in, run `npx convex login` once and then re-run the batch file.
+- Ensure a device is connected (Android USB debugging enabled) or that you've enabled Windows desktop prerequisites (Visual Studio and Developer Mode) before running the corresponding batch file.
+
+### 4) Mobile-specific prerequisites
+
+- Android SDK (installed via Android Studio) with platform-tools
+- USB drivers for your device (Windows)
+- A physical Android device with USB debugging enabled, or an Android emulator (AVD)
+
+### 5) Windows-specific prerequisites
+
+- Windows 10/11 (64-bit)
+- Enable Developer Mode (Settings → Update & Security → For developers)
+- Visual Studio with "Desktop development with C++" workload installed (required by Flutter Windows tooling)
+- Flutter configured for Windows desktop support
+
+Visual Studio install checklist
+
+If you don't already have Visual Studio installed, install **Visual Studio Community (2022 or later)** and select the following during installation:
+
+- Workload: "Desktop development with C++" (required)
+  - Component: MSVC v143 (or latest) - VS 2022 C++ x64/x86 build tools
+  - Component: Windows 10 SDK (10.0.19041.0 or later)
+  - Component: C++ CMake tools for Windows
+  - Optional: Windows Universal C Runtime SDK
+
+After installing Visual Studio, run:
 
 ```powershell
-npx convex env set RESEND_API_KEY re_your_real_key_here
+flutter doctor --windows
 ```
 
-> Security note: Do NOT commit API keys to git. Use Convex environment variables or your CI secret manager for production.
-
-### 4) Install dependencies
-
-```powershell
-# Install backend / ci helper scripts
-npm install
-
-# Install Flutter dependencies
-flutter pub get
-```
-
-### 5) Deploy Convex backend (one-time or when changed)
+This will confirm the Windows toolchain is ready. If flutter doctor flags missing components, re-run Visual Studio Installer and add the missing items.
 
 ```powershell
 npm run deploy
@@ -75,6 +67,14 @@ npm run deploy
 After deploy, Convex functions will be available at `https://<your-project>.convex.cloud` (the repo is preconfigured to use `fantastic-ibex-496.convex.cloud` when deployed there).
 
 ### 6) Run the Flutter app on Android (physical device)
+
+Mobile-specific prerequisites
+
+- Android SDK (installed via Android Studio) with platform-tools
+- USB drivers for your device (Windows)
+- A physical Android device with USB debugging enabled, or an Android emulator (AVD)
+
+Steps to run on Android device
 
 1. Enable USB debugging on your Android device.
 2. Connect the device to your PC via USB.
@@ -93,6 +93,30 @@ flutter run
 Use `r` for hot reload and `R` for full restart in the terminal.
 
 ### 7) Run the Flutter app on Windows (desktop)
+Windows-specific prerequisites
+
+- Windows 10/11 (64-bit)
+- Enable Developer Mode (Settings → Update & Security → For developers)
+- Visual Studio with "Desktop development with C++" workload installed (required by Flutter Windows tooling)
+- Flutter configured for Windows desktop support
+
+Visual Studio install checklist
+
+If you don't already have Visual Studio installed, install **Visual Studio Community (2022 or later)** and select the following during installation:
+
+- Workload: "Desktop development with C++" (required)
+  - Component: MSVC v143 (or latest) - VS 2022 C++ x64/x86 build tools
+  - Component: Windows 10 SDK (10.0.19041.0 or later)
+  - Component: C++ CMake tools for Windows
+  - Optional: Windows Universal C Runtime SDK
+
+After installing Visual Studio, run:
+
+```powershell
+flutter doctor --windows
+```
+
+This will confirm the Windows toolchain is ready. If flutter doctor flags missing components, re-run Visual Studio Installer and add the missing items.
 
 Enable Windows support and run:
 
@@ -242,6 +266,16 @@ npm run dev
 ```
 
 That's it — the app should open on the selected device. Use `r` to hot reload during development.
+
+Quick note — Run installer .bat from PowerShell (one-liners)
+
+After you `cd` into the project folder you can run any installer with a single command. Examples:
+
+```powershell
+.\"Install (Android).bat"
+.\"Install (Windows).bat"
+.\"Install (iOS).bat"  # macOS users: prints the commands to run on macOS
+```
 
 
 ---
