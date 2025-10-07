@@ -1,4 +1,4 @@
-# 🏆 AI Sports Talent Assessment Platform
+`# 🏆 AI Sports Talent Assessment Platform
 
 ### 1) Clone the repository
 
@@ -1243,8 +1243,8 @@ export const joinLiveWorkout = mutation({
 - 🎯 **Mission**: Making world-class sports assessment accessible to every Indian athlete
 - 🏆 **Achievements**: Integrated Convex, Resend, and VAPI AI into a production-ready platform
 - 💼 **Connect**: 
-  - GitHub: [@sidvashisth2005](https://github.com/sidvashisth2005) ⭐
-  - LinkedIn: [Siddhant Vashisth](https://linkedin.com/in/sidvashisth2005) 💼
+  - GitHub: [@Tarun-goswamii](https://github.com/Tarun-goswamii) ⭐
+  - LinkedIn: [TARUN GOSWAMI](https://linkedin.com/in/TARUN GOSWAMI) 💼
 
 ### 🙏 **Massive Thanks to Our Sponsors**
 
