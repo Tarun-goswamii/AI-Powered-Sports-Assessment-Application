@@ -1,6 +1,6 @@
 # 🏆 AI Sports Talent Assessment Platform
 
-### 2) Clone the repository
+### 1) Clone the repository
 
 Open PowerShell and run (one-line):
 
@@ -8,7 +8,7 @@ Open PowerShell and run (one-line):
 git clone https://github.com/Tarun-goswamii/AI-Powered-Sports-Assessment-Application.git ; cd "AI-Powered-Sports-Assessment-Application/src/FLUTTER KA CODEBASE/sports_assessment_app"
 ```
 
-### 3) One-click installers (recommended)
+### 2) One-click installers (recommended)
 
 To make demos and judging easy we provide three installer batch files in the project root. After cloning the repo, connect your target device (Android phone or Windows machine) and double-click the matching installer:
 
@@ -29,13 +29,13 @@ Notes & tips:
 - If `npx convex env set` fails because you're not logged in, run `npx convex login` once and then re-run the batch file.
 - Ensure a device is connected (Android USB debugging enabled) or that you've enabled Windows desktop prerequisites (Visual Studio and Developer Mode) before running the corresponding batch file.
 
-### 4) Mobile-specific prerequisites
+### 3) Mobile-specific prerequisites
 
 - Android SDK (installed via Android Studio) with platform-tools
 - USB drivers for your device (Windows)
 - A physical Android device with USB debugging enabled, or an Android emulator (AVD)
 
-### 5) Windows-specific prerequisites
+### 4) Windows-specific prerequisites
 
 - Windows 10/11 (64-bit)
 - Enable Developer Mode (Settings → Update & Security → For developers)
@@ -66,7 +66,7 @@ npm run deploy
 
 After deploy, Convex functions will be available at `https://<your-project>.convex.cloud` (the repo is preconfigured to use `fantastic-ibex-496.convex.cloud` when deployed there).
 
-### 6) Run the Flutter app on Android (physical device)
+### 5) Run the Flutter app on Android (physical device)
 
 Mobile-specific prerequisites
 
@@ -92,7 +92,7 @@ flutter run
 
 Use `r` for hot reload and `R` for full restart in the terminal.
 
-### 7) Run the Flutter app on Windows (desktop)
+### 6) Run the Flutter app on Windows (desktop)
 Windows-specific prerequisites
 
 - Windows 10/11 (64-bit)
@@ -126,7 +126,7 @@ npx convex env set RESEND_API_KEY re_your_real_key_here # if not already set
 flutter run -d windows
 ```
 
-### 8) Helpful scripts & commands
+### 7) Helpful scripts & commands
 
 - Deploy Convex + run app together:
 
@@ -146,13 +146,13 @@ npm run dev
 npm run seed-demo
 ```
 
-### 9) Resend (Email) notes & Free tier limitations
+### 8) Resend (Email) notes & Free tier limitations
 
 - If your Resend account is on the Free tier, you can only send emails to verified addresses (sandbox mode). Domain verification alone does not remove this restriction.
 - To send to arbitrary recipients, upgrade to Resend Transactional plan (click "Upgrade" on Resend dashboard).
 - For demo/testing you can add test addresses to the allowlist at https://resend.com/settings/audiences or use the temporary workaround implemented in the repo that routes emails to your verified address while preserving the intended recipient in the subject line.
 
-### 10) Common troubleshooting
+### 9) Common troubleshooting
 
 - If Flutter build fails: run `flutter doctor -v` and resolve missing components.
 - If Convex deployment fails: ensure you're logged in (`npx convex login`) and `RESEND_API_KEY` is set.
