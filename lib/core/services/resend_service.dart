@@ -37,6 +37,7 @@ class ResendService {
     required String toEmail,
     required String userName,
   }) async {
+    // Domain is verified! Send directly to users now
     await _sendEmail(
       to: toEmail,
       subject: 'Welcome to Sports Assessment!',
@@ -314,7 +315,7 @@ class ResendService {
           'Content-Type': 'application/json',
         },
         body: jsonEncode({
-          'from': 'Vita Sports <onboarding@resend.dev>',
+          'from': 'Vita Sports <onboarding@vitasports.shop>',
           'to': [to], // Send to actual user email
           'subject': subject,
           'html': html,

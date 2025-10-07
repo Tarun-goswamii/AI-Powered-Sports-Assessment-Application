@@ -37,6 +37,7 @@
     "convex": "^1.27.3"
   },
   "devDependencies": {
+    "@types/node": "^24.6.2",
     "concurrently": "^8.2.2"
   },
   "keywords": [

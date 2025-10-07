@@ -14,33 +14,25 @@ class AppTypography {
   
   // EXACT text styles matching React CSS typography
   static const TextStyle h1 = TextStyle(
-    fontSize: 24,           // --text-2xl equivalent
-    fontWeight: medium,     // --font-weight-medium: 500
-    height: 1.5,           // line-height: 1.5
+    fontSize: 32,           // --text-2xl equivalent
+    fontWeight: semiBold,     // --font-weight-medium: 500
+    height: 1.2,           // line-height: 1.5
     fontFamily: fontFamily,
     color: Colors.white,
   );
   
   static const TextStyle h2 = TextStyle(
-    fontSize: 20,           // --text-xl equivalent  
-    fontWeight: medium,     // --font-weight-medium: 500
-    height: 1.5,           // line-height: 1.5
+    fontSize: 24,           // --text-xl equivalent  
+    fontWeight: semiBold,     // --font-weight-medium: 500
+    height: 1.3,           // line-height: 1.5
     fontFamily: fontFamily,
     color: Colors.white,
   );
   
   static const TextStyle h3 = TextStyle(
-    fontSize: 18,           // --text-lg equivalent
-    fontWeight: medium,     // --font-weight-medium: 500
-    height: 1.5,           // line-height: 1.5
-    fontFamily: fontFamily,
-    color: Colors.white,
-  );
-  
-  static const TextStyle h4 = TextStyle(
-    fontSize: 16,           // --text-base equivalent
-    fontWeight: medium,     // --font-weight-medium: 500
-    height: 1.5,           // line-height: 1.5
+    fontSize: 20,           // --text-lg equivalent
+    fontWeight: semiBold,     // --font-weight-medium: 500
+    height: 1.4,           // line-height: 1.5
     fontFamily: fontFamily,
     color: Colors.white,
   );
@@ -81,6 +73,18 @@ class AppTypography {
     fontSize: 16,           // --text-base equivalent
     fontWeight: medium,     // --font-weight-medium: 500
     height: 1.5,           // line-height: 1.5
+    fontFamily: fontFamily,
+    color: Colors.white,
+  );
+  
+  // Additional heading styles
+  static const TextStyle headingLarge = h1;
+  static const TextStyle headingMedium = h2;
+  static const TextStyle headingSmall = h3;
+  static const TextStyle h4 = TextStyle(
+    fontSize: 18,
+    fontWeight: semiBold,
+    height: 1.4,
     fontFamily: fontFamily,
     color: Colors.white,
   );

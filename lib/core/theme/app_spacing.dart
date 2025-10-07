@@ -24,4 +24,21 @@ class AppSpacing {
   static const EdgeInsets paddingHorizontalLarge = EdgeInsets.symmetric(horizontal: 20.0);  // px-5
   static const EdgeInsets paddingVerticalMedium = EdgeInsets.symmetric(vertical: 16.0);     // py-4
   static const EdgeInsets paddingVerticalLarge = EdgeInsets.symmetric(vertical: 20.0);      // py-5
+  
+  // Gap widgets (SizedBox shortcuts)
+  static const Widget gapH4 = SizedBox(height: xs);
+  static const Widget gapH8 = SizedBox(height: sm);
+  static const Widget gapH12 = SizedBox(height: md);
+  static const Widget gapH16 = SizedBox(height: lg);
+  static const Widget gapH20 = SizedBox(height: xl);
+  static const Widget gapH24 = SizedBox(height: xxl);
+  static const Widget gapH32 = SizedBox(height: xxxl);
+  
+  static const Widget gapW4 = SizedBox(width: xs);
+  static const Widget gapW8 = SizedBox(width: sm);
+  static const Widget gapW12 = SizedBox(width: md);
+  static const Widget gapW16 = SizedBox(width: lg);
+  static const Widget gapW20 = SizedBox(width: xl);
+  static const Widget gapW24 = SizedBox(width: xxl);
+  static const Widget gapW32 = SizedBox(width: xxxl);
 }

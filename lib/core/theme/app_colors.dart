@@ -1,6 +1,5 @@
 // lib/core/theme/app_colors.dart
 import 'package:flutter/material.dart';
-import 'dart:ui';
 
 class AppColors {
   // 🎯 EXACT BRAND COLORS FROM REACT CSS (DO NOT CHANGE HEX VALUES)
@@ -17,18 +16,9 @@ class AppColors {
   static const Color foreground = Colors.white;
   static const Color card = Color(0x0CFFFFFF);           // rgba(255,255,255,0.05)
   static const Color cardForeground = Colors.white;
-  static const Color popover = deepCharcoal;
-  static const Color popoverForeground = Colors.white;
   static const Color primary = royalPurple;
-  static const Color primaryForeground = Colors.white;
   static const Color secondary = electricBlue;
-  static const Color secondaryForeground = Colors.white;
-  static const Color muted = Color(0x1AFFFFFF);          // rgba(255,255,255,0.1)
-  static const Color mutedForeground = Color(0xB3FFFFFF); // rgba(255,255,255,0.7)
   static const Color accent = neonGreen;
-  static const Color accentForeground = Colors.black;
-  static const Color destructive = brightRed;
-  static const Color destructiveForeground = Colors.white;
   static const Color border = Color(0x1AFFFFFF);         // rgba(255,255,255,0.1)
   static const Color input = Color(0x0CFFFFFF);          // rgba(255,255,255,0.05)
   static const Color inputBackground = Color(0x1AFFFFFF); // rgba(255,255,255,0.1)
@@ -76,6 +66,13 @@ class AppColors {
       Color(0xFF0A0A0A),          // Darker than deep charcoal
     ],
   );
+
+  // Additional foreground colors for theme
+  static const Color primaryForeground = Colors.white;
+  static const Color secondaryForeground = Colors.white;
+  static const Color accentForeground = deepCharcoal;
+  static const Color destructive = brightRed;
+  static const Color destructiveForeground = Colors.white;
 
   // 💫 EXACT NEON GLOW SHADOW EFFECTS FROM REACT CSS
   // .glass-card { box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3); }
@@ -267,33 +264,24 @@ class AppColors {
       ),
     );
   }
-}
 
-
-
-// 📐 EXACT SPACING SYSTEM FROM REACT CSS/TAILWIND
-class AppSpacing {
-  // Exact spacing scale from Tailwind/React implementation
-  static const double xs = 4.0;    // 4px
-  static const double sm = 8.0;    // 8px
-  static const double md = 12.0;   // 12px
-  static const double lg = 16.0;   // 16px
-  static const double xl = 20.0;   // 20px
-  static const double xxl = 24.0;  // 24px
-  static const double xxxl = 32.0; // 32px
-  static const double huge = 48.0; // 48px
-
-  // Padding values used throughout the app
-  static const EdgeInsets paddingSmall = EdgeInsets.all(12.0);   // p-3
-  static const EdgeInsets paddingMedium = EdgeInsets.all(16.0);  // p-4
-  static const EdgeInsets paddingLarge = EdgeInsets.all(20.0);   // p-5
-  static const EdgeInsets paddingXLarge = EdgeInsets.all(24.0);  // p-6
-
-  // Horizontal/Vertical specific padding
-  static const EdgeInsets paddingHorizontalMedium = EdgeInsets.symmetric(horizontal: 16.0); // px-4
-  static const EdgeInsets paddingHorizontalLarge = EdgeInsets.symmetric(horizontal: 20.0);  // px-5
-  static const EdgeInsets paddingVerticalMedium = EdgeInsets.symmetric(vertical: 16.0);     // py-4
-  static const EdgeInsets paddingVerticalLarge = EdgeInsets.symmetric(vertical: 20.0);      // py-5
+  static const Color muted = Color(0x1AFFFFFF);          // rgba(255,255,255,0.1)
+  static const Color mutedForeground = Color(0xB3FFFFFF); // rgba(255,255,255,0.7)
+  
+  // Additional color constants used throughout the app
+  static const Color backgroundColor = background;
+  static const Color surfaceColor = card;
+  static const Color borderColor = border;
+  static const Color errorColor = brightRed;
+  static const Color successGreen = Color(0xFF00FF85);
+  
+  // Neon colors for special effects
+  static const Color neonBlue = electricBlue;
+  static const Color neonRed = brightRed;
+  static const Color oceanBlue = Color(0xFF0077BE);
+  static const Color electricGreen = neonGreen;
+  static const Color sunsetOrange = warmOrange;
+  static const Color magentaPink = Color(0xFFFF00FF);
 }
 
 // 🎨 EXACT BORDER RADIUS FROM REACT CSS

@@ -59,3 +59,62 @@ export const update = mutation({
     return { success: true, userId: user._id };
   },
 });
+
+// Create new user (users:create)
+export const createUser = mutation({
+  args: {
+    email: v.string(),
+    displayName: v.string(),
+    password: v.string(),
+    // Add other fields as necessary
+  },
+  handler: async (ctx, args) => {
+    // Check if the user already exists
+    const existingUsers = await ctx.db.query("users").collect();
+    const existingUser = existingUsers.find(u => u.email === args.email);
+    
+    if (existingUser) {
+      throw new Error(`User already exists with email: ${args.email}`);
+    }
+
+    try {
+      // Create user in database
+      const userId = await ctx.db.insert("users", {
+        email: args.email,
+        displayName: args.displayName,
+        passwordHash: await hashPassword(args.password), // Ensure to hash the password
+        createdAt: Date.now(),
+      });
+
+      console.log(`✅ User created successfully: ${userId}`);
+
+      // 📧 SEND WELCOME EMAIL (non-blocking)
+      try {
+        await ctx.runMutation(api.emails.sendWelcomeEmail, {
+          userEmail: args.email,
+          displayName: args.displayName,
+        });
+        console.log('✅ Welcome email triggered successfully');
+      } catch (emailError) {
+        console.error('⚠️ Email sending failed (non-critical):', emailError);
+        // Don't throw - user registration still succeeds even if email fails
+      }
+
+      return {
+        userId,
+        success: true,
+        message: 'User created successfully',
+      };
+
+    } catch (error) {
+      console.error('❌ Error creating user:', error);
+      throw error;
+    }
+  },
+});
+
+// Utility function to hash passwords
+async function hashPassword(password: string): Promise<string> {
+  // Implement password hashing logic here (e.g., using bcrypt)
+  return password; // Placeholder - replace with hashed password
+}

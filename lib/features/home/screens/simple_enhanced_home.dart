@@ -231,7 +231,6 @@ class _SimpleEnhancedHomeState extends ConsumerState<SimpleEnhancedHome>
           'Your Progress',
           fontSize: 20,
           fontWeight: FontWeight.bold,
-          ),
         ),
         const SizedBox(height: 16),
         Row(
@@ -271,7 +270,6 @@ class _SimpleEnhancedHomeState extends ConsumerState<SimpleEnhancedHome>
           'Quick Actions',
           fontSize: 20,
           fontWeight: FontWeight.bold,
-          ),
         ),
         const SizedBox(height: 16),
         GridView.count(

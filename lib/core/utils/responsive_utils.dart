@@ -4,36 +4,40 @@ import 'package:flutter/material.dart';
 /// Ensures all UI elements scale properly across devices
 class ResponsiveUtils {
   final BuildContext context;
-  late final double screenWidth;
-  late final double screenHeight;
-  late final double textScaleFactor;
-  late final Orientation orientation;
-
-  ResponsiveUtils(this.context) {
-    final size = MediaQuery.of(context).size;
-    screenWidth = size.width;
-    screenHeight = size.height;
-    // Using textScaler for forward compatibility
-    final textScaler = MediaQuery.of(context).textScaler;
-    textScaleFactor = textScaler.scale(1.0);
-    orientation = MediaQuery.of(context).orientation;
+  
+  ResponsiveUtils(this.context);
+  
+  // Get screen width
+  double get screenWidth => MediaQuery.of(context).size.width;
+  
+  // Get screen height
+  double get screenHeight => MediaQuery.of(context).size.height;
+  
+  // Width percentage
+  double wp(double percentage) {
+    return screenWidth * (percentage / 100);
   }
-
-  /// Get responsive width based on percentage (0.0 to 1.0)
-  double wp(double percentage) => screenWidth * percentage / 100;
-
-  /// Get responsive height based on percentage (0.0 to 1.0)
-  double hp(double percentage) => screenHeight * percentage / 100;
-
-  /// Get responsive font size
+  
+  // Height percentage
+  double hp(double percentage) {
+    return screenHeight * (percentage / 100);
+  }
+  
+  // Scale point (for font sizes)
   double sp(double size) {
-    // Base design on 375x812 (iPhone X)
-    const baseWidth = 375.0;
-    final scale = screenWidth / baseWidth;
-    return size * scale;
+    return size * (screenWidth / 375); // Base width 375 (iPhone SE)
   }
-
-  /// Get responsive padding
+  
+  // Check if mobile
+  bool get isMobile => screenWidth < 600;
+  
+  // Check if tablet
+  bool get isTablet => screenWidth >= 600 && screenWidth < 1024;
+  
+  // Check if desktop
+  bool get isDesktop => screenWidth >= 1024;
+  
+  // Generate responsive padding
   EdgeInsets responsivePadding({
     double? all,
     double? horizontal,
@@ -44,67 +48,12 @@ class ResponsiveUtils {
     double? bottom,
   }) {
     return EdgeInsets.only(
-      left: wp(left ?? horizontal ?? all ?? 0),
-      right: wp(right ?? horizontal ?? all ?? 0),
-      top: hp(top ?? vertical ?? all ?? 0),
-      bottom: hp(bottom ?? vertical ?? all ?? 0),
+      left: left != null ? wp(left) : (horizontal != null ? wp(horizontal) : (all != null ? wp(all) : 0)),
+      right: right != null ? wp(right) : (horizontal != null ? wp(horizontal) : (all != null ? wp(all) : 0)),
+      top: top != null ? hp(top) : (vertical != null ? hp(vertical) : (all != null ? hp(all) : 0)),
+      bottom: bottom != null ? hp(bottom) : (vertical != null ? hp(vertical) : (all != null ? hp(all) : 0)),
     );
   }
-
-  /// Get responsive margin
-  EdgeInsets responsiveMargin({
-    double? all,
-    double? horizontal,
-    double? vertical,
-    double? left,
-    double? right,
-    double? top,
-    double? bottom,
-  }) {
-    return EdgeInsets.only(
-      left: wp(left ?? horizontal ?? all ?? 0),
-      right: wp(right ?? horizontal ?? all ?? 0),
-      top: hp(top ?? vertical ?? all ?? 0),
-      bottom: hp(bottom ?? vertical ?? all ?? 0),
-    );
-  }
-
-  /// Check if device is mobile (width < 600)
-  bool get isMobile => screenWidth < 600;
-
-  /// Check if device is tablet (600 <= width < 1200)
-  bool get isTablet => screenWidth >= 600 && screenWidth < 1200;
-
-  /// Check if device is desktop (width >= 1200)
-  bool get isDesktop => screenWidth >= 1200;
-
-  /// Get responsive icon size
-  double iconSize([double baseSize = 24.0]) {
-    return sp(baseSize);
-  }
-
-  /// Get responsive border radius
-  BorderRadius responsiveBorderRadius(double radius) {
-    return BorderRadius.circular(wp(radius));
-  }
-
-  /// Get scaled value based on screen size
-  double scale(double value) {
-    const baseWidth = 375.0;
-    return value * (screenWidth / baseWidth);
-  }
-
-  /// Get responsive spacing
-  double spacing(double value) => wp(value);
-
-  /// Safe area padding
-  EdgeInsets get safeAreaPadding => MediaQuery.of(context).padding;
-
-  /// Get responsive app bar height
-  double get appBarHeight => kToolbarHeight * (screenWidth / 375.0).clamp(0.8, 1.2);
-
-  /// Get responsive bottom navigation height
-  double get bottomNavHeight => 60.0 * (screenWidth / 375.0).clamp(0.8, 1.2);
 }
 
 /// Extension on BuildContext for easy access

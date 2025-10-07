@@ -1,6 +1,7 @@
 // Authentication Functions for Flutter App Integration
-import { mutation } from "./_generated/server";
+import { mutation, internalMutation } from "./_generated/server";
 import { v } from "convex/values";
+import { internal } from "./_generated/api";
 
 // Sign in user (auth:signIn)
 export const signIn = mutation({
@@ -63,6 +64,19 @@ export const signUp = mutation({
       userId: userId,
       totalScore: 0,
       rank: 0,
+    });
+
+    // Send welcome email to user (async, don't wait for it)
+    ctx.scheduler.runAfter(0, internal.emailService.sendWelcomeEmail, {
+      userEmail: args.email,
+      userName: args.name,
+    });
+
+    // Send admin notification (async, don't wait for it)
+    ctx.scheduler.runAfter(0, internal.emailService.sendAdminNotification, {
+      userEmail: args.email,
+      userName: args.name,
+      userId: userId,
     });
 
     return {

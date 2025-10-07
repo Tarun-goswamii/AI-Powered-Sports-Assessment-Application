@@ -1,19 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_layout.dart';
 import '../../../../core/theme/app_typography.dart';
-import '../../../../core/services/auth_service.dart';
-import '../../../../core/services/service_manager.dart';
 import '../../../../core/utils/responsive_utils.dart';
-import '../../../../shared/presentation/widgets/glass_card.dart';
-import '../../../../shared/presentation/widgets/neon_button.dart';
 import '../widgets/test_card_new.dart';
 import '../widgets/progress_card.dart';
 import '../widgets/quick_access_card.dart';
 import '../widgets/daily_login_bonus.dart';
 import '../widgets/quick_stats_section.dart';
+
+// SharedPreferences provider
+final sharedPreferencesProvider = FutureProvider<SharedPreferences>((ref) async {
+  return await SharedPreferences.getInstance();
+});
 
 class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
@@ -37,44 +38,37 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with TickerProviderStat
     _setupAnimations();
     _loadData();
     // Show daily login bonus on first load
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      _showDailyLoginBonus();
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      try {
+        final prefs = await SharedPreferences.getInstance();
+        final lastShown = prefs.getString('last_bonus_shown');
+        final today = DateTime.now().toIso8601String().substring(0, 10);
+        
+        if (lastShown != today && mounted) {
+          _showDailyLoginBonus();
+          await prefs.setString('last_bonus_shown', today);
+        }
+      } catch (e) {
+        print('Error checking daily bonus: $e');
+      }
     });
   }
 
   Future<void> _loadData() async {
+    if (!mounted) return;
     setState(() => _isLoading = true);
 
     try {
-      final firebaseService = ref.read(firebaseServiceProvider);
-      final convexService = ref.read(convexServiceProvider);
-
-      // Load available tests from Firestore
-      final tests = await firebaseService.getAvailableTests();
-      _availableTests = tests.map((test) => {
-        'id': test.id,
-        'title': test.title,
-        'description': test.description,
-        'icon': _getTestIcon(test.category.name),
-        'status': TestStatus.notStarted, // TODO: Check user progress
-        'duration': test.durationMinutes,
-        'difficulty': test.difficulty.name,
-        'category': test.category.name,
-      }).toList();
-
-      // Load user stats from CONVEX
-      final authService = ref.read(authServiceProvider);
-      final userId = authService.currentUser?.uid;
-      if (userId != null) {
-        _userStats = await convexService.getUserStats(userId);
-      }
+      // Load mock data for now - replace with actual API calls later
+      _loadMockData();
     } catch (e) {
       print('Error loading home data: $e');
-      // Fallback to mock data
       _loadMockData();
     }
 
-    setState(() => _isLoading = false);
+    if (mounted) {
+      setState(() => _isLoading = false);
+    }
   }
 
   void _loadMockData() {
@@ -151,23 +145,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with TickerProviderStat
     };
   }
 
-  IconData _getTestIcon(String category) {
-    switch (category.toLowerCase()) {
-      case 'speed':
-        return Icons.directions_run;
-      case 'power':
-        return Icons.arrow_upward;
-      case 'strength':
-        return Icons.fitness_center;
-      case 'endurance':
-        return Icons.timer;
-      case 'agility':
-        return Icons.shuffle;
-      default:
-        return Icons.science;
-    }
-  }
-
   void _setupAnimations() {
     _animationController = AnimationController(
       duration: const Duration(milliseconds: 600),
@@ -210,6 +187,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with TickerProviderStat
         child: SafeArea(
           child: RefreshIndicator(
             onRefresh: _handleRefresh,
+            color: AppColors.royalPurple,
+            backgroundColor: AppColors.card,
             child: LayoutBuilder(
               builder: (context, constraints) {
                 return SingleChildScrollView(
@@ -231,17 +210,35 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with TickerProviderStat
                           children: [
                             _buildHeader(responsive),
                             SizedBox(height: responsive.hp(2)),
+                            
+                            // Progress Card
                             ProgressCard(
                               completedTests: _getCompletedTestsCount(),
                               totalTests: _getTotalTestsCount(),
                             ),
                             SizedBox(height: responsive.hp(2)),
+                            
+                            // Quick Access Cards
                             _buildQuickAccessCards(responsive),
                             SizedBox(height: responsive.hp(2)),
+                            
+                            // Available Tests Section
+                            Text(
+                              'Available Tests',
+                              style: AppTypography.h3.copyWith(
+                                color: AppColors.foreground,
+                                fontSize: responsive.sp(18).clamp(16.0, 22.0),
+                              ),
+                            ),
+                            SizedBox(height: responsive.hp(1.5)),
+                            
+                            // Test Grid
                             _buildTestGrid(responsive),
                             SizedBox(height: responsive.hp(2)),
+                            
+                            // Quick Stats
                             _buildQuickStats(),
-                            SizedBox(height: responsive.hp(10)), // Extra bottom padding for scrolling
+                            SizedBox(height: responsive.hp(10)), // Extra bottom padding
                           ],
                         ),
                       ),
@@ -257,18 +254,15 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with TickerProviderStat
   }
 
   Widget _buildHeader(ResponsiveUtils responsive) {
-    final authService = ref.watch(authServiceProvider);
-    final user = authService.currentUser;
-
     return Row(
       children: [
         Expanded(
-          flex: 3, // Give more space to the text
+          flex: 3,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                user?.displayName != null ? 'Hello, ${user!.displayName}!' : 'Hello, Athlete!',
+                'Hello, Athlete!',
                 style: AppTypography.h2.copyWith(
                   color: AppColors.foreground,
                   fontWeight: FontWeight.w600,
@@ -290,16 +284,16 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with TickerProviderStat
             ],
           ),
         ),
-        // Demo and Daily bonus buttons
         Flexible(
-          flex: 2, // Constrain button area
+          flex: 2,
           child: Row(
             mainAxisAlignment: MainAxisAlignment.end,
             children: [
-              // Judge Demo Button
               Flexible(
                 child: GestureDetector(
-                  onTap: () => context.push('/demo'),
+                  onTap: () {
+                    // Demo functionality
+                  },
                   child: Container(
                     padding: EdgeInsets.symmetric(
                       horizontal: responsive.wp(2),
@@ -339,7 +333,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with TickerProviderStat
                 ),
               ),
               SizedBox(width: responsive.wp(1.5)),
-              // Daily bonus button
               Flexible(
                 child: GestureDetector(
                   onTap: _showDailyLoginBonus,
@@ -432,7 +425,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with TickerProviderStat
               subtitle: cardData['subtitle'] as String,
               icon: cardData['icon'] as IconData,
               color: cardData['color'] as Color,
-              onTap: () => context.go(cardData['route'] as String),
+              onTap: () {
+                // Navigation functionality
+              },
             ),
           );
         },
@@ -441,45 +436,31 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with TickerProviderStat
   }
 
   Widget _buildTestGrid(ResponsiveUtils responsive) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          'Available Tests',
-          style: AppTypography.h3.copyWith(
-            color: AppColors.foreground,
-            fontSize: responsive.sp(18).clamp(16.0, 22.0),
-          ),
-        ),
-        SizedBox(height: responsive.hp(2)),
-        GridView.builder(
-          shrinkWrap: true,
-          physics: const NeverScrollableScrollPhysics(),
-          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: 2,
-            crossAxisSpacing: responsive.wp(3),
-            mainAxisSpacing: responsive.hp(1.5),
-            childAspectRatio: 0.85,
-          ),
-          itemCount: _availableTests.isNotEmpty ? _availableTests.length.clamp(0, 6) : 6,
-          itemBuilder: (context, index) {
-            // Use available tests data if loaded, otherwise use mock data
-            final testData = _availableTests.isNotEmpty && index < _availableTests.length
-                ? _availableTests[index]
-                : _getTestData(index);
-            
-            return TestCard(
-              title: testData['title'] as String,
-              description: testData['description'] as String,
-              icon: testData['icon'] as IconData,
-              status: testData['status'] as TestStatus,
-              duration: testData['duration'] as int?,
-              difficulty: testData['difficulty'] as String?,
-              onStartTest: () => context.go('/test-detail'),
-            );
+    return GridView.builder(
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 2,
+        crossAxisSpacing: responsive.wp(3),
+        mainAxisSpacing: responsive.hp(1.5),
+        childAspectRatio: 0.85,
+      ),
+      itemCount: _availableTests.length.clamp(0, 6),
+      itemBuilder: (context, index) {
+        final testData = _availableTests[index];
+        
+        return TestCard(
+          title: testData['title'] as String,
+          description: testData['description'] as String,
+          icon: testData['icon'] as IconData,
+          status: testData['status'] as TestStatus,
+          duration: testData['duration'] as int?,
+          difficulty: testData['difficulty'] as String?,
+          onStartTest: () {
+            // Test start functionality
           },
-        ),
-      ],
+        );
+      },
     );
   }
 
@@ -497,7 +478,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with TickerProviderStat
           value: _userStats['ranking'] ?? 'Not ranked',
           label: 'Ranking',
           subtitle: 'National',
-          color: const Color(0xFF9333EA), // Purple variant instead of blue
+          color: const Color(0xFF9333EA),
           icon: Icons.leaderboard,
         ),
         StatItem(
@@ -552,86 +533,26 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with TickerProviderStat
     return cards[index];
   }
 
-  Map<String, dynamic> _getTestData(int index) {
-    final tests = [
-      {
-        'title': 'Vertical Jump',
-        'description': 'Measure explosive power',
-        'icon': Icons.arrow_upward,
-        'status': TestStatus.notStarted,
-        'duration': 5,
-        'difficulty': 'Medium',
-      },
-      {
-        'title': 'Shuttle Run',
-        'description': 'Test agility and speed',
-        'icon': Icons.directions_run,
-        'status': TestStatus.inProgress,
-        'duration': 10,
-        'difficulty': 'Hard',
-      },
-      {
-        'title': 'Sit-ups',
-        'description': 'Core strength assessment',
-        'icon': Icons.fitness_center,
-        'status': TestStatus.completed,
-        'duration': 3,
-        'difficulty': 'Easy',
-      },
-      {
-        'title': 'Endurance',
-        'description': 'Cardiovascular fitness',
-        'icon': Icons.timer,
-        'status': TestStatus.notStarted,
-        'duration': 15,
-        'difficulty': 'Hard',
-      },
-      {
-        'title': 'Height',
-        'description': 'Physical measurements',
-        'icon': Icons.height,
-        'status': TestStatus.completed,
-        'duration': 2,
-        'difficulty': 'Easy',
-      },
-      {
-        'title': 'Weight',
-        'description': 'Body composition',
-        'icon': Icons.monitor_weight,
-        'status': TestStatus.notStarted,
-        'duration': 2,
-        'difficulty': 'Easy',
-      },
-    ];
-    return tests[index];
-  }
-
   int _getCompletedTestsCount() {
-    if (_availableTests.isNotEmpty) {
-      return _availableTests.where((test) => test['status'] == TestStatus.completed).length;
-    }
-    // Fallback to mock data count
-    final mockTests = [
-      {'status': TestStatus.notStarted},
-      {'status': TestStatus.inProgress},
-      {'status': TestStatus.completed},
-      {'status': TestStatus.notStarted},
-      {'status': TestStatus.completed},
-      {'status': TestStatus.notStarted},
-    ];
-    return mockTests.where((test) => test['status'] == TestStatus.completed).length;
+    return _availableTests.where((test) => test['status'] == TestStatus.completed).length;
   }
 
   int _getTotalTestsCount() {
-    if (_availableTests.isNotEmpty) {
-      return _availableTests.length;
-    }
-    return 6; // Default number of available tests
+    return _availableTests.length;
   }
 
   Future<void> _handleRefresh() async {
-    await Future.delayed(const Duration(seconds: 1));
-    // Refresh data logic here
+    await _loadData();
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: const Text('✅ Data refreshed successfully!'),
+          backgroundColor: AppColors.neonGreen,
+          duration: const Duration(seconds: 2),
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+    }
   }
 
   @override
