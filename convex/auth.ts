@@ -32,7 +32,7 @@ export const signIn = mutation({
 });
 
 // Sign up user (auth:signUp)
-export const signUp = mutation({
+export const signUp = internalMutation({
   args: {
     email: v.string(),
     password: v.string(),
