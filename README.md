@@ -1,4 +1,4 @@
-`# 🏆 AI Sports Talent Assessment Platform
+# 🏆 AI Sports Talent Assessment Platform
 
 ### 1) Clone the repository
 
