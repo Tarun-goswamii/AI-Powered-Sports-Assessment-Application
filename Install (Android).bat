@@ -50,6 +50,16 @@ if errorlevel 1 (
     echo Flutter found.
 )
 
+REM Check VS Code
+echo Checking VS Code...
+where code >nul 2>&1
+if errorlevel 1 (
+    echo VS Code not found. VS Code is recommended for development.
+    echo You can install it from: https://code.visualstudio.com/
+) else (
+    echo VS Code found.
+)
+
 REM Check Flutter doctor
 echo Running Flutter doctor...
 flutter doctor || echo WARNING: Flutter doctor found issues, continuing...
@@ -99,9 +109,18 @@ goto no_device
 :install_now
 adb install -r "%APK%" || goto install_failed
 echo.
-echo SUCCESS: App installed successfully!
+echo ==================================================
+echo ✅ SUCCESS: App installed successfully!
+echo ==================================================
+echo.
+echo Your AI Sports Assessment app is now installed on your device.
+echo You can find it in your app drawer.
+echo.
 echo Cleaning up temporary files...
 rmdir /s /q "%INSTALLER_TEMP%" 2>nul
+echo.
+echo Installation complete! Press any key to close...
+pause >nul
 exit /b 0
 
 :install_nodejs
@@ -160,17 +179,23 @@ exit /b 0
 echo ERROR: Node.js not found and auto-installation failed.
 echo Please manually install Node.js from https://nodejs.org
 echo This is required for npm and the Convex backend.
+echo.
+pause
 exit /b 1
 
 :missing_npm
 echo ERROR: npm not found. Usually comes with Node.js.
 echo Please reinstall Node.js from https://nodejs.org
+echo.
+pause
 exit /b 1
 
 :missing_flutter
 echo ERROR: Flutter not found and auto-installation failed.
 echo Please manually install Flutter from https://flutter.dev
 echo Make sure flutter/bin is added to your PATH.
+echo.
+pause
 exit /b 1
 
 :missing_powershell
@@ -180,29 +205,41 @@ echo - Node.js: https://nodejs.org
 echo - Git: https://git-scm.com
 echo - Flutter: https://flutter.dev
 echo - Android Studio: https://developer.android.com/studio
+echo.
+pause
 exit /b 1
 
 :install_nodejs_failed
 echo ERROR: Node.js installation failed.
 echo Please manually install Node.js from https://nodejs.org
+echo.
+pause
 exit /b 1
 
 :install_git_failed
 echo ERROR: Git installation failed.
 echo Please manually install Git from https://git-scm.com
+echo.
+pause
 exit /b 1
 
 :download_failed
 echo ERROR: Download failed. Check your internet connection.
+echo.
+pause
 exit /b 1
 
 :extract_failed
 echo ERROR: Archive extraction failed.
+echo.
+pause
 exit /b 1
 
 :no_apk
 echo ERROR: APK not found after build
 echo The Flutter build may have failed. Check the output above for errors.
+echo.
+pause
 exit /b 1
 
 :no_device
@@ -214,6 +251,8 @@ echo 3. Go to Settings ^> Developer Options ^> Enable "USB debugging"
 echo 4. Accept the RSA fingerprint prompt on your device when it appears
 echo 5. Run 'adb devices' to verify connection
 echo 6. Re-run this installer
+echo.
+pause
 exit /b 1
 
 :install_failed
@@ -223,6 +262,8 @@ echo 2. App signature conflicts (try uninstalling old version first)
 echo 3. Device not allowing installation from unknown sources
 echo 4. USB debugging not properly enabled
 echo Try running: adb install -r "%APK%" manually for more details
+echo.
+pause
 exit /b 1
 
 :error_exit
@@ -232,6 +273,8 @@ echo 1. Run as Administrator
 echo 2. Check internet connection
 echo 3. Ensure Android device is connected with USB debugging enabled
 echo 4. Try running individual commands manually
+echo.
+pause
 exit /b 1
 
 :setup_adb
@@ -253,4 +296,6 @@ exit /b 0
 :adb_failed
 echo ERROR: Android platform-tools setup failed.
 echo Please manually install Android Studio or platform-tools.
+echo.
+pause
 exit /b 1

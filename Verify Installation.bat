@@ -7,7 +7,7 @@ echo Checking installed development tools...
 echo.
 
 REM Check Node.js
-echo [1/5] Checking Node.js...
+echo [1/6] Checking Node.js...
 where node >nul 2>&1
 if errorlevel 1 (
     echo ❌ Node.js: NOT FOUND
@@ -17,7 +17,7 @@ if errorlevel 1 (
 )
 
 REM Check npm
-echo [2/5] Checking npm...
+echo [2/6] Checking npm...
 where npm >nul 2>&1
 if errorlevel 1 (
     echo ❌ npm: NOT FOUND
@@ -27,7 +27,7 @@ if errorlevel 1 (
 )
 
 REM Check Git
-echo [3/5] Checking Git...
+echo [3/6] Checking Git...
 where git >nul 2>&1
 if errorlevel 1 (
     echo ❌ Git: NOT FOUND
@@ -37,7 +37,7 @@ if errorlevel 1 (
 )
 
 REM Check Flutter
-echo [4/5] Checking Flutter...
+echo [4/6] Checking Flutter...
 where flutter >nul 2>&1
 if errorlevel 1 (
     echo ❌ Flutter: NOT FOUND
@@ -46,8 +46,17 @@ if errorlevel 1 (
     for /f "tokens=2" %%a in ('flutter --version ^| findstr "Flutter" 2^>nul') do echo ✅ Flutter: %%a
 )
 
+REM Check VS Code
+echo [5/6] Checking VS Code...
+where code >nul 2>&1
+if errorlevel 1 (
+    echo ⚠️ VS Code: NOT FOUND (recommended for development)
+) else (
+    for /f "tokens=*" %%a in ('code --version 2^>nul ^| findstr /r "^[0-9]"') do echo ✅ VS Code: %%a
+)
+
 REM Check ADB
-echo [5/5] Checking Android Debug Bridge...
+echo [6/6] Checking Android Debug Bridge...
 where adb >nul 2>&1
 if errorlevel 1 (
     if exist "platform-tools-local\platform-tools\adb.exe" (
